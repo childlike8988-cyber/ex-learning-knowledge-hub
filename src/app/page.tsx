@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { LearningAppCard } from "@/components/LearningAppCard";
+import { learningApps } from "@/data/learning-apps";
 import { categories } from "@/data/site";
 
 export default function Home() {
@@ -10,6 +12,7 @@ export default function Home() {
       <div className="glass mt-8 flex max-w-xl items-center gap-3 rounded-2xl px-4 py-3 text-sm text-slate-400"><span>⌕</span><span>搜尋教學、資源與學習主題（即將推出）</span></div>
     </section>
     <section aria-labelledby="categories"><div className="mb-5 flex items-end justify-between"><h2 id="categories" className="text-2xl font-semibold">探索分類</h2><span className="text-xs text-slate-400">07 COLLECTIONS</span></div><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{categories.map((item) => <Link href={item.href} key={item.href} className="glass group rounded-2xl p-5 transition hover:-translate-y-1 hover:border-cyan-200/40"><span className="text-xs font-bold tracking-widest text-cyan-300">{item.label}</span><h3 className="mt-7 text-xl font-semibold text-white">{item.title}</h3><p className="mt-2 text-sm leading-6 text-slate-300">{item.description}</p><span className="mt-5 block text-xs text-cyan-200 opacity-0 transition group-hover:opacity-100">進入分類 →</span></Link>)}</div></section>
+    <section aria-labelledby="learning-apps" className="mt-16"><div className="mb-5 flex items-end justify-between"><div><p className="eyebrow">Interactive tools</p><h2 id="learning-apps" className="mt-2 text-2xl font-semibold">Learning Apps</h2></div><span className="text-xs text-slate-400">OPEN IN NEW TAB</span></div><div className="grid gap-3 lg:grid-cols-3">{learningApps.map((app) => <LearningAppCard app={app} key={app.id} />)}</div></section>
     <section className="mt-16 grid gap-4 lg:grid-cols-2"><div className="glass rounded-2xl p-6"><p className="eyebrow">Latest tutorial</p><h2 className="mt-3 text-2xl font-semibold">Seedance 2.0｜真人 × 動漫分身房屋介紹</h2><p className="mt-3 text-sm leading-6 text-slate-300">完整英文 Prompt、5 段分鏡與可下載 PDF 的 AI 影音教學。</p><Link href="/ai-tutorials/seedance-2-real-anime-home-tour" className="mt-5 inline-block text-sm font-semibold text-cyan-300">閱讀教學 →</Link></div><div className="glass rounded-2xl p-6"><p className="eyebrow">Popular resources</p><h2 className="mt-3 text-2xl font-semibold">免費資源庫</h2><p className="mt-3 text-sm leading-6 text-slate-300">精選工具、模板與下載素材，將逐步開放。</p><Link href="/resources" className="mt-5 inline-block text-sm font-semibold text-cyan-300">查看資源 →</Link></div></section>
   </div>;
 }

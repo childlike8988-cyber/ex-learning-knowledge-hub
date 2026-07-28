@@ -10,3 +10,4 @@
 - 初始化 Git、建立 `main` 與 GitHub origin，並建立 v0.1 靜態網站首次提交。
 - 將 Seedance 2.0 示範頁升級為正式教學，新增完整英文 Prompt、分鏡、設定、檢查清單與 GitHub Pages 相容的 PDF 下載。
 - 新增共用 public asset path helper，確保 PDF 下載在 project Pages 子路徑下可用。
+- 新增 Learning Apps 集中資料與外部連結入口，接入 STK、ENG、JP 三個互動式學習網站。

@@ -1,1 +1,4 @@
-import { PlaceholderPage } from "@/components/PlaceholderPage"; export default function Page() { return <PlaceholderPage title="日文學習" description="從基礎到情境練習的日文學習入口。" />; }
+import { LearningAppPage } from "@/components/LearningAppPage";
+import { getLearningApp } from "@/data/learning-apps";
+
+export default function Page() { return <LearningAppPage app={getLearningApp("japanese")} />; }

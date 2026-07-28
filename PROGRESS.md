@@ -9,3 +9,4 @@
 - Git 初始化與首次提交：已建立 `main`、設定 `origin` 為 `https://github.com/childlike8988-cyber/ex-learning-knowledge-hub.git`，並建立首次靜態網站提交；等待推送後確認 GitHub Actions 與 Pages 部署結果。
 - Seedance 2.0 正式教學：已接入 5 頁中英對照 PDF、完整英文 Prompt、五段分鏡、建議設定與成片檢查清單；PDF 與下載按鈕使用 GitHub Pages basePath 相容路徑。
 - 驗證完成：PDF 已輸出至 `out/pdf/Seedance2.0-真人動漫分身教學.pdf`（15,605,567 bytes），且 GitHub Pages 子路徑 build 已確認文章連結正確。
+- Learning Apps：已將股票、英文與日文互動學習工具接入首頁與三個分類入口頁，所有外部網址由集中式資料設定管理並以新分頁開啟。

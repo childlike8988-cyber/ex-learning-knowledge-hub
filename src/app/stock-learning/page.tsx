@@ -1,1 +1,4 @@
-import { PlaceholderPage } from "@/components/PlaceholderPage"; export default function Page() { return <PlaceholderPage title="股票學習" description="投資觀念、閱讀方法與風險意識的學習入口。" />; }
+import { LearningAppPage } from "@/components/LearningAppPage";
+import { getLearningApp } from "@/data/learning-apps";
+
+export default function Page() { return <LearningAppPage app={getLearningApp("stock")} />; }
