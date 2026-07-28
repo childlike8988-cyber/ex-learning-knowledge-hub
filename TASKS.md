@@ -13,5 +13,6 @@
 - [x] 驗證 Seedance PDF 靜態輸出與 GitHub Pages repository 子路徑
 - [x] 接入 STK、ENG 與 JP 外部互動學習工具
 - [x] 強化 Learning Apps 預覽、可點擊辨識度與分類頁 CTA
+- [x] 重整首頁 Hero 並優先呈現 Learning Apps 與 Glass Showcase
 - [ ] 確認 GitHub Actions 部署成功與 GitHub Pages 公開網址
 - [ ] 新增正式內容與資源檔案

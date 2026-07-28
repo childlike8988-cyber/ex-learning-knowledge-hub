@@ -11,3 +11,4 @@
 - 驗證完成：PDF 已輸出至 `out/pdf/Seedance2.0-真人動漫分身教學.pdf`（15,605,567 bytes），且 GitHub Pages 子路徑 build 已確認文章連結正確。
 - Learning Apps：已將股票、英文與日文互動學習工具接入首頁與三個分類入口頁，所有外部網址由集中式資料設定管理並以新分頁開啟。
 - Learning Apps 視覺強化：已新增 STK、ENG、JP 本機預覽圖，首頁整卡與分類頁 CTA 均具明確可點擊、hover、focus 與新分頁提示。
+- 首頁 Hero 重整：Learning Apps 已上移至探索分類之前；新增 Glass Showcase 輪播導覽，提供 STK、ENG、JP 與 Seedance 教學的可點擊重點入口。

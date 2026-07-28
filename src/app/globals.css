@@ -8,3 +8,15 @@ body { margin: 0; min-width: 320px; background: #07111f; color: #e8f0fb; font-fa
 body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 15% 5%, rgba(8,145,178,.25), transparent 30rem), radial-gradient(circle at 85% 25%, rgba(79,70,229,.18), transparent 28rem); }
 .glass { border: 1px solid rgba(255,255,255,.12); background: rgba(15, 29, 49, .68); box-shadow: 0 14px 44px rgba(0,0,0,.18); backdrop-filter: blur(14px); }
 .eyebrow { color: #67e8f9; font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.hero-emboss { text-shadow: 0 1px 0 rgba(255,255,255,.18), 0 16px 40px rgba(34,211,238,.18); }
+.showcase-shell { isolation: isolate; }
+.showcase-orbit { position: absolute; z-index: -1; inset: 8% -9%; border: 1px solid rgba(34,211,238,.2); border-radius: 30% 70% 65% 35% / 35% 35% 65% 65%; filter: drop-shadow(0 0 22px rgba(34,211,238,.22)); transform: rotate(-8deg); animation: drift 8s ease-in-out infinite; }
+.showcase-scan { position: absolute; z-index: 2; inset: 1px; pointer-events: none; border-radius: 1.6rem; overflow: hidden; }
+.showcase-scan::after { content: ""; position: absolute; inset: -20% -70%; background: linear-gradient(110deg, transparent 42%, rgba(165,243,252,.14) 50%, transparent 58%); transform: translateX(-35%); animation: scan 7s ease-in-out infinite; }
+.showcase-tutorial-art { background: radial-gradient(circle at 68% 26%, rgba(251,191,36,.36), transparent 22%), radial-gradient(circle at 32% 38%, rgba(34,211,238,.45), transparent 28%), linear-gradient(135deg, #0b1730, #15113c 54%, #072e3e); }
+.tool-ticker { mask-image: linear-gradient(90deg, transparent, black 9%, black 91%, transparent); }
+.tool-ticker span { display: inline-block; animation: ticker 20s linear infinite; }
+@keyframes drift { 50% { transform: rotate(-4deg) translateY(-7px); } }
+@keyframes scan { 55%, 100% { transform: translateX(35%); } }
+@keyframes ticker { to { transform: translateX(-12%); } }
+@media (prefers-reduced-motion: reduce) { .showcase-orbit, .showcase-scan::after, .tool-ticker span { animation: none; } }

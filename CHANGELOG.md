@@ -12,3 +12,4 @@
 - 新增共用 public asset path helper，確保 PDF 下載在 project Pages 子路徑下可用。
 - 新增 Learning Apps 集中資料與外部連結入口，接入 STK、ENG、JP 三個互動式學習網站。
 - 新增三張本機 Learning Apps 預覽圖，強化首頁入口卡與分類頁 CTA 的可點擊辨識度。
+- 首頁新增 Glass Showcase 自動輪播導覽與輕量科技感動態，並調整 Learning Apps 為 Hero 後的第一主要區塊。
