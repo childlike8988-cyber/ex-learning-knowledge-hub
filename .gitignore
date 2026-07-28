@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+.npm-cache/
+*.tsbuildinfo
+npm-debug.log*
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

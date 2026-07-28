@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; background: #07111f; color: #e8f0fb; font-family: Arial, "Noto Sans TC", sans-serif; }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 15% 5%, rgba(8,145,178,.25), transparent 30rem), radial-gradient(circle at 85% 25%, rgba(79,70,229,.18), transparent 28rem); }
+.glass { border: 1px solid rgba(255,255,255,.12); background: rgba(15, 29, 49, .68); box-shadow: 0 14px 44px rgba(0,0,0,.18); backdrop-filter: blur(14px); }
+.eyebrow { color: #67e8f9; font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }

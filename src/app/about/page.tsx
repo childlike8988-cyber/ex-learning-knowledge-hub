@@ -1,0 +1,1 @@
+export default function AboutPage() { return <section className="mx-auto max-w-4xl px-5 py-14 sm:px-8"><p className="eyebrow">About E.X</p><h1 className="mt-3 text-4xl font-bold">讓知識成為可前進的路徑。</h1><p className="mt-5 max-w-2xl leading-7 text-slate-300">E.X Learning & Knowledge Hub 聚焦清晰、實用、可持續的公開學習內容。</p></section>; }
