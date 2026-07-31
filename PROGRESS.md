@@ -12,3 +12,9 @@
 - Learning Apps：已將股票、英文與日文互動學習工具接入首頁與三個分類入口頁，所有外部網址由集中式資料設定管理並以新分頁開啟。
 - Learning Apps 視覺強化：已新增 STK、ENG、JP 本機預覽圖，首頁整卡與分類頁 CTA 均具明確可點擊、hover、focus 與新分頁提示。
 - 首頁 Hero 重整：Learning Apps 已上移至探索分類之前；新增 Glass Showcase 輪播導覽，提供 STK、ENG、JP 與 Seedance 教學的可點擊重點入口。
+- 生活管理 v1.0：已取代原生活健康入口，建立成果展示、三級運動、居家與每週運動、情緒、早餐、合作與安全提示的純前端模組；已接入使用者提供的 YUNI 動作、週運動與早餐示意資產。
+- 驗證：`typecheck`、`lint`、4 項 Node 測試與 GitHub Pages production build 均通過；新增 `/life-management`，並輸出 `/health` 與 `/health-management` 相容導向頁。
+- 首頁 Creator Studio Hero：已改為深藍紫霓光、玻璃擬態的 AI 創作平台入口，新增 `E.X CREATOR STUDIO` 品牌列、桌機導覽與手機漢堡選單、創作工作室抽象主視覺、搜尋框與快速分類字串；Learning Apps 仍為 Hero 後的第一主區塊。
+- 響應式驗收：已在 320、375、414、480、768、1024、1440 與 1920px 實際檢查 Hero，無水平溢出；手機選單、內部導航與既有外部 Learning Apps 連結可用，Console 無 error 或 warning。
+- 首頁 Creator Studio Hero：已改為深藍紫霓光、玻璃擬態的 AI 創作平台入口，新增 `E.X CREATOR STUDIO` 品牌列、桌機導覽與手機漢堡選單、創作工作室抽象主視覺、搜尋框與快速分類字串；Learning Apps 仍為 Hero 後的第一主區塊。
+- 響應式驗收：已在 320、375、414、480、768、1024、1440 與 1920px 實際檢查 Hero，無水平溢出；手機選單、內部導航與既有外部 Learning Apps 連結可用，Console 無 error 或 warning。

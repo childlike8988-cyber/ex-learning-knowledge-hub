@@ -14,5 +14,11 @@
 - [x] 接入 STK、ENG 與 JP 外部互動學習工具
 - [x] 強化 Learning Apps 預覽、可點擊辨識度與分類頁 CTA
 - [x] 重整首頁 Hero 並優先呈現 Learning Apps 與 Glass Showcase
+- [x] 將首頁 Hero 升級為 E.X Creator Studio 深藍紫霓光品牌入口，完成桌機與手機導覽及主要斷點驗收
+- [x] 將健康入口升級為生活管理 v1.0 前端展示與互動模組
+- [x] 接入使用者提供的 YUNI 動作、週運動與早餐示意圖
+  - `public/assets/life-management/yuni-home-exercise-breakdown.png`（16:9，完整動作標籤）
+  - `public/assets/life-management/yuni-weekly-exercise-options.png`（五項運動示意）
+  - `public/assets/life-management/nutrilite-breakfast-example.png`（使用者提供；公開商業使用前須確認品牌授權）
 - [ ] 確認 GitHub Actions 部署成功與 GitHub Pages 公開網址
 - [ ] 新增正式內容與資源檔案
