@@ -47,7 +47,7 @@ export const learningApps: readonly LearningApp[] = [
     title: "Japanese Kana Adventure",
     englishTitle: "Japanese Kana Adventure",
     description: "透過互動方式學習日文五十音與假名。",
-    href: "https://jp-kana-adventure-0713.childlike8988.chatgpt.site/",
+    href: "https://jp-kana-adventure-z54t.vercel.app/",
     category: "日文學習",
     external: true,
     previewImage: "/images/learning-apps/jp-preview.png",
