@@ -1,8 +1,8 @@
-export type LearningAppId = "stock" | "english" | "japanese";
+export type LearningAppId = "ai-pulse" | "stock" | "english" | "japanese";
 
 export type LearningApp = {
   id: LearningAppId;
-  shortCode: "STK" | "ENG" | "JP";
+  shortCode: "AI" | "STK" | "ENG" | "JP";
   title: string;
   englishTitle: string;
   description: string;
@@ -11,10 +11,27 @@ export type LearningApp = {
   external: true;
   previewImage: string;
   previewAlt: string;
+  ctaLabel: string;
+  tags?: readonly string[];
   features: readonly string[];
 };
 
 export const learningApps: readonly LearningApp[] = [
+  {
+    id: "ai-pulse",
+    shortCode: "AI",
+    title: "AI 脈動",
+    englishTitle: "AI Pulse Brief",
+    description: "每日整理 AI 產業動態、工具更新與重要趨勢，快速掌握最新脈動。",
+    href: "https://ai-pulse-brief-2026.childlike8988.chatgpt.site/",
+    category: "AI 脈動",
+    external: true,
+    previewImage: "/images/learning-apps/ai-pulse-preview.png",
+    previewAlt: "AI 脈動的青藍與紫色資料流預覽圖",
+    ctaLabel: "開啟 AI 快報",
+    tags: ["AI NEWS", "TREND", "BRIEF"],
+    features: ["AI 產業動態", "工具更新摘要", "重要趨勢追蹤"],
+  },
   {
     id: "stock",
     shortCode: "STK",
@@ -26,6 +43,7 @@ export const learningApps: readonly LearningApp[] = [
     external: true,
     previewImage: "/images/learning-apps/stk-preview.png",
     previewAlt: "股票視覺學習的圖表與資料卡預覽圖",
+    ctaLabel: "開始學習",
     features: ["視覺化基礎觀念", "互動式學習節奏", "適合建立投資入門知識"],
   },
   {
@@ -39,6 +57,7 @@ export const learningApps: readonly LearningApp[] = [
     external: true,
     previewImage: "/images/learning-apps/eng-preview.png",
     previewAlt: "Little Star English 的互動學習預覽圖",
+    ctaLabel: "開始學習",
     features: ["兒童友善互動", "情境式英文練習", "容易開始的學習體驗"],
   },
   {
@@ -52,6 +71,7 @@ export const learningApps: readonly LearningApp[] = [
     external: true,
     previewImage: "/images/learning-apps/jp-preview.png",
     previewAlt: "Japanese Kana Adventure 的假名冒險預覽圖",
+    ctaLabel: "開始學習",
     features: ["五十音與假名練習", "互動式關卡體驗", "適合持續複習"],
   },
 ];
