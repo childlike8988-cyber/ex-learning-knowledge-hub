@@ -7,6 +7,14 @@
 - 首頁 Hero 新增 AI CREATIVE CENTER × CREATOR ACADEMY、小標、搜尋框與快速分類字串；Learning Apps 保持為第一個後續主區塊。
 - 完成 320px 至 1920px 的本機響應式驗收、外部連結安全屬性檢查與 Console 檢查。
 
+## Unreleased - 2026-08-08
+
+- 建立 `docs/DESIGN_SYSTEM_V1.md`，定義 E.X Creator Studio 品牌定位、色彩 token、玻璃材質、動效、產品路徑與元件契約。
+- Hero 接入本機 AI 創作工作室攝影資產，加入多螢幕監看牆、剪輯工作站、Camera／Lens 與 AI 影像氛圍。
+- 新增 `InteractiveGlassNavigator`，自動輪播 Seedance Lab、Learning Hub、Creator System、Voice Studio，支援 hover／focus 暫停與 reduced-motion。
+- Learning Apps 升級為 E.X AI App Ecosystem；Creator Categories 加入本機圖片預覽與六個創作方向。
+- 新增訪客、會員工作區、點數與 Creator Pass 的靜態產品化入口；未連接帳號、付款、點數與 AI API。
+
 ## 0.1.0 - 2026-07-28
 
 - 建立 E.X Learning & Knowledge Hub 靜態網站骨架。

@@ -15,6 +15,9 @@
 - [x] 強化 Learning Apps 預覽、可點擊辨識度與分類頁 CTA
 - [x] 重整首頁 Hero 並優先呈現 Learning Apps 與 Glass Showcase
 - [x] 將首頁 Hero 升級為 E.X Creator Studio 深藍紫霓光品牌入口，完成桌機與手機導覽及主要斷點驗收
+- [x] 建立 E.X Creator Studio Design System v1 與產品化使用者路徑
+- [x] Hero 接入本機攝影工作室主視覺與 Interactive Glass Navigator
+- [x] 升級 E.X AI App Ecosystem、Creator Categories 圖片卡與會員／點數／訂閱入口佔位
 - [x] 將健康入口升級為生活管理 v1.0 前端展示與互動模組
 - [x] 接入使用者提供的 YUNI 動作、週運動與早餐示意圖
   - `public/assets/life-management/yuni-home-exercise-breakdown.png`（16:9，完整動作標籤）

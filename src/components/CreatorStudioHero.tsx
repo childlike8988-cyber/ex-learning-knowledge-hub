@@ -1,3 +1,7 @@
+import Image from "next/image";
+import { InteractiveGlassNavigator } from "@/components/InteractiveGlassNavigator";
+import { publicAssetPath } from "@/lib/paths";
+
 export function CreatorStudioHero() {
   return (
     <section className="creator-hero" aria-labelledby="creator-studio-heading">
@@ -22,17 +26,12 @@ export function CreatorStudioHero() {
           <p className="creator-hero__ticker" aria-label="AI、影音、創作者、課程、資源與生活管理分類">AI · VIDEO · CREATOR · COURSES · RESOURCES · HEALTH</p>
         </div>
 
-        <div className="creator-hero__visual" aria-hidden="true">
-          <div className="creator-hero__visual-glow" />
-          <div className="creator-hero__panel creator-hero__panel--back"><span>CREATIVE<br />SYSTEMS</span></div>
-          <div className="creator-hero__panel creator-hero__panel--main">
-            <div className="creator-hero__panel-head"><span className="creator-hero__signal" /> STUDIO / LIVE</div>
-            <div className="creator-hero__panel-lines"><i /><i /><i /><i /></div>
-            <div className="creator-hero__panel-orb" />
-            <div className="creator-hero__panel-footer"><span>AI</span><span>VIDEO</span><span>IDEAS</span></div>
-          </div>
-          <div className="creator-hero__camera"><span /><i /></div>
-          <div className="creator-hero__tag">FROM IDEA<br />TO IMPACT</div>
+        <div className="creator-hero__visual">
+          <Image src={publicAssetPath("/images/creator-studio/hero-showcase-v1.png")} alt="AI 創作工作室的多螢幕監看牆、剪輯工作站與攝影機" fill priority sizes="(max-width: 899px) 70vw, 42vw" className="creator-hero__photo" />
+          <div className="creator-hero__visual-tint" aria-hidden="true" />
+          <div className="creator-hero__visual-frame" aria-hidden="true" />
+          <div className="creator-hero__visual-label" aria-hidden="true"><span><i /> REC</span><b>AI CREATIVE ROOM</b></div>
+          <InteractiveGlassNavigator />
         </div>
       </div>
     </section>

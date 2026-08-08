@@ -11,6 +11,12 @@ export function Header() {
           <Link href="/resources">資源</Link>
           <Link href="/about">關於</Link>
         </nav>
+        <nav aria-label="產品化入口" className="creator-header__account">
+          <Link href="/#membership">登入</Link>
+          <Link href="/#membership">會員中心</Link>
+          <Link href="/#membership">點數</Link>
+          <Link href="/#membership" className="creator-header__subscribe">訂閱</Link>
+        </nav>
         <details className="creator-mobile-nav">
           <summary aria-label="開啟主要導覽"><span /><span /><span /></summary>
           <nav aria-label="手機主要導覽" className="creator-mobile-nav__panel">
@@ -18,6 +24,11 @@ export function Header() {
             <Link href="/video-production">課程</Link>
             <Link href="/resources">資源</Link>
             <Link href="/about">關於</Link>
+            <span className="creator-mobile-nav__divider" aria-hidden="true" />
+            <Link href="/#membership">登入</Link>
+            <Link href="/#membership">會員中心</Link>
+            <Link href="/#membership">點數</Link>
+            <Link href="/#membership" className="creator-mobile-nav__subscribe">訂閱</Link>
           </nav>
         </details>
       </div>

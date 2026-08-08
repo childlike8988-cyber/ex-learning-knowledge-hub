@@ -6,11 +6,17 @@
 - `src/data/learning-apps.ts`：STK、ENG、JP 外部學習工具的集中式資料來源。
 - `src/components/LearningAppCard.tsx` 與 `LearningAppPage.tsx`：可重用的外部學習工具入口介面。
 - `src/components/CreatorStudioHero.tsx`：首頁 Creator Studio Hero，提供靜態相容的品牌內容、搜尋入口與 CSS 創作工作室主視覺。
+- `src/components/InteractiveGlassNavigator.tsx`：Hero 右側互動玻璃導覽，輪播 Seedance Lab、Learning Hub、Creator System 與 Voice Studio。
+- `src/components/CreatorCategoryCard.tsx`：帶有本機圖片預覽、色彩 tone 與站內導覽的 Creator Categories 卡片。
+- `src/components/MembershipPreview.tsx`：訪客、會員工作區與 Creator Pass 的產品化前端入口；目前不連接帳號、付款或點數服務。
 - `src/components/Header.tsx`：全站品牌列與響應式主要導覽；桌機顯示水平導覽，手機以原生 `details` 選單維持無 JavaScript 可用性。
 - `src/components/HomeShowcase.tsx`：可重用的重點入口輪播與手動導覽模組，保留供後續首頁內容編排使用。
 - `src/data/lifeManagement.ts`：生活管理的靜態內容、型別與預期資產路徑。
+- `src/data/creator-platform.ts`：Hero 導覽、Creator Categories 與產品化入口的集中式資料。
 - `src/components/LifeManagement*.tsx`：生活管理區段導覽、Hero、成果、運動、情緒、早餐與安全提示元件。
 - `public/images/learning-apps/`：STK、ENG、JP 由專案管理、可隨 GitHub Pages 部署的預覽圖。
+- `public/images/creator-studio/hero-showcase-v1.png`：AI 創作工作室的多螢幕、剪輯工作站與攝影機 Hero 圖片資產。
+- `docs/DESIGN_SYSTEM_V1.md`：E.X Creator Studio v1 品牌、色彩、玻璃材質、動效與產品體驗規範。
 - `content`：未來可擴充的文章來源。
 - `public`：公開靜態素材。
 - `out`：建置後的 GitHub Pages 部署產物（不納入版本控制）。
