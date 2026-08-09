@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CreatorCourseSection } from "@/components/CreatorCourseSection";
 import { CreatorPromptExample } from "@/components/CreatorPromptExample";
+import { CreatorToolkitLink } from "@/components/CreatorToolkitLink";
 import { yuniCinematicCameraMovementCourse as course } from "@/data/creator-courses";
 import { publicAssetPath } from "@/lib/paths";
 
@@ -31,5 +32,6 @@ export default function YuniCameraMovementBasicsPage() {
     <CreatorCourseSection id={cases.id} number={cases.number} eyebrow="YUNI camera studies" title={cases.title} description={cases.summary}><div className="space-y-7">{course.examples.map((example) => <CreatorPromptExample example={example} key={example.id} />)}</div></CreatorCourseSection>
 
     <section id="director-pro" aria-labelledby="director-pro-title" className="mb-8 scroll-mt-24 overflow-hidden rounded-3xl border border-amber-300/20 bg-[radial-gradient(circle_at_85%_20%,rgba(251,191,36,0.13),transparent_35%),rgba(255,255,255,0.03)] p-6 sm:p-8"><div className="grid gap-7 lg:grid-cols-[1fr_auto] lg:items-center"><div><p className="text-[10px] font-bold tracking-[0.18em] text-amber-200">PRO COURSE / PREVIEW</p><h2 id="director-pro-title" className="mt-3 text-3xl font-semibold text-white">{course.proSection?.title}</h2><p className="mt-3 text-sm font-semibold text-amber-100">{course.proSection?.description}</p><div className="mt-5 flex flex-wrap gap-2">{course.proSection?.topics.map((topic) => <span key={topic} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300">{topic}</span>)}</div><p className="mt-5 max-w-2xl text-sm leading-7 text-slate-400">此區僅預留 Creator Pass 課程方向，不建立登入、會員驗證或付款流程。</p></div><span className="inline-flex min-h-12 cursor-not-allowed items-center justify-center rounded-full border border-amber-300/25 bg-amber-300/10 px-5 text-sm font-bold text-amber-100" aria-disabled="true">🔒 會員專屬內容</span></div></section>
+    <CreatorToolkitLink href="/creator-academy/resources#camera-motion-library" title="查看 AI 運鏡示範庫" subtitle="Camera Motion Library" />
   </main>;
 }

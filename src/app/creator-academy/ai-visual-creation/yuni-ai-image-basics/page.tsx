@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CreatorCourseSection } from "@/components/CreatorCourseSection";
 import { CreatorPromptExample } from "@/components/CreatorPromptExample";
+import { CreatorToolkitLink } from "@/components/CreatorToolkitLink";
 import { yuniAiImageBasicsCourse as course } from "@/data/creator-courses";
 import { publicAssetPath } from "@/lib/paths";
 
@@ -33,5 +34,6 @@ export default function YuniAiImageBasicsPage() {
     <CreatorCourseSection id="practice" number="06" eyebrow="YUNI case study" title="實戰案例" description="以一張室內生活照示範，觀察五大 Prompt 元素如何共同建立角色、場景與攝影感。"><CreatorPromptExample example={course.examples[0]} /></CreatorCourseSection>
 
     <section aria-labelledby="pro-preview" className="mb-8 overflow-hidden rounded-3xl border border-amber-300/20 bg-[radial-gradient(circle_at_85%_20%,rgba(251,191,36,0.12),transparent_35%),rgba(255,255,255,0.03)] p-6 sm:p-8"><div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-[10px] font-bold tracking-[0.18em] text-amber-200">PRO SECTION / PREVIEW</p><h2 id="pro-preview" className="mt-3 text-2xl font-semibold text-white">Creator Pass 會員解鎖</h2><p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300">進階角色參考圖工作流、批次 Prompt 變體與完整商業案例將收錄於未來 Creator Pass。本階段僅保留產品概念，不建立登入或付款。</p></div><span className="inline-flex min-h-12 shrink-0 cursor-not-allowed items-center justify-center rounded-full border border-amber-300/25 bg-amber-300/10 px-5 text-sm font-bold text-amber-100" aria-disabled="true">🔒 尚未開放</span></div></section>
+    <CreatorToolkitLink href="/creator-academy/resources#ai-prompt-library" title="查看 AI 生圖提示詞庫" subtitle="AI Prompt Library" />
   </main>;
 }
