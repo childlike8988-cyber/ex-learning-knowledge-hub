@@ -15,6 +15,7 @@ export type CreatorAcademyCourse = {
   thumbnail: string;
   level: CreatorAcademyLevel;
   access: CreatorAcademyAccess;
+  href?: string;
 };
 
 export type CreatorAcademyCategory = {
@@ -65,6 +66,7 @@ export const creatorAcademyCourses: readonly CreatorAcademyCourse[] = [
     thumbnail: creatorStudioThumbnail,
     level: "基礎",
     access: "free",
+    href: "/creator-academy/ai-visual-creation/yuni-ai-image-basics",
   },
   {
     id: "yuni-ai-camera-movement",
