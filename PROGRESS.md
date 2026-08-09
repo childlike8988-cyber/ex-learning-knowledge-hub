@@ -16,6 +16,7 @@
 - 驗證：`typecheck`、`lint`、4 項 Node 測試與 GitHub Pages production build 均通過；新增 `/life-management`，並輸出 `/health` 與 `/health-management` 相容導向頁。
 - 首頁 Creator Studio Hero：已改為深藍紫霓光、玻璃擬態的 AI 創作平台入口，新增 `E.X CREATOR STUDIO` 品牌列、桌機導覽與手機漢堡選單、創作工作室抽象主視覺、搜尋框與快速分類字串；Learning Apps 仍為 Hero 後的第一主區塊。
 - 響應式驗收：已在 320、375、414、480、768、1024、1440 與 1920px 實際檢查 Hero，無水平溢出；手機選單、內部導航與既有外部 Learning Apps 連結可用，Console 無 error 或 warning。
+- YUNI Creator Academy MVP：新增三大創作分類、七門初始課程、Free／Pro 狀態、首頁入口與 `/creator-academy` 靜態頁；課程詳情、登入、會員、付款與存取控制維持未實作。
 - E.X Realty Data Tools Integration：已於 E.X AI App Ecosystem 接入 E.X Realty Operations Hub 的 GitHub Pages 公開展示，提供實價登錄查詢（展示版）、房市行情分析與後續學區生活機能分析入口；維持 Mock Data 展示定位，不代表政府正式資料。
 - E.X Creator Studio Design System v1：已建立品牌方向、Deep Space Navy／Cyber Cyan／Aurora Purple 色彩 token、玻璃材質、動效、產品路徑與元件契約文件。
 - Creator Studio 產品化升級：Hero 接入本機 AI 創作工作室攝影資產與 Interactive Glass Navigator；Learning Apps 更名為 E.X AI App Ecosystem，新增 Seedance Lab、Voice Studio 等未來入口；探索分類升級為 Creator Categories 圖片卡；新增訪客／會員／Creator Pass 的靜態產品入口。

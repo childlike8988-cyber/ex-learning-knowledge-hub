@@ -13,6 +13,9 @@
 - `src/components/HomeShowcase.tsx`：可重用的重點入口輪播與手動導覽模組，保留供後續首頁內容編排使用。
 - `src/data/lifeManagement.ts`：生活管理的靜態內容、型別與預期資產路徑。
 - `src/data/creator-platform.ts`：Hero 導覽、Creator Categories 與產品化入口的集中式資料。
+- `src/data/creator-academy.ts`：Creator Academy 三大分類、七門初始課程、Free／Pro 存取標籤與課程查詢函式。
+- `src/components/CreatorAcademy*.tsx`：首頁 Academy 入口、分類卡片與課程卡片；Pro 僅呈現靜態鎖定狀態。
+- `src/app/creator-academy`：YUNI Creator Academy 公開靜態入口頁。
 - `src/components/LifeManagement*.tsx`：生活管理區段導覽、Hero、成果、運動、情緒、早餐與安全提示元件。
 - `public/images/learning-apps/`：STK、ENG、JP 由專案管理、可隨 GitHub Pages 部署的預覽圖。
 - `public/images/creator-studio/hero-showcase-v1.png`：AI 創作工作室的多螢幕、剪輯工作站與攝影機 Hero 圖片資產。

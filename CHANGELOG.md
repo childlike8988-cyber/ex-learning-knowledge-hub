@@ -2,6 +2,9 @@
 
 ## Unreleased - 2026-08-09
 
+- 新增 YUNI Creator Academy 架構 MVP，包含 AI 視覺創作、攝影美學構圖與影像拍攝技巧三大分類及七門初始課程。
+- 新增 Creator Academy 首頁入口、分類卡片、課程卡片與 Free／Pro 靜態狀態；Pro 顯示會員專屬鎖定，但不建立登入或付款。
+- 新增 Creator Academy 資料與元件契約測試，維持 GitHub Pages 靜態輸出相容性。
 - E.X AI App Ecosystem 新增 E.X Realty Data Tools 公開展示入口，連結至 GitHub Pages 的 E.X Realty Operations Hub。
 - 新增深藍、紫色與金色的房產資料分析預覽圖，並保留外部工具的新分頁與安全連結屬性。
 - 新增 Realty Data Tools 整合文件，記錄展示版範圍與正式資料、地圖、AI 房市分析的後續規劃。
