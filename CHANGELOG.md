@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased - 2026-08-09
+
+- E.X AI App Ecosystem 新增 E.X Realty Data Tools 公開展示入口，連結至 GitHub Pages 的 E.X Realty Operations Hub。
+- 新增深藍、紫色與金色的房產資料分析預覽圖，並保留外部工具的新分頁與安全連結屬性。
+- 新增 Realty Data Tools 整合文件，記錄展示版範圍與正式資料、地圖、AI 房市分析的後續規劃。
+
 ## Unreleased - 2026-07-31
 
 - 首頁 Hero 升級為 E.X Creator Studio 視覺：深藍紫霓光、玻璃擬態、抽象創作工作室主視覺與低調 CSS 動態。

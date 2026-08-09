@@ -1,8 +1,8 @@
-export type LearningAppId = "ai-pulse" | "stock" | "english" | "japanese";
+export type LearningAppId = "ai-pulse" | "realty-data-tools" | "stock" | "english" | "japanese";
 
 export type LearningApp = {
   id: LearningAppId;
-  shortCode: "AI" | "STK" | "ENG" | "JP";
+  shortCode: "AI" | "RE" | "STK" | "ENG" | "JP";
   title: string;
   englishTitle: string;
   description: string;
@@ -31,6 +31,21 @@ export const learningApps: readonly LearningApp[] = [
     ctaLabel: "開啟 AI 快報",
     tags: ["AI NEWS", "TREND", "BRIEF"],
     features: ["AI 產業動態", "工具更新摘要", "重要趨勢追蹤"],
+  },
+  {
+    id: "realty-data-tools",
+    shortCode: "RE",
+    title: "E.X Realty Data Tools",
+    englishTitle: "Real Price Explorer",
+    description: "AI 輔助房地產資料分析工具展示中心。",
+    href: "https://childlike8988-cyber.github.io/E.X-Realty-Operations-Hub/",
+    category: "Real Estate AI Tools",
+    external: true,
+    previewImage: "/images/learning-apps/realty-data-tools-preview.png",
+    previewAlt: "深藍紫色房地產資料儀表板、地圖與成交分析圖表視覺",
+    ctaLabel: "開啟展示工具",
+    tags: ["REAL ESTATE", "AI TOOLS", "DEMO"],
+    features: ["實價登錄查詢（展示版）", "房市行情分析", "未來學區生活機能分析"],
   },
   {
     id: "stock",
