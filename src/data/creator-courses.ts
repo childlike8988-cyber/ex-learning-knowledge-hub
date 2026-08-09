@@ -154,5 +154,49 @@ export const yuniPhotographyCompositionBasicsCourse: CreatorCourseDetail = {
   proSection: { title: "Cinematic Composition Masterclass", description: "會員專屬內容", topics: ["電影構圖", "色彩心理", "故事敘事", "商業攝影"] },
 };
 
-export const creatorCourseDetails: readonly CreatorCourseDetail[] = [yuniAiImageBasicsCourse, yuniAiVideoMotionBasicsCourse, yuniPhotographyCompositionBasicsCourse];
+export const yuniCinematicCameraMovementCourse: CreatorCourseDetail = {
+  id: "yuni-camera-movement-basics",
+  title: "YUNI 電影感運鏡基礎",
+  englishTitle: "YUNI Cinematic Camera Movement",
+  subtitle: "Learn Camera Movement for Mobile, AI Video and Commercial Storytelling",
+  category: "video-production",
+  categoryTitle: "影像拍攝技巧",
+  level: "基礎",
+  access: "free",
+  duration: "約 25 分鐘",
+  heroImage: studioPlaceholder,
+  heroImageAlt: "YUNI 電影感運鏡課程主視覺預留位置，呈現鏡頭與影像工作站",
+  chapters: [
+    { id: "camera-foundation", number: "01", title: "影像運鏡基本概念", summary: "運鏡是選擇觀看主體的方法。每一次移動都應支援情緒、資訊或人物關係，而不是只為了讓畫面動起來。", points: ["為什麼需要運鏡：引導注意力、揭示資訊或回應人物情緒", "靜態與動態畫面：靜態畫面建立穩定；動態畫面帶出時間、空間與能量", "運鏡如何增加故事感：先交代環境，再跟隨行動，最後靠近表情或細節"] },
+    { id: "camera-techniques", number: "02", title: "基礎運鏡技巧", summary: "先練習單一、緩慢而穩定的鏡頭運動。每支短片只要選對一種主要動作，就能明確提升觀看感。", points: ["Push In", "Pull Out", "Pan", "Tilt", "Tracking Shot", "Orbit Shot"] },
+    { id: "motion-prompt", number: "03", title: "AI Video Motion Prompt", summary: "將人物、動作、鏡頭、環境、光線與時長寫成可閱讀的時間指令，讓 AI 影片工具更容易生成穩定結果。", points: ["Subject", "Action", "Camera Movement", "Environment", "Lighting", "Duration"] },
+    { id: "camera-cases", number: "04", title: "YUNI 實戰案例", summary: "以日常咖啡店、旅行與商業展示三種情境，拆解從開場、運鏡到收尾的鏡頭選擇。", points: ["YUNI 日常生活", "YUNI 旅行影片", "YUNI 商業展示"] },
+  ],
+  promptElements: [
+    { id: "subject", label: "01", title: "Subject", description: "人物與主體：固定 YUNI、產品或當下最重要的視覺目標。" },
+    { id: "action", label: "02", title: "Action", description: "動作：描述走入、停下、看向鏡頭或展示物件。" },
+    { id: "camera-movement", label: "03", title: "Camera Movement", description: "鏡頭運動：選擇 push in、tracking、orbit、pan 或 tilt。" },
+    { id: "environment", label: "04", title: "Environment", description: "環境：交代咖啡店、旅行地景或商業棚拍空間。" },
+    { id: "lighting", label: "05", title: "Lighting", description: "光線：指定晨光、黃金時刻、棚燈或品牌色反射。" },
+    { id: "duration", label: "06", title: "Duration", description: "時長：指定 5–8 秒等短片長度，讓動作節奏可控。" },
+  ],
+  scenes: [],
+  photographyLanguage: [],
+  motionLanguage: [
+    { term: "Push In", translation: "鏡頭慢慢靠近主體", description: "增加情緒並建立注意力，適合收進人物表情或產品細節。" },
+    { term: "Pull Out", translation: "鏡頭慢慢拉遠", description: "展現環境與空間感，適合從人物帶出更完整的故事位置。" },
+    { term: "Pan", translation: "水平移動", description: "用於介紹場景或讓視線由一個資訊點移向另一個資訊點。" },
+    { term: "Tilt", translation: "上下移動", description: "用於展現建築、高度或從物件細節移至人物。" },
+    { term: "Tracking Shot", translation: "跟隨人物移動", description: "跟著人物步伐移動，增加臨場感並維持行動方向。" },
+    { term: "Orbit Shot", translation: "環繞人物", description: "環繞人物或產品建立電影感，適合造型與商品展示。" },
+  ],
+  examples: [
+    { id: "yuni-cafe-entry", title: "YUNI 日常生活｜走入咖啡店", image: studioPlaceholder, imageAlt: "YUNI 走入咖啡店運鏡案例預留位置", tools: ["KLING AI", "Seedance", "LumaFlow"], prompt: `YUNI walks into a warm modern coffee shop from the entrance, wearing a light blue sleeveless knit top and neutral trousers. Start with a wide establishing shot showing the coffee counter and window light. Smooth tracking shot follows behind her for two steps, then a slow push in as she turns toward the camera with a natural relaxed smile. Soft morning light, realistic footsteps, shallow depth of field, stable handheld gimbal feeling, 7 seconds, cinematic everyday lifestyle film, no camera shake, no warped interior, consistent YUNI appearance.`, analysis: ["開場遠景先交代咖啡店與人物進入方向", "Tracking Shot 跟拍兩步，把觀眾帶進同一個空間", "Push In 收到近景表情，讓日常片段有情緒焦點"], tips: ["空間過窄時，改為 side tracking 避免背影遮住畫面", "人物動作不自然時，把 two steps 改為 walks slowly", "想增加品牌感，可補上桌面、杯子與色彩限制"] },
+    { id: "yuni-travel-reveal", title: "YUNI 旅行影片｜從環境到人物", image: studioPlaceholder, imageAlt: "YUNI 旅行影片運鏡案例預留位置", tools: ["KLING AI", "Seedance", "LumaFlow"], prompt: `A wide establishing shot of a coastal travel landscape at golden hour. YUNI stands near the path looking toward the ocean, her long dark brown hair moving gently in the wind. Slow pull out reveals the coastline and layered mountains, then a gentle push in toward YUNI's profile. Subtle slow motion movement, warm golden sunlight, cinematic atmospheric lighting, natural fabric motion, 8 seconds, smooth gimbal camera movement, consistent character appearance, no floating, no warped horizon, no speed ramp.`, analysis: ["Establishing Shot 先建立地點、時間與旅行規模", "Pull Out 擴大環境比例，再以 Push In 回到人物感受", "Slow Motion 僅用於細微風與頭髮動態，保持自然節奏"], tips: ["想更有壯闊感，可增加 wide environmental composition", "地平線扭曲時加入 keep horizon straight", "人物比例不穩時先縮短鏡頭移動距離"] },
+    { id: "yuni-product-reveal", title: "YUNI 商業展示｜商品／品牌展示", image: studioPlaceholder, imageAlt: "YUNI 商業展示運鏡案例預留位置", tools: ["KLING AI", "Seedance", "LumaFlow"], prompt: `YUNI presents a premium product on a clean studio table. Begin with a close product reveal under polished commercial lighting, then make a slow controlled orbit shot around YUNI and the product from front-left to front. YUNI places one hand beside the product and looks at the camera with a calm confident expression. Cyan and soft purple accent lighting, crisp product edges, realistic contact shadows, elegant minimal movement, 6 seconds, cinematic commercial film, no logo distortion, no extra objects, no exaggerated gesture.`, analysis: ["Product Reveal 先讓觀眾理解商品，再引入人物", "Orbit Shot 用小角度環繞增加電影感，同時保留產品輪廓", "Lighting 使用青藍與紫色反射，建立一致的品牌視覺"], tips: ["包裝文字重要時，應以實拍或後期合成處理", "Orbit 過度時改為 slow push in，避免產品變形", "手部瑕疵可把動作簡化為 places one hand beside"] },
+  ],
+  proSection: { title: "Creator Film Director Masterclass", description: "會員專屬內容", topics: ["商業影片分鏡", "Shot List", "B-roll 設計", "AI Director Workflow", "房產影片製作"] },
+};
+
+export const creatorCourseDetails: readonly CreatorCourseDetail[] = [yuniAiImageBasicsCourse, yuniAiVideoMotionBasicsCourse, yuniPhotographyCompositionBasicsCourse, yuniCinematicCameraMovementCourse];
 export function getCreatorCourseDetail(id: string) { return creatorCourseDetails.find((course) => course.id === id); }
