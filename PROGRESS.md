@@ -19,6 +19,7 @@
 - YUNI Creator Academy MVP：新增三大創作分類、七門初始課程、Free／Pro 狀態、首頁入口與 `/creator-academy` 靜態頁；課程詳情、登入、會員、付款與存取控制維持未實作。
 - YUNI AI 生圖基礎：完成第一個 Free 課程頁、六段教學、Prompt 五元素、場景與攝影語言卡、YUNI 案例 Prompt、複製功能及 Creator Pass 預覽。
 - YUNI AI 影片運鏡入門：完成第二個 Free 課程頁、五種運鏡語言、Video Prompt 五元素、三個 YUNI 影片案例、適用工具標籤與 AI Director Pro 預覽。
+- YUNI 基礎構圖法：完成第三個 Free 課程頁、五種基礎構圖、三個 YUNI 攝影案例分析及 Cinematic Composition Pro 預覽。
 - E.X Realty Data Tools Integration：已於 E.X AI App Ecosystem 接入 E.X Realty Operations Hub 的 GitHub Pages 公開展示，提供實價登錄查詢（展示版）、房市行情分析與後續學區生活機能分析入口；維持 Mock Data 展示定位，不代表政府正式資料。
 - E.X Creator Studio Design System v1：已建立品牌方向、Deep Space Navy／Cyber Cyan／Aurora Purple 色彩 token、玻璃材質、動效、產品路徑與元件契約文件。
 - Creator Studio 產品化升級：Hero 接入本機 AI 創作工作室攝影資產與 Interactive Glass Navigator；Learning Apps 更名為 E.X AI App Ecosystem，新增 Seedance Lab、Voice Studio 等未來入口；探索分類升級為 Creator Categories 圖片卡；新增訪客／會員／Creator Pass 的靜態產品入口。

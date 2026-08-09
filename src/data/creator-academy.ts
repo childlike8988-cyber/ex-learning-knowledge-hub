@@ -98,6 +98,7 @@ export const creatorAcademyCourses: readonly CreatorAcademyCourse[] = [
     thumbnail: creatorStudioThumbnail,
     level: "基礎",
     access: "free",
+    href: "/creator-academy/photography-composition/yuni-composition-basics",
   },
   {
     id: "cinematic-composition",

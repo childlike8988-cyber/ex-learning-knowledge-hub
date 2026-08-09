@@ -3,6 +3,8 @@ import type { CreatorAcademyAccess, CreatorAcademyCategoryId, CreatorAcademyLeve
 export type CreatorCourseChapter = { id: string; number: string; title: string; summary: string; points: readonly string[] };
 export type CreatorCoursePromptElement = { id: string; label: string; title: string; description: string };
 export type CreatorCourseExample = { id: string; title: string; image: string; imageAlt: string; prompt: string; analysis: readonly string[]; tips: readonly string[]; tools?: readonly string[] };
+export type CreatorCompositionPrinciple = { id: string; number: string; title: string; englishTitle: string; description: string };
+export type CreatorPhotographyExample = { id: string; title: string; image: string; imageAlt: string; analysis: readonly { label: string; description: string }[] };
 export type CreatorCourseDetail = {
   id: string;
   title: string;
@@ -20,6 +22,8 @@ export type CreatorCourseDetail = {
   scenes: readonly { title: string; description: string }[];
   photographyLanguage: readonly { term: string; description: string }[];
   motionLanguage?: readonly { term: string; translation: string; description: string }[];
+  compositionPrinciples?: readonly CreatorCompositionPrinciple[];
+  photographyExamples?: readonly CreatorPhotographyExample[];
   proSection?: { title: string; description: string; topics: readonly string[] };
   examples: readonly CreatorCourseExample[];
 };
@@ -114,5 +118,41 @@ export const yuniAiVideoMotionBasicsCourse: CreatorCourseDetail = {
   proSection: { title: "AI Director Motion Masterclass", description: "會員專屬內容", topics: ["多鏡頭分鏡", "連續劇情控制", "角色一致性", "商業影片流程", "AI 廣告製作"] },
 };
 
-export const creatorCourseDetails: readonly CreatorCourseDetail[] = [yuniAiImageBasicsCourse, yuniAiVideoMotionBasicsCourse];
+export const yuniPhotographyCompositionBasicsCourse: CreatorCourseDetail = {
+  id: "yuni-composition-basics",
+  title: "YUNI 基礎構圖法",
+  englishTitle: "YUNI Photography Composition Basics",
+  subtitle: "Learn Visual Focus, Spatial Balance and Photography Composition with YUNI",
+  category: "photography-composition",
+  categoryTitle: "攝影美學構圖",
+  level: "基礎",
+  access: "free",
+  duration: "約 20 分鐘",
+  heroImage: studioPlaceholder,
+  heroImageAlt: "YUNI 基礎構圖課程主視覺預留位置，呈現攝影與影像監看工作室",
+  chapters: [
+    { id: "composition-foundation", number: "01", title: "攝影構圖基本概念", summary: "構圖決定觀看者先看見什麼、視線如何移動，以及人物和環境之間呈現何種關係。", points: ["構圖如何影響視覺焦點：利用位置、明暗與大小建立觀看順序", "主體與背景關係：讓背景支持人物，而不是搶走注意力", "畫面層次：使用前景、中景與背景建立空間深度"] },
+    { id: "composition-methods", number: "02", title: "基礎構圖法", summary: "五種常用構圖可以作為拍攝起點。理解目的後再選擇，而不是讓所有照片都套用同一規則。", points: ["三分法", "中央構圖", "引導線", "前景框景", "留白"] },
+    { id: "composition-cases", number: "03", title: "YUNI 實戰案例", summary: "從咖啡廳、戶外旅行與商業形象三種情境，觀察人物位置、環境比例、光線與視覺焦點。", points: ["YUNI 咖啡廳人像", "YUNI 戶外旅行", "YUNI 商業形象照"] },
+  ],
+  promptElements: [],
+  scenes: [],
+  photographyLanguage: [],
+  compositionPrinciples: [
+    { id: "rule-of-thirds", number: "01", title: "三分法", englishTitle: "Rule of Thirds", description: "利用水平與垂直分割線安排人物位置，讓主體與觀看方向保有平衡空間。" },
+    { id: "center-composition", number: "02", title: "中央構圖", englishTitle: "Center Composition", description: "適合人物肖像與對稱場景，直接強調主體並建立穩定感。" },
+    { id: "leading-lines", number: "03", title: "引導線", englishTitle: "Leading Lines", description: "利用道路、建築邊緣或光線方向，把視線帶向人物或重要物件。" },
+    { id: "frame-within-frame", number: "04", title: "前景框景", englishTitle: "Frame Within Frame", description: "利用窗戶、門框或前景物件包圍主體，增加空間層次與觀看感。" },
+    { id: "negative-space", number: "05", title: "留白", englishTitle: "Negative Space", description: "保留乾淨空間，營造情緒、呼吸感與簡潔的高級視覺。" },
+  ],
+  photographyExamples: [
+    { id: "yuni-cafe-portrait", title: "YUNI 咖啡廳人像", image: studioPlaceholder, imageAlt: "YUNI 咖啡廳人像構圖案例預留位置", analysis: [{ label: "主體位置", description: "將 YUNI 放在右側三分線，左側保留觀看方向與環境資訊。" }, { label: "背景", description: "選擇簡潔桌面與柔和牆面，避免高對比物件干擾人物。" }, { label: "光線", description: "使用側面窗光塑造臉部立體感，讓背景亮度稍低。" }, { label: "景深", description: "使用淺景深柔化背景，同時保留咖啡廳的空間辨識度。" }] },
+    { id: "yuni-outdoor-travel", title: "YUNI 戶外旅行", image: studioPlaceholder, imageAlt: "YUNI 戶外旅行攝影構圖案例預留位置", analysis: [{ label: "環境比例", description: "讓景觀占較大比例，人物作為尺度與旅行故事的視覺錨點。" }, { label: "人與空間", description: "使用道路或地景線條引導視線，同時保留人物前進方向的空間。" }] },
+    { id: "yuni-brand-portrait", title: "YUNI 商業形象照", image: studioPlaceholder, imageAlt: "YUNI 商業形象攝影構圖案例預留位置", analysis: [{ label: "品牌感", description: "使用中央或微偏中央構圖、乾淨背景與一致品牌色，建立專業穩定感。" }, { label: "視覺焦點", description: "讓臉部與眼神成為最高對比區域，服裝和背景只作支援。" }] },
+  ],
+  examples: [],
+  proSection: { title: "Cinematic Composition Masterclass", description: "會員專屬內容", topics: ["電影構圖", "色彩心理", "故事敘事", "商業攝影"] },
+};
+
+export const creatorCourseDetails: readonly CreatorCourseDetail[] = [yuniAiImageBasicsCourse, yuniAiVideoMotionBasicsCourse, yuniPhotographyCompositionBasicsCourse];
 export function getCreatorCourseDetail(id: string) { return creatorCourseDetails.find((course) => course.id === id); }

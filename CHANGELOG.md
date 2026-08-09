@@ -9,6 +9,8 @@
 - 啟用「YUNI AI 生圖基礎」課程卡連結，加入完整英文 Prompt、中文解析、修改技巧與未啟用的 Creator Pass 預覽。
 - 新增 `/creator-academy/ai-visual-creation/yuni-ai-video-motion-basics/` Free 課程頁，涵蓋 AI 影片基礎、五種運鏡與 Prompt 五元素。
 - Creator Prompt 案例新增 KLING AI、Seedance、LumaFlow 適用工具標籤，並加入三個 YUNI 影片情境與 AI Director Motion Masterclass 預覽。
+- 新增 `/creator-academy/photography-composition/yuni-composition-basics/` Free 課程頁，包含五種構圖教學與三個 YUNI 攝影案例。
+- 新增構圖原則與攝影案例集中資料、構圖分析元件，以及不連接登入的 Cinematic Composition Masterclass 預覽。
 - E.X AI App Ecosystem 新增 E.X Realty Data Tools 公開展示入口，連結至 GitHub Pages 的 E.X Realty Operations Hub。
 - 新增深藍、紫色與金色的房產資料分析預覽圖，並保留外部工具的新分頁與安全連結屬性。
 - 新增 Realty Data Tools 整合文件，記錄展示版範圍與正式資料、地圖、AI 房市分析的後續規劃。
