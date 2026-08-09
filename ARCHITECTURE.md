@@ -18,6 +18,7 @@
 - `src/app/creator-academy`：YUNI Creator Academy 公開靜態入口頁。
 - `src/data/creator-courses.ts`：可擴充的完整課程資料模型，包含章節、Prompt 元素、場景、攝影語言與案例。
 - `src/app/creator-academy/[category]/[course]`：Creator Academy 公開課程頁；目前實作 YUNI AI 生圖基礎。
+- Creator Academy 完整課程現包含 YUNI AI 生圖基礎與 YUNI AI 影片運鏡入門；共用章節、Prompt 案例及適用工具標籤元件。
 - `src/components/LifeManagement*.tsx`：生活管理區段導覽、Hero、成果、運動、情緒、早餐與安全提示元件。
 - `public/images/learning-apps/`：STK、ENG、JP 由專案管理、可隨 GitHub Pages 部署的預覽圖。
 - `public/images/creator-studio/hero-showcase-v1.png`：AI 創作工作室的多螢幕、剪輯工作站與攝影機 Hero 圖片資產。

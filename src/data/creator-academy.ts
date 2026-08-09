@@ -77,6 +77,7 @@ export const creatorAcademyCourses: readonly CreatorAcademyCourse[] = [
     thumbnail: creatorStudioThumbnail,
     level: "入門",
     access: "free",
+    href: "/creator-academy/ai-visual-creation/yuni-ai-video-motion-basics",
   },
   {
     id: "ai-director-masterclass",

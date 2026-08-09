@@ -2,7 +2,7 @@ import type { CreatorAcademyAccess, CreatorAcademyCategoryId, CreatorAcademyLeve
 
 export type CreatorCourseChapter = { id: string; number: string; title: string; summary: string; points: readonly string[] };
 export type CreatorCoursePromptElement = { id: string; label: string; title: string; description: string };
-export type CreatorCourseExample = { id: string; title: string; image: string; imageAlt: string; prompt: string; analysis: readonly string[]; tips: readonly string[] };
+export type CreatorCourseExample = { id: string; title: string; image: string; imageAlt: string; prompt: string; analysis: readonly string[]; tips: readonly string[]; tools?: readonly string[] };
 export type CreatorCourseDetail = {
   id: string;
   title: string;
@@ -19,6 +19,8 @@ export type CreatorCourseDetail = {
   promptElements: readonly CreatorCoursePromptElement[];
   scenes: readonly { title: string; description: string }[];
   photographyLanguage: readonly { term: string; description: string }[];
+  motionLanguage?: readonly { term: string; translation: string; description: string }[];
+  proSection?: { title: string; description: string; topics: readonly string[] };
   examples: readonly CreatorCourseExample[];
 };
 
@@ -70,5 +72,47 @@ export const yuniAiImageBasicsCourse: CreatorCourseDetail = {
   }],
 };
 
-export const creatorCourseDetails: readonly CreatorCourseDetail[] = [yuniAiImageBasicsCourse];
+export const yuniAiVideoMotionBasicsCourse: CreatorCourseDetail = {
+  id: "yuni-ai-video-motion-basics",
+  title: "YUNI AI 影片運鏡入門",
+  englishTitle: "YUNI AI Video Motion Basics",
+  subtitle: "Control Camera Motion, Character Action and Scene Atmosphere with Prompts",
+  category: "ai-visual-creation",
+  categoryTitle: "AI 視覺創作",
+  level: "入門",
+  access: "free",
+  duration: "約 25 分鐘",
+  heroImage: studioPlaceholder,
+  heroImageAlt: "YUNI AI 影片運鏡課程主視覺預留位置，呈現影像監看與創作工作站",
+  chapters: [
+    { id: "video-foundation", number: "01", title: "AI 影片生成基本概念", summary: "AI 影片工具會依文字、圖片或前後畫面推算時間中的變化。Prompt 需要同時說明人物動作、鏡頭運動與環境狀態。", points: ["圖片轉影片：以單張角色或場景圖作為視覺起點", "文字生成影片：用完整描述建立人物、動作與場景", "首幀／尾幀：用開始與結束畫面控制變化方向", "鏡頭語言：模型會把 push in、orbit、tracking 等詞轉換成視角移動"] },
+    { id: "motion-language", number: "02", title: "AI 運鏡語言", summary: "每次先選一個主要鏡頭運動，再搭配人物動作。過多互相衝突的運鏡指令容易造成畫面漂移。", points: ["Push In", "Pull Out", "Orbit", "Tracking", "Pan / Tilt"] },
+    { id: "video-prompt-elements", number: "03", title: "AI Video Prompt 五大元素", summary: "影片 Prompt 需要描述時間中的行為。依序建立人物、動作、鏡頭、環境與光線，讓模型理解畫面如何發生。", points: ["Subject", "Action", "Camera Motion", "Environment", "Lighting"] },
+    { id: "video-practice", number: "04", title: "YUNI 實戰案例", summary: "以室內生活、旅行與商業展示三種情境，練習把人物動作與鏡頭運動寫進 Prompt。", points: ["室內生活影片", "旅行場景", "商業展示"] },
+  ],
+  promptElements: [
+    { id: "subject", label: "01", title: "Subject", description: "人物與主體：固定 YUNI 的外觀、服裝與畫面角色。" },
+    { id: "action", label: "02", title: "Action", description: "動作：說明走路、轉身、展示或與物件互動的方式。" },
+    { id: "camera-motion", label: "03", title: "Camera Motion", description: "鏡頭運動：指定 push in、tracking、orbit 或 pan。" },
+    { id: "environment", label: "04", title: "Environment", description: "環境：交代空間、背景層次、天氣與移動路徑。" },
+    { id: "lighting", label: "05", title: "Lighting", description: "光線與氛圍：描述時間、光源方向、色溫與情緒。" },
+  ],
+  scenes: [],
+  photographyLanguage: [],
+  motionLanguage: [
+    { term: "Push In", translation: "鏡頭緩緩靠近", description: "逐步拉近人物或物件，集中注意力並強化情緒。" },
+    { term: "Pull Out", translation: "鏡頭拉遠展現環境", description: "從主體向外移動，揭示空間、位置與整體情境。" },
+    { term: "Orbit", translation: "環繞人物", description: "鏡頭沿人物周圍移動，適合展示造型或建立立體感。" },
+    { term: "Tracking", translation: "跟隨人物移動", description: "保持人物在畫面中的相對位置，跟著走路方向平順移動。" },
+    { term: "Pan / Tilt", translation: "水平與垂直移動", description: "Pan 左右觀看場景；Tilt 上下揭示高度或物件全貌。" },
+  ],
+  examples: [
+    { id: "yuni-cozy-room", title: "室內生活影片", image: studioPlaceholder, imageAlt: "YUNI 室內生活影片案例視覺預留位置", tools: ["KLING AI", "Seedance", "LumaFlow"], prompt: `YUNI standing in a cozy room beside a large window, wearing a light blue sleeveless knit top and neutral trousers. She gently turns toward the camera and smiles naturally while soft curtains move in the breeze. Slow camera push in, stable cinematic movement, subtle natural body motion, warm morning window light, shallow depth of field, realistic fabric movement, consistent face and outfit, no sudden motion, no distorted hands, no camera shake.`, analysis: ["Subject 固定 YUNI 的服裝、外觀與所在位置", "Action 使用緩慢轉身、自然微笑與窗簾細微飄動", "Camera Motion 只使用 slow push in，避免運鏡衝突"], tips: ["想更安靜，可移除窗簾動態並加入 locked background", "人物動作不穩時，把轉身改為 looks toward the camera", "畫面晃動時加入 stable cinematic movement 與 no camera shake"] },
+    { id: "yuni-travel-landscape", title: "旅行場景", image: studioPlaceholder, imageAlt: "YUNI 旅行場景 AI 影片案例視覺預留位置", tools: ["KLING AI", "Seedance", "LumaFlow"], prompt: `YUNI walking through a beautiful coastal landscape at golden hour, her long dark brown hair moving gently in the wind. She walks at a relaxed natural pace and looks toward the horizon. Smooth side tracking shot matching her walking speed, wide environmental composition, soft golden sunlight, distant ocean and layered mountains, realistic footsteps, consistent character appearance, cinematic travel film, no floating, no warped landscape, no speed ramp.`, analysis: ["Action 指定自然步伐、視線方向與頭髮受風影響", "Tracking 跟隨人物速度，並保留寬廣旅行環境", "Golden hour 統一光線、色溫與旅行影片氣氛"], tips: ["想看更多風景，可把 tracking 改成 slow pull out", "人物漂移時縮短走路距離並固定 consistent character appearance", "不需要快速節奏時加入 no speed ramp"] },
+    { id: "yuni-product-presentation", title: "商業展示", image: studioPlaceholder, imageAlt: "YUNI 商業產品展示 AI 影片案例視覺預留位置", tools: ["KLING AI", "Seedance", "LumaFlow"], prompt: `YUNI presenting a product on a clean premium studio table. She places one hand beside the product, looks at the camera and makes a small confident presentation gesture. Slow controlled camera orbit from the front-left to the front, polished commercial lighting, cyan and soft purple accent reflections, crisp product edges, realistic contact shadows, consistent YUNI appearance, elegant restrained movement, no logo distortion, no extra objects, no exaggerated gesture.`, analysis: ["商業場景同時固定人物、產品位置與手部動作", "Controlled orbit 僅使用小角度環繞，保持產品輪廓清楚", "Commercial lighting 配合青藍與紫色反射，延續 E.X 品牌調性"], tips: ["若產品文字重要，應以實拍或後期合成處理，不依賴生成模型", "手部容易變形時，減少拿取動作並使用 places one hand beside", "想更穩定，可將 orbit 改成 slow push in"] },
+  ],
+  proSection: { title: "AI Director Motion Masterclass", description: "會員專屬內容", topics: ["多鏡頭分鏡", "連續劇情控制", "角色一致性", "商業影片流程", "AI 廣告製作"] },
+};
+
+export const creatorCourseDetails: readonly CreatorCourseDetail[] = [yuniAiImageBasicsCourse, yuniAiVideoMotionBasicsCourse];
 export function getCreatorCourseDetail(id: string) { return creatorCourseDetails.find((course) => course.id === id); }

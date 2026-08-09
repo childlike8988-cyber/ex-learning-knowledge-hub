@@ -1,0 +1,38 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { CreatorCourseSection } from "@/components/CreatorCourseSection";
+import { CreatorPromptExample } from "@/components/CreatorPromptExample";
+import { yuniAiVideoMotionBasicsCourse as course } from "@/data/creator-courses";
+import { publicAssetPath } from "@/lib/paths";
+
+export const metadata: Metadata = {
+  title: "YUNI AI 影片運鏡入門 | Creator Academy",
+  description: "使用 AI 影片 Prompt 控制鏡頭運動、人物動作與場景氛圍，學習 Push In、Orbit、Tracking 等基礎運鏡語言。",
+};
+
+export default function YuniAiVideoMotionBasicsPage() {
+  const [foundation, motion, prompt, practice] = course.chapters;
+  return <main className="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
+    <nav aria-label="課程導覽" className="flex flex-wrap items-center gap-2 text-sm text-slate-400"><Link href="/creator-academy" className="rounded-full px-2 py-2 text-cyan-100 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-200">Creator Academy</Link><span aria-hidden="true">/</span><span>AI 視覺創作</span></nav>
+
+    <header className="relative mt-6 overflow-hidden rounded-[2rem] border border-violet-300/20 bg-[radial-gradient(circle_at_72%_12%,rgba(59,130,246,0.26),transparent_32%),radial-gradient(circle_at_88%_80%,rgba(124,58,237,0.25),transparent_34%),linear-gradient(145deg,rgba(5,21,49,0.98),rgba(10,8,37,0.94))] shadow-[0_30px_100px_rgba(2,6,23,0.4)]">
+      <div className="grid lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="relative z-10 p-6 sm:p-10 lg:p-12"><div className="flex flex-wrap gap-2 text-[10px] font-bold tracking-[0.14em]"><span className="rounded-full border border-cyan-200/30 bg-cyan-300/10 px-3 py-1.5 text-cyan-100">FREE COURSE</span><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-slate-300">{course.level}</span><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-slate-300">{course.duration}</span></div><p className="eyebrow mt-7">{course.englishTitle}</p><h1 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-6xl">{course.title}</h1><p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-cyan-100 sm:text-lg">{course.subtitle}</p><p className="mt-5 max-w-2xl text-sm leading-7 text-slate-300">透過 Prompt 控制鏡頭運動、YUNI 人物動作與場景氛圍，建立清楚、穩定且可重複調整的 AI 影片生成流程。</p><a href="#video-foundation" className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full border border-cyan-200/40 bg-cyan-300/15 px-6 py-3 text-sm font-bold text-cyan-50 transition hover:bg-cyan-300 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200">開始學習 ↓</a></div>
+        <div className="relative min-h-72 overflow-hidden border-t border-white/10 lg:min-h-full lg:border-l lg:border-t-0"><Image src={publicAssetPath(course.heroImage)} alt={course.heroImageAlt} fill priority sizes="(max-width: 1024px) 100vw, 45vw" unoptimized className="object-cover opacity-65" /><div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-blue-950/20 lg:bg-gradient-to-r" /><div className="absolute left-[20%] top-[24%] h-24 w-24 rounded-full border border-cyan-200/20 bg-cyan-300/[0.06] shadow-[0_0_60px_rgba(34,211,238,0.2)]" aria-hidden="true" /><div className="absolute bottom-5 left-5 rounded-2xl border border-white/15 bg-slate-950/65 px-4 py-3 backdrop-blur-xl"><p className="text-[10px] font-bold tracking-[0.16em] text-cyan-200">YUNI MOTION LAB</p><p className="mt-1 text-sm text-slate-300">正式影片案例視覺預留位置</p></div></div>
+      </div>
+    </header>
+
+    <nav aria-label="課程章節" className="sticky top-3 z-20 mt-6 flex gap-2 overflow-x-auto rounded-2xl border border-white/10 bg-slate-950/80 p-2 text-xs font-semibold text-slate-300 shadow-xl backdrop-blur-xl"><a href="#video-foundation" className="shrink-0 rounded-xl px-3 py-2 hover:bg-white/10">影片基礎</a><a href="#motion-language" className="shrink-0 rounded-xl px-3 py-2 hover:bg-white/10">運鏡語言</a><a href="#video-prompt-elements" className="shrink-0 rounded-xl px-3 py-2 hover:bg-white/10">Prompt</a><a href="#video-practice" className="shrink-0 rounded-xl px-3 py-2 hover:bg-white/10">YUNI 案例</a><a href="#director-pro" className="shrink-0 rounded-xl px-3 py-2 text-amber-100 hover:bg-amber-300/10">Pro 預覽</a></nav>
+
+    <CreatorCourseSection id={foundation.id} number={foundation.number} eyebrow="Video foundation" title={foundation.title} description={foundation.summary}><div className="grid gap-4 sm:grid-cols-2">{foundation.points.map((point) => { const [label, detail] = point.split("："); return <article key={point} className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h3 className="font-semibold text-cyan-100">{label}</h3><p className="mt-2 text-sm leading-7 text-slate-300">{detail}</p></article>; })}</div></CreatorCourseSection>
+
+    <CreatorCourseSection id={motion.id} number={motion.number} eyebrow="Camera motion" title={motion.title} description={motion.summary}><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">{course.motionLanguage?.map((item) => <article key={item.term} className="rounded-2xl border border-violet-300/15 bg-gradient-to-b from-violet-300/[0.07] to-transparent p-5"><p className="font-mono text-lg font-bold text-white">{item.term}</p><p className="mt-2 text-sm font-semibold text-violet-100">{item.translation}</p><p className="mt-4 text-sm leading-6 text-slate-300">{item.description}</p></article>)}</div></CreatorCourseSection>
+
+    <CreatorCourseSection id={prompt.id} number={prompt.number} eyebrow="Prompt framework" title={prompt.title} description={prompt.summary}><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">{course.promptElements.map((element) => <article key={element.id} className="rounded-2xl border border-cyan-200/15 bg-cyan-300/[0.035] p-5"><span className="text-xs font-black text-cyan-300/50">{element.label}</span><h3 className="mt-4 text-lg font-semibold text-white">{element.title}</h3><p className="mt-3 text-sm leading-6 text-slate-300">{element.description}</p></article>)}</div></CreatorCourseSection>
+
+    <CreatorCourseSection id={practice.id} number={practice.number} eyebrow="YUNI video cases" title={practice.title} description={practice.summary}><div className="space-y-7">{course.examples.map((example) => <CreatorPromptExample example={example} key={example.id} />)}</div></CreatorCourseSection>
+
+    <section id="director-pro" aria-labelledby="director-pro-title" className="mb-8 scroll-mt-24 overflow-hidden rounded-3xl border border-amber-300/20 bg-[radial-gradient(circle_at_85%_20%,rgba(251,191,36,0.13),transparent_35%),rgba(255,255,255,0.03)] p-6 sm:p-8"><div className="grid gap-7 lg:grid-cols-[1fr_auto] lg:items-center"><div><p className="text-[10px] font-bold tracking-[0.18em] text-amber-200">PRO COURSE / PREVIEW</p><h2 id="director-pro-title" className="mt-3 text-3xl font-semibold text-white">{course.proSection?.title}</h2><p className="mt-3 text-sm font-semibold text-amber-100">{course.proSection?.description}</p><div className="mt-5 flex flex-wrap gap-2">{course.proSection?.topics.map((topic) => <span key={topic} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300">{topic}</span>)}</div><p className="mt-5 max-w-2xl text-sm leading-7 text-slate-400">此區僅預留 Creator Pass 課程方向，不建立登入、會員驗證或付款流程。</p></div><span className="inline-flex min-h-12 cursor-not-allowed items-center justify-center rounded-full border border-amber-300/25 bg-amber-300/10 px-5 text-sm font-bold text-amber-100" aria-disabled="true">🔒 會員專屬內容</span></div></section>
+  </main>;
+}
