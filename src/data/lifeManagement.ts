@@ -7,7 +7,7 @@ export type BreakfastSection = { title: string; items: readonly string[] };
 export const lifeAssetPaths = {
   homeExercise: "/assets/life-management/yuni-home-exercise-breakdown.png",
   weeklyExercise: "/assets/life-management/yuni-weekly-exercise-options.png",
-  breakfast: "/assets/life-management/nutrilite-breakfast-example.png",
+  breakfast: "/images/health-breakfast-management.png",
 } as const;
 
 export const exerciseLevels: readonly ExerciseLevel[] = [
