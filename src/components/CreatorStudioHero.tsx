@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { AIVideoCenterSwitch } from "@/components/AIVideoCenterSwitch";
 import { InteractiveGlassNavigator } from "@/components/InteractiveGlassNavigator";
 import { publicAssetPath } from "@/lib/paths";
 
@@ -7,6 +8,13 @@ export function CreatorStudioHero() {
     <section className="creator-hero" aria-labelledby="creator-studio-heading">
       <div className="creator-hero__aurora" aria-hidden="true" />
       <div className="creator-hero__grid" aria-hidden="true" />
+      <div
+        className="creator-hero__circuit-overlay"
+        aria-hidden="true"
+        style={{ backgroundImage: `url(${publicAssetPath("/images/creator-academy/hero-circuit-background.png")})` }}
+      />
+      <div className="creator-hero__readability-mask" aria-hidden="true" />
+      <div className="creator-hero__circuit-nodes" aria-hidden="true"><i /><i /><i /><i /><i /></div>
       <div className="creator-hero__inner">
         <div className="creator-hero__content">
           <p className="creator-hero__eyebrow">AI CREATIVE CENTER × CREATOR ACADEMY</p>
@@ -25,6 +33,8 @@ export function CreatorStudioHero() {
 
           <p className="creator-hero__ticker" aria-label="AI、影音、創作者、課程、資源與生活管理分類">AI · VIDEO · CREATOR · COURSES · RESOURCES · HEALTH</p>
         </div>
+
+        <div className="creator-hero__primary-entry"><AIVideoCenterSwitch mode="primary" /></div>
 
         <div className="creator-hero__visual">
           <Image src={publicAssetPath("/images/creator-studio/hero-showcase-v1.png")} alt="AI 創作工作室的多螢幕監看牆、剪輯工作站與攝影機" fill priority sizes="(max-width: 899px) 70vw, 42vw" className="creator-hero__photo" />

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
+import { GlobalTechBackground } from "@/components/GlobalTechBackground";
 import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="zh-Hant"><body><Header /><main>{children}</main><Footer /></body></html>;
+  return <html lang="zh-Hant"><body><GlobalTechBackground /><div className="app-shell"><Header /><main>{children}</main><Footer /></div></body></html>;
 }
