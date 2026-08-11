@@ -23,6 +23,10 @@ npm.cmd run build
 
 `npm.cmd run build` 會產生 `out/`，由 `.github/workflows/deploy.yml` 發佈至 GitHub Pages。推送前請在 GitHub repository 設定中將 Pages source 設為 GitHub Actions。GitHub Actions 建置時會自動識別 project Pages 的 repository 子路徑；若 repository 名稱為 `<帳號>.github.io`，則維持根網域路徑。
 
+## Related Projects
+
+- [Ernest Personal Brand Hub](https://childlike8988-cyber.github.io/ex-personal-brand-hub/) — Personal Brand Showcase
+
 ## E.X Realty Data Tools Integration
 
 - Public Demo deployed: [E.X Realty Operations Hub](https://childlike8988-cyber.github.io/E.X-Realty-Operations-Hub/)

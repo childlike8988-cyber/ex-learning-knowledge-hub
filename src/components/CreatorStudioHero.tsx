@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { AIVideoCenterSwitch } from "@/components/AIVideoCenterSwitch";
 import { InteractiveGlassNavigator } from "@/components/InteractiveGlassNavigator";
+import { PersonalBrandShowcaseFloat } from "@/components/PersonalBrandShowcaseFloat";
 import { publicAssetPath } from "@/lib/paths";
 
 export function CreatorStudioHero() {
@@ -35,6 +36,7 @@ export function CreatorStudioHero() {
         </div>
 
         <div className="creator-hero__primary-entry"><AIVideoCenterSwitch mode="primary" /></div>
+        <PersonalBrandShowcaseFloat />
 
         <div className="creator-hero__visual">
           <Image src={publicAssetPath("/images/creator-studio/hero-showcase-v1.png")} alt="AI 創作工作室的多螢幕監看牆、剪輯工作站與攝影機" fill priority sizes="(max-width: 899px) 70vw, 42vw" className="creator-hero__photo" />
