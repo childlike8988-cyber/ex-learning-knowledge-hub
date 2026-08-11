@@ -7,16 +7,15 @@ const pageSource = await readFile(new URL("../src/app/creator-academy/page.tsx",
 const courseCardSource = await readFile(new URL("../src/components/CreatorAcademyCourseCard.tsx", import.meta.url), "utf8");
 
 test("creator academy defines three categories and seven initial courses", () => {
-  for (const category of ["ai-visual-creation", "photography-composition", "video-production"]) {
-    assert.match(dataSource, new RegExp(`id: "${category}"`));
-  }
+  for (const category of ["ai-visual-creation", "photography-composition", "video-production"]) assert.match(dataSource, new RegExp(`id: "${category}"`));
   assert.equal((dataSource.match(/access: "(?:free|pro)"/g) ?? []).length, 7);
 });
 
-test("creator academy page composes category and course cards", () => {
+test("creator academy page is Chinese-first and composes category and course cards", () => {
   assert.match(pageSource, /CreatorAcademyCategoryCard/);
   assert.match(pageSource, /CreatorAcademyCourseCard/);
-  assert.match(pageSource, /YUNI Creator Academy/);
+  assert.match(pageSource, /AI 創作者學院/);
+  assert.match(pageSource, /Creator Academy/);
 });
 
 test("pro courses expose a locked member-only state without login behavior", () => {

@@ -7,27 +7,18 @@ const pageSource = await readFile(new URL("../src/app/creator-academy/page.tsx",
 const pathSource = await readFile(new URL("../src/components/CreatorLearningPath.tsx", import.meta.url), "utf8");
 const cardSource = await readFile(new URL("../src/components/CreatorPathCard.tsx", import.meta.url), "utf8");
 
-test("learning path defines Starter, Creator and Pro stages", () => {
-  for (const item of ["Beginner Creator", "Visual Creator", "AI Creator Pro", "STARTER", "CREATOR", "PRO"]) {
-    assert.match(dataSource, new RegExp(item));
-  }
-
-  for (const item of ["AI Director Masterclass", "Commercial Video Workflow", "Advanced Prompt Library"]) {
-    assert.match(dataSource, new RegExp(item));
-  }
+test("learning path presents Chinese-first stage labels with English subtitles", () => {
+  for (const item of ["初階創作者", "Beginner Creator", "視覺創作者", "Visual Creator", "專業創作者", "AI Creator Pro"]) assert.match(dataSource, new RegExp(item));
+  for (const item of ["YUNI AI 生圖基礎", "YUNI 基礎構圖法", "YUNI AI 影片運鏡入門", "YUNI 電影感運鏡基礎"]) assert.match(dataSource, new RegExp(item));
 });
 
 test("academy homepage renders the learning path and recommendation", () => {
   assert.match(pageSource, /CreatorLearningPath/);
-  assert.match(pathSource, /creatorRecommendedOrder/);
-  assert.match(pathSource, /推薦學習順序/);
-
-  for (const item of ["Start Here", "AI Image", "Composition", "AI Video", "Cinematic Motion"]) {
-    assert.match(dataSource, new RegExp(item));
-  }
+  assert.match(pathSource, /學習路徑/);
+  for (const item of ["開始這裡", "AI 生圖", "構圖", "AI 影片", "電影感運鏡"]) assert.match(dataSource, new RegExp(item));
 });
 
-test("path cards retain free links and a static member-only Pro state", () => {
+test("path cards retain free links and static member-only Pro content", () => {
   assert.match(cardSource, /course\.href/);
   assert.match(cardSource, /會員專屬內容/);
   assert.doesNotMatch(cardSource, /signIn|login|checkout|payment/i);

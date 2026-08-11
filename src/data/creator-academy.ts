@@ -40,7 +40,7 @@ export const creatorAcademyCategories: readonly CreatorAcademyCategory[] = [
   },
   {
     id: "photography-composition",
-    title: "攝影美學構圖",
+    title: "攝影構圖美學",
     englishTitle: "Photography Composition",
     description: "理解畫面比例、視覺動線與電影感構圖，提升影像表達力。",
     thumbnail: creatorStudioThumbnail,
@@ -48,7 +48,7 @@ export const creatorAcademyCategories: readonly CreatorAcademyCategory[] = [
   },
   {
     id: "video-production",
-    title: "影像拍攝技巧",
+    title: "影片製作技巧",
     englishTitle: "Video Production",
     description: "從基礎運鏡到 Creator Film Lab，逐步建立影像拍攝能力。",
     thumbnail: creatorStudioThumbnail,
