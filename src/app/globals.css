@@ -382,6 +382,7 @@ body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: 
 
 .creator-hero__primary-entry { z-index: 9; top: clamp(7.8rem, 12.2vw, 10.4rem); right: -.15rem; width: min(24rem, calc(100% - 1rem)); }
 .creator-hero__primary-entry .ai-video-center-switch--primary { position: relative; width: 100%; }
+@media (min-width: 900px) { .creator-hero__primary-entry { top: clamp(6.05rem, calc(12.2vw - 1.75rem), 8.65rem); } }
 .ai-video-center-switch--primary .ai-video-center-switch__housing { position: absolute; z-index: -1; inset: -.42rem -.58rem; overflow: hidden; border: 1px solid rgba(125, 211, 252, .38); border-radius: 1.45rem .85rem 1.45rem .85rem; background: linear-gradient(100deg, rgba(8, 45, 79, .92), rgba(24, 21, 71, .82)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 0 1px rgba(34, 211, 238, .15), 0 20px 48px rgba(1, 7, 24, .52), 0 0 52px rgba(34, 211, 238, .23), 0 0 74px rgba(124, 58, 237, .12); }
 .ai-video-center-switch--primary .ai-video-center-switch__housing::before, .ai-video-center-switch--primary .ai-video-center-switch__housing::after { position: absolute; content: ""; }
 .ai-video-center-switch--primary .ai-video-center-switch__housing::before { inset: .42rem; border: 1px solid rgba(165, 243, 252, .12); border-radius: 1.05rem .55rem 1.05rem .55rem; }
@@ -459,6 +460,15 @@ body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: 
   .creator-hero__readability-mask { background: radial-gradient(ellipse 93% 70% at 38% 37%, rgba(2, 6, 23, .87) 0%, rgba(2, 8, 24, .68) 55%, transparent 88%); }
   .creator-hero__grid { opacity: .1; }
   .creator-hero__primary-entry::after, .platform-navigator::after { opacity: .46; transform: scale(.72); transform-origin: right center; }
+}
+
+/* Keep the mobile platform entry in the upper control area, clear of the hero copy. */
+@media (max-width: 899px) {
+  .creator-hero__primary-entry { top: 5.25rem; right: auto; bottom: auto; left: 0; width: clamp(10.6rem, 48vw, 12rem); }
+}
+
+@media (max-width: 374px) {
+  .creator-hero__primary-entry { left: -.9rem; width: clamp(9.4rem, 48vw, 10.8rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
