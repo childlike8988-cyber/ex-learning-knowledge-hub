@@ -464,3 +464,35 @@ body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: 
 @media (prefers-reduced-motion: reduce) {
   .creator-hero__circuit-overlay { filter: saturate(1.05) contrast(1.05); }
 }
+
+/* Hero circuit enhancement: static traces, a masked current pass, and staggered junction pulses. */
+.creator-hero__circuit-overlay { opacity: .9; filter: saturate(1.3) contrast(1.28) brightness(1.13); }
+.creator-hero__circuit-overlay::before,
+.creator-hero__circuit-overlay::after { position: absolute; inset: 0; content: ""; pointer-events: none; }
+.creator-hero__circuit-overlay::before { background-image: inherit; background-repeat: no-repeat; background-position: center; background-size: 100% 100%; filter: saturate(1.55) brightness(2.25) drop-shadow(0 0 5px rgba(34, 211, 238, .72)); mix-blend-mode: screen; opacity: 0; -webkit-mask-image: linear-gradient(105deg, transparent 20%, rgba(0, 0, 0, .08) 35%, #000 46%, rgba(0, 0, 0, .12) 57%, transparent 70%); -webkit-mask-size: 210% 100%; -webkit-mask-position: 150% 0; mask-image: linear-gradient(105deg, transparent 20%, rgba(0, 0, 0, .08) 35%, #000 46%, rgba(0, 0, 0, .12) 57%, transparent 70%); mask-size: 210% 100%; mask-position: 150% 0; animation: creator-hero-circuit-current 10.8s cubic-bezier(.42, 0, .24, 1) -2.8s infinite; }
+.creator-hero__circuit-overlay::after { background: radial-gradient(ellipse 22% 42% at 12% 20%, rgba(34, 211, 238, .16), transparent 72%), radial-gradient(ellipse 19% 36% at 84% 23%, rgba(103, 232, 249, .13), transparent 72%), radial-gradient(ellipse 23% 40% at 83% 76%, rgba(56, 189, 248, .14), transparent 72%), radial-gradient(ellipse 24% 42% at 18% 80%, rgba(34, 211, 238, .11), transparent 72%); background-size: 158% 132%; background-position: 0% 50%; mix-blend-mode: screen; opacity: .3; animation: creator-hero-circuit-ambient-flow 9.6s ease-in-out -5.1s infinite alternate; }
+.creator-hero__circuit-nodes i { border-color: rgba(186, 230, 253, .88); background: rgba(103, 232, 249, .88); box-shadow: 0 0 0 6px rgba(34, 211, 238, .1), 0 0 24px rgba(34, 211, 238, .95); animation-duration: 12.8s; }
+.creator-hero__circuit-nodes i:nth-child(2) { animation-delay: -8.7s; }
+.creator-hero__circuit-nodes i:nth-child(3) { animation-delay: -3.4s; }
+.creator-hero__circuit-nodes i:nth-child(4) { animation-delay: -10.6s; }
+.creator-hero__circuit-nodes i:nth-child(5) { animation-delay: -5.8s; }
+@keyframes creator-hero-circuit-current { 0%, 13% { -webkit-mask-position: 150% 0; mask-position: 150% 0; opacity: 0; } 24% { opacity: .34; } 46% { opacity: .7; } 63% { opacity: .18; } 78%, 100% { -webkit-mask-position: -72% 0; mask-position: -72% 0; opacity: 0; } }
+@keyframes creator-hero-circuit-ambient-flow { 0%, 18% { background-position: 0% 50%; opacity: .16; } 54% { opacity: .42; } 100% { background-position: 100% 50%; opacity: .24; } }
+
+@media (max-width: 899px) {
+  .creator-hero__circuit-overlay { opacity: .78; filter: saturate(1.22) contrast(1.2) brightness(1.08); }
+}
+
+@media (max-width: 639px) {
+  .creator-hero__circuit-overlay { opacity: .66; filter: saturate(1.16) contrast(1.14) brightness(1.05); }
+  .creator-hero__circuit-overlay::before { opacity: .76; animation-duration: 11.4s; }
+  .creator-hero__circuit-overlay::after { opacity: .2; }
+  .creator-hero__circuit-nodes i { box-shadow: 0 0 0 4px rgba(34, 211, 238, .08), 0 0 15px rgba(34, 211, 238, .74); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .creator-hero__circuit-overlay::before,
+  .creator-hero__circuit-overlay::after,
+  .creator-hero__circuit-nodes i { animation: none; }
+  .creator-hero__circuit-overlay::before { -webkit-mask-position: 48% 0; mask-position: 48% 0; opacity: .28; }
+}
