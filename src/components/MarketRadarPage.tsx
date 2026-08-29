@@ -1,4 +1,5 @@
 import type { MarketRadarChart, MarketRadarReport } from "@/data/market-radar";
+import { MarketRadarDownloadSection } from "@/components/MarketRadarDownloadSection";
 import { MarketRadarProSection } from "@/components/MarketRadarProSection";
 
 function TrendMark({ trend }: { trend: "up" | "down" | "steady" }) {
@@ -13,6 +14,7 @@ export function MarketRadarPage({ report }: { report: MarketRadarReport }) {
   return <div className="market-radar-page"><div className="market-radar-page__texture" aria-hidden="true" />
     <section className="market-radar-hero" aria-labelledby="market-radar-title"><div className="market-radar-container"><div className="market-radar-hero__meta"><span>E.X MARKET RADAR</span><b>MOCK DATA · MVP</b></div><p className="market-radar-kicker">Kaohsiung Housing Brief</p><h1 id="market-radar-title">高雄房市快報</h1><p className="market-radar-hero__date">{report.date}｜{report.updatedAt}</p><p className="market-radar-hero__summary">{report.summary}</p><p className="market-radar-hero__notice">本頁為 UI 與 Mock Data 展示，不代表即時市場資訊或投資建議。</p></div></section>
     <div className="market-radar-container market-radar-content">
+      <MarketRadarDownloadSection report={report} />
       <section className="market-radar-daily-word" aria-labelledby="daily-word"><p className="market-radar-kicker">FREE BRIEF · TODAY</p><h2 id="daily-word">今日一句</h2><blockquote>高雄房市持續量縮，<br />但不同區域的買氣開始明顯分化。</blockquote></section>
       <section className="market-radar-temperature" aria-labelledby="temperature"><div><p className="market-radar-kicker">MARKET TEMPERATURE</p><h2 id="temperature">今日市場溫度 <span>{report.marketTemperature.label}</span></h2><p>{report.marketTemperature.description}</p></div><div className="market-radar-indicators">{report.marketTemperature.indicators.map((indicator) => <article key={indicator.id}><p>{indicator.label} <TrendMark trend={indicator.trend} /></p><strong>{indicator.value}</strong><span>{indicator.detail}</span><i className={`market-radar-meter market-radar-meter--${indicator.trend}`} /></article>)}</div></section>
       <section className="market-radar-section" aria-labelledby="district-highlights"><div className="market-radar-section__heading"><div><p className="market-radar-kicker">DISTRICT SIGNALS</p><h2 id="district-highlights">今日 3 大重點</h2></div><span>Free Brief</span></div><div className="market-radar-districts">{report.districtHighlights.map((item) => <article key={item.district}><p>{item.district}</p><h3>{item.headline}</h3><span>{item.note}</span></article>)}</div></section>

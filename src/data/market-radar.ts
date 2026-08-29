@@ -25,6 +25,29 @@ export type MarketRadarChart = {
   labels: readonly string[];
 };
 
+export type MarketRadarPricing = {
+  monthlyPrice: number;
+  annualPrice: number;
+  monthlyDurationDays: number;
+  annualDurationDays: number;
+  annualEquivalentMonthly: number;
+};
+
+export type MarketRadarFreePlan = {
+  downloadsPerQuarter: number;
+  includesPng: boolean;
+  includesPdf: boolean;
+  creditsCarryOver: boolean;
+};
+
+export type MarketRadarQuarter = {
+  id: string;
+  label: string;
+  quarterStart: string;
+  quarterEnd: string;
+  nextQuarterLabel: string;
+};
+
 export type MarketRadarReport = {
   id: string;
   date: string;
@@ -54,21 +77,28 @@ export type MarketRadarReport = {
     description: string;
     benefits: readonly string[];
   };
+  freePlan: MarketRadarFreePlan;
+  currentQuarter: MarketRadarQuarter;
+  downloadBundle: {
+    id: "current-full-report";
+    reportId: string;
+    title: string;
+    formats: readonly ["PNG", "PDF"];
+    freeCreditCost: number;
+  };
   downloads: readonly {
     id: "brief-png" | "analysis-pdf";
     title: string;
     description: string;
     format: "PNG" | "PDF";
-    access: "pro";
+    access: "full-report";
   }[];
-  pricing: {
-    singlePrice: number;
-    annualPrice: number;
-    annualDurationDays: number;
-    annualEquivalentMonthly: number;
-  };
+  pricing: MarketRadarPricing;
   access: {
-    hasPurchasedCurrentReport: boolean;
+    freeQuarterlyDownloadsAllowed: number;
+    freeQuarterlyDownloadsUsed: number;
+    freeQuarterlyDownloadsRemaining: number;
+    hasActiveMonthlySubscription: boolean;
     hasActiveAnnualSubscription: boolean;
   };
 };
@@ -117,25 +147,57 @@ export const marketRadarReport: MarketRadarReport = {
   ],
   proContent: {
     title: "MARKET RADAR PRO",
-    description: "解鎖完整市場分析、專業圖表與可下載報告。",
+    description: "需要更頻繁使用房市快報？升級 Pro 即可於訂閱期間無限下載。",
     benefits: ["完整區域分析", "成交量趨勢", "價格動能圖", "議價空間分析", "實價比較", "專業圖表", "PNG 快報", "PDF 完整報告", "歷史報告下載"],
   },
+  freePlan: {
+    downloadsPerQuarter: 1,
+    includesPng: true,
+    includesPdf: true,
+    creditsCarryOver: false,
+  },
+  currentQuarter: {
+    id: "2026-Q3",
+    label: "Q3 免費下載額度",
+    quarterStart: "2026-07-01",
+    quarterEnd: "2026-09-30",
+    nextQuarterLabel: "2026 Q4",
+  },
+  downloadBundle: {
+    id: "current-full-report",
+    reportId: "kaohsiung-2026-08-29",
+    title: "本期完整報告",
+    formats: ["PNG", "PDF"],
+    freeCreditCost: 1,
+  },
   downloads: [
-    { id: "brief-png", title: "下載今日快報 PNG", description: "適合快速分享的 Report Card。", format: "PNG", access: "pro" },
-    { id: "analysis-pdf", title: "下載完整分析 PDF", description: "保留完整閱讀脈絡的 Article Report。", format: "PDF", access: "pro" },
+    { id: "brief-png", title: "PNG 快報", description: "適合 LINE、社群分享、客戶溝通與快速轉傳。", format: "PNG", access: "full-report" },
+    { id: "analysis-pdf", title: "PDF 完整報告", description: "適合完整閱讀、客戶說明、提案、市場簡報與留存。", format: "PDF", access: "full-report" },
   ],
   pricing: {
-    singlePrice: 30,
+    monthlyPrice: 40,
     annualPrice: 360,
+    monthlyDurationDays: 30,
     annualDurationDays: 365,
     annualEquivalentMonthly: 30,
   },
   access: {
-    hasPurchasedCurrentReport: false,
+    freeQuarterlyDownloadsAllowed: 1,
+    freeQuarterlyDownloadsUsed: 0,
+    freeQuarterlyDownloadsRemaining: 1,
+    hasActiveMonthlySubscription: false,
     hasActiveAnnualSubscription: false,
   },
 };
 
-export function canDownloadMarketRadarPro(report: MarketRadarReport): boolean {
-  return report.access.hasPurchasedCurrentReport || report.access.hasActiveAnnualSubscription;
+export function hasFreeQuarterlyCredit(report: MarketRadarReport): boolean {
+  return report.access.freeQuarterlyDownloadsRemaining > 0;
+}
+
+export function hasMarketRadarProAccess(report: MarketRadarReport): boolean {
+  return report.access.hasActiveMonthlySubscription || report.access.hasActiveAnnualSubscription;
+}
+
+export function canDownloadMarketRadarReport(report: MarketRadarReport): boolean {
+  return hasFreeQuarterlyCredit(report) || hasMarketRadarProAccess(report);
 }
