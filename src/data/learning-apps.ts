@@ -1,16 +1,17 @@
-export type LearningAppId = "ai-pulse" | "realty-data-tools" | "stock" | "english" | "japanese";
+export type LearningAppId = "ai-pulse" | "market-radar" | "realty-data-tools" | "stock" | "english" | "japanese";
 
 export type LearningApp = {
   id: LearningAppId;
-  shortCode: "AI" | "RE" | "STK" | "ENG" | "JP";
+  shortCode: "AI" | "MR" | "RE" | "STK" | "ENG" | "JP";
   title: string;
   englishTitle: string;
   description: string;
   href: string;
   category: string;
-  external: true;
+  external: boolean;
   previewImage: string;
   previewAlt: string;
+  previewKind?: "market-radar";
   ctaLabel: string;
   tags?: readonly string[];
   features: readonly string[];
@@ -31,6 +32,22 @@ export const learningApps: readonly LearningApp[] = [
     ctaLabel: "開啟 AI 快報",
     tags: ["AI NEWS", "TREND", "BRIEF"],
     features: ["AI 產業動態", "工具更新摘要", "重要趨勢追蹤"],
+  },
+  {
+    id: "market-radar",
+    shortCode: "MR",
+    title: "E.X MARKET RADAR",
+    englishTitle: "Housing Market Intelligence",
+    description: "高雄房市重點、區域趨勢、政策、房貸與實價資訊整理。",
+    href: "/market-radar/",
+    category: "高雄房市快報",
+    external: false,
+    previewImage: "",
+    previewAlt: "E.X MARKET RADAR 的高雄房市快報資料視覺預覽",
+    previewKind: "market-radar",
+    ctaLabel: "查看房市快報",
+    tags: ["KAOHSIUNG", "MARKET", "BRIEF"],
+    features: ["每日市場摘要", "區域趨勢整理", "Pro 報告預覽"],
   },
   {
     id: "realty-data-tools",
