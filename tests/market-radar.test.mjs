@@ -10,16 +10,21 @@ const quickNavigationSource = await readFile(new URL("../src/components/MarketRa
 const detailDrawerSource = await readFile(new URL("../src/components/MarketRadarDetailDrawer.tsx", import.meta.url), "utf8");
 const routeSource = await readFile(new URL("../src/app/market-radar/page.tsx", import.meta.url), "utf8");
 const paymentDoc = await readFile(new URL("../docs/market-radar/payment-architecture.md", import.meta.url), "utf8");
+const dataContractDoc = await readFile(new URL("../docs/market-radar/data-contract.md", import.meta.url), "utf8");
+const loaderSource = await readFile(new URL("../src/lib/market-radar/loadMarketRadarReport.ts", import.meta.url), "utf8");
+const fixtureSource = await readFile(new URL("../public/data/market-radar/2026-08-29.json", import.meta.url), "utf8");
 const appDataSource = await readFile(new URL("../src/data/learning-apps.ts", import.meta.url), "utf8");
+const fixture = JSON.parse(fixtureSource);
 
 test("market radar keeps the quarterly Free credit and monthly / annual pricing centralized", () => {
-  for (const term of ["MarketRadarFreePlan", "MarketRadarPricing", "monthlyPrice: 40", "annualPrice: 360", "downloadsPerQuarter: 1", "includesPng: true", "includesPdf: true", "creditsCarryOver: false", "freeQuarterlyDownloadsRemaining: 1", "hasActiveMonthlySubscription", "hasActiveAnnualSubscription", "formats: [\"PNG\", \"PDF\"]", "2026-Q3"]) assert.match(dataSource, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  for (const term of ["MarketRadarFreePlan", "MarketRadarPricing", "freeQuarterlyDownloadsRemaining", "hasActiveMonthlySubscription", "hasActiveAnnualSubscription"]) assert.match(dataSource, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  for (const term of ["\"monthlyPrice\": 40", "\"annualPrice\": 360", "\"downloadsPerQuarter\": 1", "\"includesPng\": true", "\"includesPdf\": true", "\"creditsCarryOver\": false", "\"2026-Q3\"", "\"PNG\", \"PDF\""]) assert.ok(fixtureSource.includes(term));
   assert.doesNotMatch(dataSource, /singlePrice/);
   assert.doesNotMatch(dataSource, /NT\$10/);
 });
 
 test("market radar route and report UI preserve the requested public sections", () => {
-  for (const term of ["market-radar-hero__grid", "market-radar-hero__download", "market-key-take", "market-district-signals", "market-temperature", "market-public-charts", "market-updates", "market-key-sentences", "TODAY&apos;S KEY TAKE", "market-radar-daily-word__bookmark", "market-radar-daily-word__cityline", "高雄房市快報", "今日一句", "今日市場溫度", "今日 3 大重點", "今天最值得知道的 3 句話", "今日快訊", "公開圖表"]) assert.ok(pageSource.includes(term));
+  for (const term of ["market-radar-hero__grid", "market-radar-hero__download", "market-key-take", "market-district-signals", "market-temperature", "market-public-charts", "market-updates", "market-key-sentences", "TODAY&apos;S KEY TAKE", "market-radar-daily-word__bookmark", "market-radar-daily-word__cityline", "今日一句", "今日市場溫度", "今日 3 大重點", "今天最值得知道的 3 句話", "今日快訊", "公開圖表"]) assert.ok(pageSource.includes(term));
   assert.ok(pageSource.indexOf("今日 3 大重點") < pageSource.indexOf("今日市場溫度"));
   assert.ok(pageSource.indexOf("今日市場溫度") < pageSource.indexOf("公開圖表"));
   assert.ok(pageSource.indexOf("公開圖表") < pageSource.indexOf("今日快訊"));
@@ -36,9 +41,34 @@ test("market radar models Free exhaustion and individual Pro format actions", ()
   assert.ok(downloadSource.includes("本季已下載。下一次免費額度"));
 });
 
-test("market radar details keep source timing fields distinct and remain marked as Mock", () => {
-  for (const term of ["MarketRadarDetail", "publishedAt", "dataPeriod", "verifiedAt", "detail: MarketRadarDetail", "districtHighlights", "newsItems", "publicCharts", "isMock: true"]) assert.ok(dataSource.includes(term));
-  for (const term of ["role=\"dialog\"", "aria-modal=\"true\"", "Escape", "Mock Data", "資料資訊", "最後驗證時間", "目前為 Mock Data"]) assert.ok(detailDrawerSource.includes(term));
+test("market radar source contract keeps source times, priority, freshness, facts and analysis separate", () => {
+  for (const term of ["MarketRadarSource", "publishedAt", "dataPeriodStart", "dataPeriodEnd", "verifiedAt", "retrievedAt", "MarketRadarSourcePriority", "expectedUpdateFrequency", "MarketRadarFreshness", "MarketRadarFact", "MarketRadarAnalysis", "sourceIds", "facts: readonly MarketRadarFact[]", "sources: readonly MarketRadarSource[]", "analysisBasis"]) assert.ok(dataSource.includes(term));
+  assert.match(dataSource, /priority: MarketRadarSourcePriority/);
+  assert.match(dataSource, /sourceIds: readonly string\[\]/);
+  assert.match(dataSource, /chartType: "line" \| "bar" \| "comparison"/);
+});
+
+test("market radar fixture is explicitly mock and drives the source-referenced report contract", () => {
+  assert.equal(fixture.status, "fixture");
+  assert.equal(fixture.isMock, true);
+  assert.ok(Array.isArray(fixture.sources) && fixture.sources.length >= 2);
+  assert.ok(fixture.sources.every((source) => source.isMock === true && source.publishedAt && source.verifiedAt && source.retrievedAt));
+  assert.ok(fixture.districtHighlights.every((district) => district.sourceIds.length > 0 && district.detail.sourceIds.length > 0));
+  assert.ok(fixture.newsItems.every((item) => item.sourceIds.length > 0 && item.detail.sourceIds.length > 0));
+  assert.ok(fixture.publicCharts.every((chart) => chart.sourceIds.length > 0 && chart.series.length > 0));
+  assert.ok(fixture.dailyKeyTake.sourceIds.length > 0);
+  assert.equal(fixture.pricing.monthlyPrice, 40);
+  assert.equal(fixture.pricing.annualPrice, 360);
+});
+
+test("market radar loader validates references and safely falls back without hardcoded route data", () => {
+  for (const term of ["parseMarketRadarFixture", "loadMarketRadarReport", "marketRadarFallbackReport", "Unknown Market Radar source reference", "Fixture must remain marked as mock", "process.env.NODE_ENV !== \"production\""]) assert.ok(loaderSource.includes(term));
+  assert.match(routeSource, /loadMarketRadarReport/);
+  assert.doesNotMatch(routeSource, /marketRadarReport/);
+});
+
+test("market radar detail drawer distinguishes facts, analysis and source metadata without mock links", () => {
+  for (const term of ["role=\"dialog\"", "aria-modal=\"true\"", "Escape", "MOCK DATA", "原始資訊", "Market Radar 解讀", "本段為 Market Radar 根據公開資料整理之分析", "影響對象", "影響程度", "分析信心", "原始來源", "發布日期", "資料期間", "最後驗證", "取得時間", "target=\"_blank\"", "rel=\"noopener noreferrer\"", "Boolean(source.url) && !source.isMock", "Mock Source"]) assert.ok(detailDrawerSource.includes(term));
 });
 
 test("market radar shows one quarterly Free bundle and does not pretend payment is active", () => {
@@ -53,6 +83,10 @@ test("market radar shows one quarterly Free bundle and does not pretend payment 
 test("payment architecture documents the paid access boundary without implementing it", () => {
   for (const term of ["NT$40", "NT$360", "每個自然季度", "PNG 快報 + PDF 完整報告", "不累積", "verified email", "QuarterlyDownloadUsage", "Cloudflare Worker", "D1 / KV", "Cloudflare R2", "24 小時有效", "最多 3 次"]) assert.ok(paymentDoc.includes(term));
   assert.ok(!paymentDoc.includes("單次下載："));
+});
+
+test("data contract documents source integrity, freshness, validation and Phase 2B flow", () => {
+  for (const term of ["Tier 1", "Tier 2", "Tier 3", "Time fields", "MarketRadarFreshness", "Mock versus live", "Validation and fallback", "SOURCE INTEGRITY RULE", "Original numeric facts are never generated by an LLM", "Phase 2B", "Official Source → Fetcher or manual import", "n8n"]) assert.ok(dataContractDoc.includes(term));
 });
 
 test("the ecosystem includes Market Radar as an internal entry before Realty", () => {
