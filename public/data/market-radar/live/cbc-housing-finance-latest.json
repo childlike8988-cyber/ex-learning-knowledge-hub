@@ -1,0 +1,107 @@
+{
+  "status": "live",
+  "dataStatus": "live",
+  "sourceId": "cbc-housing-finance",
+  "generatedAt": "2026-08-30T16:38:19.617Z",
+  "sourcePublishedAt": "2026-08-21T00:00:00+08:00",
+  "dataPeriodStart": "2026-07-01",
+  "dataPeriodEnd": "2026-07-31",
+  "verifiedAt": "2026-08-31T00:00:00+08:00",
+  "source": {
+    "id": "cbc-housing-finance",
+    "name": "中央銀行房貸與購屋貸款統計",
+    "publisher": "中央銀行",
+    "type": "government",
+    "priority": "official",
+    "url": "https://www.cbc.gov.tw/tw/cp-302-192747-5edf4-1.html",
+    "publishedAt": "2026-08-21T00:00:00+08:00",
+    "dataPeriodStart": "2026-07-01",
+    "dataPeriodEnd": "2026-07-31",
+    "verifiedAt": "2026-08-31T00:00:00+08:00",
+    "retrievedAt": "2026-08-30T16:38:19.617Z",
+    "expectedUpdateFrequency": "monthly",
+    "notes": "五大銀行新承做購屋貸款資料；金額單位為新台幣百萬元，利率為年息百分比率。",
+    "isPrimarySource": true,
+    "isMock": false
+  },
+  "freshness": {
+    "status": "normal",
+    "label": "官方月資料已驗證",
+    "expectedUpdateFrequency": "monthly"
+  },
+  "latest": {
+    "period": "2026-07",
+    "mortgageRate": 2.29,
+    "newMortgageAmount": 69109,
+    "mortgageRateChangePercentagePoints": -0.009
+  },
+  "history": [
+    {
+      "period": "2025-08",
+      "mortgageRate": 2.303,
+      "newMortgageAmount": 61658
+    },
+    {
+      "period": "2025-09",
+      "mortgageRate": 2.294,
+      "newMortgageAmount": 50504
+    },
+    {
+      "period": "2025-10",
+      "mortgageRate": 2.313,
+      "newMortgageAmount": 55136
+    },
+    {
+      "period": "2025-11",
+      "mortgageRate": 2.301,
+      "newMortgageAmount": 58807
+    },
+    {
+      "period": "2025-12",
+      "mortgageRate": 2.298,
+      "newMortgageAmount": 63540
+    },
+    {
+      "period": "2026-01",
+      "mortgageRate": 2.327,
+      "newMortgageAmount": 56766
+    },
+    {
+      "period": "2026-02",
+      "mortgageRate": 2.322,
+      "newMortgageAmount": 36764
+    },
+    {
+      "period": "2026-03",
+      "mortgageRate": 2.306,
+      "newMortgageAmount": 59024
+    },
+    {
+      "period": "2026-04",
+      "mortgageRate": 2.307,
+      "newMortgageAmount": 53336
+    },
+    {
+      "period": "2026-05",
+      "mortgageRate": 2.322,
+      "newMortgageAmount": 46915
+    },
+    {
+      "period": "2026-06",
+      "mortgageRate": 2.299,
+      "newMortgageAmount": 57974
+    },
+    {
+      "period": "2026-07",
+      "mortgageRate": 2.29,
+      "newMortgageAmount": 69109
+    }
+  ],
+  "methodology": {
+    "notes": [
+      "以最新有效月資料為 Finance Signal。",
+      "利率月變動為百分點，不是相對百分比。",
+      "房貸利率反映近期購屋融資成本環境；單月變化不應單獨解讀為房價漲跌訊號。"
+    ]
+  }
+}

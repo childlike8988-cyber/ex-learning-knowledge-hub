@@ -32,7 +32,9 @@ test("market radar route and report UI preserve the requested public sections", 
   assert.ok(pageSource.indexOf("今日快訊") < pageSource.indexOf("今天最值得知道的 3 句話"));
   assert.match(routeSource, /MarketRadarPage/);
   assert.match(routeSource, /loadMarketRadarLiveData/);
+  assert.match(routeSource, /loadMarketRadarCbcData/);
   assert.match(pageSource, /LiveDistrictTransactionChart/);
+  assert.match(pageSource, /FinanceSignal/);
   assert.match(pageSource, /官方資料 · LIVE/);
 });
 
