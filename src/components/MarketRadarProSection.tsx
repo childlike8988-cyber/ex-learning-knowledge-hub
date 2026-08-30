@@ -11,7 +11,7 @@ export function MarketRadarProSection({ report }: { report: MarketRadarReport })
     setMessage(`${label}的付款功能準備中。Payment integration coming soon.`);
   }
 
-  return <section className="market-radar-pro" aria-labelledby="market-radar-pro">
+  return <section className="market-radar-pro" id="market-pro" aria-labelledby="market-radar-pro">
     <div className="market-radar-pro__intro"><p className="market-radar-kicker">會員專屬內容 · MARKET RADAR PRO</p><h2 id="market-radar-pro">{report.proContent.title}</h2><p>{report.proContent.description}</p></div>
     <div className="market-radar-plan-summary" aria-label="Free 與 Pro 簡要差異"><article><p>FREE</p><strong>免費瀏覽</strong><span>每季 1 次 PNG + PDF 完整報告下載</span></article><article><p>PRO</p><strong>無限下載</strong><span>PNG / PDF / Charts、完整分析與歷史報告</span></article></div>
     <ul className="market-radar-pro__benefits" aria-label="Market Radar Pro 包含內容">{report.proContent.benefits.map((benefit) => <li key={benefit}>✓ {benefit}</li>)}</ul>

@@ -6,6 +6,8 @@ const dataSource = await readFile(new URL("../src/data/market-radar.ts", import.
 const pageSource = await readFile(new URL("../src/components/MarketRadarPage.tsx", import.meta.url), "utf8");
 const proSource = await readFile(new URL("../src/components/MarketRadarProSection.tsx", import.meta.url), "utf8");
 const downloadSource = await readFile(new URL("../src/components/MarketRadarDownloadSection.tsx", import.meta.url), "utf8");
+const quickNavigationSource = await readFile(new URL("../src/components/MarketRadarQuickNavigation.tsx", import.meta.url), "utf8");
+const detailDrawerSource = await readFile(new URL("../src/components/MarketRadarDetailDrawer.tsx", import.meta.url), "utf8");
 const routeSource = await readFile(new URL("../src/app/market-radar/page.tsx", import.meta.url), "utf8");
 const paymentDoc = await readFile(new URL("../docs/market-radar/payment-architecture.md", import.meta.url), "utf8");
 const appDataSource = await readFile(new URL("../src/data/learning-apps.ts", import.meta.url), "utf8");
@@ -17,7 +19,7 @@ test("market radar keeps the quarterly Free credit and monthly / annual pricing 
 });
 
 test("market radar route and report UI preserve the requested public sections", () => {
-  for (const term of ["market-radar-hero__grid", "market-radar-hero__download", "TODAY&apos;S KEY TAKE", "market-radar-daily-word__bookmark", "market-radar-daily-word__cityline", "高雄房市快報", "今日一句", "今日市場溫度", "今日 3 大重點", "今天最值得知道的 3 句話", "今日快訊", "公開圖表"]) assert.ok(pageSource.includes(term));
+  for (const term of ["market-radar-hero__grid", "market-radar-hero__download", "market-key-take", "market-district-signals", "market-temperature", "market-public-charts", "market-updates", "market-key-sentences", "TODAY&apos;S KEY TAKE", "market-radar-daily-word__bookmark", "market-radar-daily-word__cityline", "高雄房市快報", "今日一句", "今日市場溫度", "今日 3 大重點", "今天最值得知道的 3 句話", "今日快訊", "公開圖表"]) assert.ok(pageSource.includes(term));
   assert.ok(pageSource.indexOf("今日 3 大重點") < pageSource.indexOf("今日市場溫度"));
   assert.ok(pageSource.indexOf("今日市場溫度") < pageSource.indexOf("公開圖表"));
   assert.ok(pageSource.indexOf("公開圖表") < pageSource.indexOf("今日快訊"));
@@ -25,8 +27,22 @@ test("market radar route and report UI preserve the requested public sections", 
   assert.match(routeSource, /MarketRadarPage/);
 });
 
+test("market radar offers semantic desktop and mobile quick navigation", () => {
+  for (const term of ["QUICK NAVIGATION", "快速索引", "快速導覽", "aria-expanded", "aria-controls", "market-pro"]) assert.ok(quickNavigationSource.includes(term));
+});
+
+test("market radar models Free exhaustion and individual Pro format actions", () => {
+  for (const term of ["freeQuarterlyDownloadsRemaining", "isFreeQuarterlyCreditExhausted", "hasActiveMonthlySubscription", "hasActiveAnnualSubscription", "canDownloadWithPro", "本季免費額度已使用", "disabled", "Pro 下載", "下載 ${download.format}"]) assert.ok(downloadSource.includes(term) || dataSource.includes(term));
+  assert.ok(downloadSource.includes("本季已下載。下一次免費額度"));
+});
+
+test("market radar details keep source timing fields distinct and remain marked as Mock", () => {
+  for (const term of ["MarketRadarDetail", "publishedAt", "dataPeriod", "verifiedAt", "detail: MarketRadarDetail", "districtHighlights", "newsItems", "publicCharts", "isMock: true"]) assert.ok(dataSource.includes(term));
+  for (const term of ["role=\"dialog\"", "aria-modal=\"true\"", "Escape", "Mock Data", "資料資訊", "最後驗證時間", "目前為 Mock Data"]) assert.ok(detailDrawerSource.includes(term));
+});
+
 test("market radar shows one quarterly Free bundle and does not pretend payment is active", () => {
-  for (const term of ["本季免費下載", "一次解鎖本期 PNG + PDF", "1 Free Full Report Credit", "本季免費下載額度已使用", "nextQuarterLabel"]) assert.ok(downloadSource.includes(term));
+  for (const term of ["本季免費下載", "一次解鎖本期 PNG + PDF", "1 Free Full Report Credit", "本季免費額度已使用", "nextQuarterLabel"]) assert.ok(downloadSource.includes(term));
   assert.match(proSource, /付款功能準備中/);
   assert.match(proSource, /Payment integration coming soon/);
   assert.match(proSource, /monthlyPrice/);
