@@ -96,12 +96,13 @@ export type MarketRadarNewsItem = {
 
 export type MarketRadarChart = {
   id: "transaction-heat" | "price-momentum" | "district-comparison";
+  dataStatus: "fixture" | "live";
   title: string;
   subtitle: string;
   chartType: "line" | "bar" | "comparison";
   xAxis?: { label?: string; labels: readonly string[] };
   yAxis?: { label?: string; unit?: string };
-  series: readonly { id: string; label: string; values: readonly number[] }[];
+  series: readonly { id: string; label: string; values: readonly number[]; displayValues?: readonly string[] }[];
   dataPeriod: MarketRadarDataPeriod;
   sourceIds: readonly string[];
   analysis: MarketRadarAnalysis;

@@ -31,6 +31,9 @@ test("market radar route and report UI preserve the requested public sections", 
   assert.ok(pageSource.indexOf("公開圖表") < pageSource.indexOf("今日快訊"));
   assert.ok(pageSource.indexOf("今日快訊") < pageSource.indexOf("今天最值得知道的 3 句話"));
   assert.match(routeSource, /MarketRadarPage/);
+  assert.match(routeSource, /loadMarketRadarLiveData/);
+  assert.match(pageSource, /LiveDistrictTransactionChart/);
+  assert.match(pageSource, /官方資料 · LIVE/);
 });
 
 test("market radar offers semantic desktop and mobile quick navigation", () => {

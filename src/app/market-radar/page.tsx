@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MarketRadarPage } from "@/components/MarketRadarPage";
 import { loadMarketRadarReport } from "@/lib/market-radar/loadMarketRadarReport";
+import { loadMarketRadarLiveData } from "@/lib/market-radar/loadMarketRadarLiveData";
 
 export const metadata: Metadata = {
   title: "E.X MARKET RADAR｜高雄房市快報",
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function MarketRadarRoute() {
-  return <MarketRadarPage report={loadMarketRadarReport()} />;
+  return <MarketRadarPage report={loadMarketRadarReport()} liveData={loadMarketRadarLiveData()} />;
 }

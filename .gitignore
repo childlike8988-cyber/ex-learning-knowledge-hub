@@ -15,3 +15,9 @@ desktop.ini
 *~
 .vscode/
 .idea/
+data/market-radar/raw/*
+!data/market-radar/raw/README.md
+!data/market-radar/raw/moi/
+data/market-radar/raw/moi/*
+!data/market-radar/raw/moi/README.md
+!data/market-radar/raw/moi/source-manifest.json

@@ -1,0 +1,13 @@
+{
+  "sourceId": "moi-real-price-sales",
+  "name": "內政部不動產實價登錄",
+  "publisher": "內政部地政司",
+  "officialDownloadPage": "https://plvr.land.moi.gov.tw/DownloadOpenData",
+  "expectedUpdateFrequency": "irregular",
+  "downloadedAt": null,
+  "sourcePublishedAt": null,
+  "dataPeriodStart": null,
+  "dataPeriodEnd": null,
+  "latestImportedFile": null,
+  "status": "awaiting-manual-official-download"
+}

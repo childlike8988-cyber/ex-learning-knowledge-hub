@@ -134,6 +134,7 @@ export function parseMarketRadarFixture(value: unknown): MarketRadarReport | nul
       if (!isRecord(item) || !Array.isArray(item.series)) throw new Error("Invalid public chart");
       return {
         id: readString(item.id, "chart.id") as MarketRadarChart["id"],
+        dataStatus: item.dataStatus === "live" ? "live" : "fixture",
         title: readString(item.title, "chart.title"),
         subtitle: readString(item.subtitle, "chart.subtitle"),
         chartType: readString(item.chartType, "chart.chartType") as MarketRadarChart["chartType"],
