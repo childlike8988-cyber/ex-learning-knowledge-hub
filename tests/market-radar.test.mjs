@@ -17,7 +17,11 @@ test("market radar keeps the quarterly Free credit and monthly / annual pricing 
 });
 
 test("market radar route and report UI preserve the requested public sections", () => {
-  for (const term of ["高雄房市快報", "今日一句", "今日市場溫度", "今日 3 大重點", "今天最值得知道的 3 句話", "今日快訊", "公開圖表"]) assert.ok(pageSource.includes(term));
+  for (const term of ["market-radar-hero__grid", "market-radar-hero__download", "TODAY&apos;S KEY TAKE", "market-radar-daily-word__bookmark", "market-radar-daily-word__cityline", "高雄房市快報", "今日一句", "今日市場溫度", "今日 3 大重點", "今天最值得知道的 3 句話", "今日快訊", "公開圖表"]) assert.ok(pageSource.includes(term));
+  assert.ok(pageSource.indexOf("今日 3 大重點") < pageSource.indexOf("今日市場溫度"));
+  assert.ok(pageSource.indexOf("今日市場溫度") < pageSource.indexOf("公開圖表"));
+  assert.ok(pageSource.indexOf("公開圖表") < pageSource.indexOf("今日快訊"));
+  assert.ok(pageSource.indexOf("今日快訊") < pageSource.indexOf("今天最值得知道的 3 句話"));
   assert.match(routeSource, /MarketRadarPage/);
 });
 
