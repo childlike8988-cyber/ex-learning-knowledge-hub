@@ -8,6 +8,7 @@ const proSource = await readFile(new URL("../src/components/MarketRadarProSectio
 const downloadSource = await readFile(new URL("../src/components/MarketRadarDownloadSection.tsx", import.meta.url), "utf8");
 const quickNavigationSource = await readFile(new URL("../src/components/MarketRadarQuickNavigation.tsx", import.meta.url), "utf8");
 const detailDrawerSource = await readFile(new URL("../src/components/MarketRadarDetailDrawer.tsx", import.meta.url), "utf8");
+const stylesSource = await readFile(new URL("../src/app/globals.css", import.meta.url), "utf8");
 const routeSource = await readFile(new URL("../src/app/market-radar/page.tsx", import.meta.url), "utf8");
 const paymentDoc = await readFile(new URL("../docs/market-radar/payment-architecture.md", import.meta.url), "utf8");
 const dataContractDoc = await readFile(new URL("../docs/market-radar/data-contract.md", import.meta.url), "utf8");
@@ -69,6 +70,14 @@ test("market radar loader validates references and safely falls back without har
 
 test("market radar detail drawer distinguishes facts, analysis and source metadata without mock links", () => {
   for (const term of ["role=\"dialog\"", "aria-modal=\"true\"", "Escape", "MOCK DATA", "原始資訊", "Market Radar 解讀", "本段為 Market Radar 根據公開資料整理之分析", "影響對象", "影響程度", "分析信心", "原始來源", "發布日期", "資料期間", "最後驗證", "取得時間", "target=\"_blank\"", "rel=\"noopener noreferrer\"", "Boolean(source.url) && !source.isMock", "Mock Source"]) assert.ok(detailDrawerSource.includes(term));
+});
+
+test("market radar news keeps its primary content column expandable across responsive layouts", () => {
+  assert.match(stylesSource, /\.market-radar-news article \{ display: block; width: 100%; min-width: 0;/);
+  assert.match(stylesSource, /\.market-radar-news article > button \{ display: grid; width: 100%; min-width: 0; grid-template-columns: minmax\(0, 1fr\);/);
+  assert.match(stylesSource, /grid-template-columns: auto minmax\(0, 1fr\) auto;/);
+  assert.match(stylesSource, /word-break: normal; overflow-wrap: break-word;/);
+  assert.ok(pageSource.includes("查看分析"));
 });
 
 test("market radar shows one quarterly Free bundle and does not pretend payment is active", () => {
