@@ -688,3 +688,77 @@ body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: 
   .market-radar-news article strong { font-size: .9rem; }.market-radar-news article small { font-size: .75rem; }
 }
 @media (prefers-reduced-motion: reduce) { .market-radar-news article > button, .market-radar-download__format-action { transition: none; } }
+
+/* Market Radar visual refinement: warmer editorial first fold and a clearer report-control hierarchy. */
+.market-radar-hero { isolation: isolate; background: linear-gradient(118deg, rgba(255, 253, 247, .98) 0%, rgba(249, 244, 234, .94) 48%, rgba(235, 224, 204, .82) 100%); }
+.market-radar-hero::after { opacity: .46; }
+.market-radar-hero__content { position: relative; isolation: isolate; overflow: hidden; }
+.market-radar-hero__content > :not(.market-radar-hero__skyline) { position: relative; z-index: 1; }
+.market-radar-hero__skyline { position: absolute; z-index: 0; bottom: -1.65rem; left: -1.25rem; width: min(96%, 32rem); height: auto; opacity: .26; pointer-events: none; }
+.market-radar-hero__skyline path { fill: none; stroke: #ad8653; stroke-width: 1.15; }
+.market-radar-hero h1 { max-width: 7ch; font-family: Georgia, "Noto Serif TC", "Songti TC", serif; font-size: clamp(3.35rem, 6.25vw, 6.75rem); font-weight: 700; letter-spacing: -.1em; line-height: 1.01; text-wrap: balance; }
+.market-radar-hero__date { display: inline-flex; align-items: center; gap: .45rem; border-bottom: 1px solid rgba(181, 142, 82, .28); padding-bottom: .5rem; }
+.market-radar-hero__date svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.55; }
+.market-radar-hero__summary { max-width: 29.5rem; }
+.market-radar-hero__notice { max-width: 30rem; }
+
+.market-radar-hero__download .market-radar-download { position: relative; overflow: hidden; border-color: rgba(148, 111, 63, .22); background: linear-gradient(135deg, rgba(255, 253, 248, .98), rgba(244, 237, 223, .82)); box-shadow: 0 20px 44px rgba(74, 55, 33, .1), inset 0 1px 0 rgba(255, 255, 255, .78); }
+.market-radar-hero__download .market-radar-download::before { position: absolute; top: -8rem; right: -7rem; width: 16rem; height: 16rem; border: 1px solid rgba(181, 142, 82, .18); border-radius: 50%; box-shadow: 0 0 0 2rem rgba(181, 142, 82, .025); content: ""; pointer-events: none; }
+.market-radar-hero__download .market-radar-download > * { position: relative; z-index: 1; }
+.market-radar-download__credit { border-color: rgba(173, 132, 77, .36); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8); }
+.market-radar-download__credit strong { color: #31271d; font-size: clamp(1.35rem, 2.2vw, 1.72rem); }
+.market-radar-download__formats article { grid-template-columns: 2.75rem minmax(0, 1fr); gap: .75rem; }
+.market-radar-download__format-icon { display: grid; width: 2.55rem; min-height: 2.55rem; place-items: center; border: 1px solid currentColor; border-radius: .66rem; background: rgba(255, 252, 244, .88); }
+.market-radar-download__format-icon svg { width: 1.38rem; height: 1.38rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.55; }
+.market-radar-download__format-icon--png { border-color: #c98f25; color: #fffaf0; background: linear-gradient(145deg, #d6a135, #b77b18); }
+.market-radar-download__format-icon--pdf { border-color: #bd5a53; color: #fff9f5; background: linear-gradient(145deg, #cc655c, #aa4541); }
+.market-radar-download__formats h3 { font-size: .96rem; }
+.market-radar-download__formats p { max-width: 15.5rem; line-height: 1.62; }
+
+@media (min-width: 1024px) {
+  .market-radar-hero__grid { align-items: stretch; }
+  .market-radar-hero__content { display: flex; min-height: 29.5rem; flex-direction: column; justify-content: center; padding: .5rem 0 2.75rem; }
+  .market-radar-hero h1 { max-width: none; font-size: clamp(4.2rem, 6.2vw, 6.4rem); white-space: nowrap; }
+  .market-radar-hero__download { display: flex; align-items: center; }
+  .market-radar-hero__download .market-radar-download { width: 100%; }
+  .market-radar-content { padding-top: 0; }
+  .market-radar-quick-navigation { position: relative; z-index: 2; width: min(100%, 40rem); margin: -3.35rem 0 clamp(2.1rem, 4vw, 3.15rem); border: 1px solid rgba(165, 128, 79, .25); border-radius: 1.08rem; background: linear-gradient(135deg, rgba(255, 253, 248, .94), rgba(244, 235, 219, .8)); box-shadow: 0 14px 28px rgba(80, 61, 39, .07), inset 0 1px 0 rgba(255, 255, 255, .78); }
+  .market-radar-quick-navigation__desktop { grid-template-columns: 1fr; gap: .75rem; min-height: 0; padding: .85rem .95rem .95rem; }
+  .market-radar-quick-navigation__label { display: flex; align-items: baseline; gap: .62rem; padding: 0 .25rem; }
+  .market-radar-quick-navigation__desktop > .market-radar-quick-navigation__label > span { color: #4d4236; font-size: .79rem; font-weight: 800; }
+  .market-radar-quick-navigation__desktop ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); justify-content: stretch; gap: .35rem; }
+  .market-radar-quick-navigation__desktop a { display: flex; min-height: 2.36rem; align-items: center; gap: .33rem; border: 1px solid transparent; border-radius: .62rem; padding: .42rem .48rem; color: #635543; background: rgba(255, 253, 247, .48); font-size: .67rem; transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease; }
+  .market-radar-quick-navigation__desktop a:hover, .market-radar-quick-navigation__desktop a:focus-visible { border-color: rgba(165, 128, 79, .3); background: rgba(255, 253, 247, .92); color: var(--mr-gold-deep); outline: none; transform: translateY(-1px); }
+  .market-radar-quick-navigation__desktop b { min-width: 1.18rem; color: #aa8656; font-size: .53rem; }
+  .market-radar-quick-navigation__desktop a > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+.market-radar-daily-word { min-height: clamp(18rem, 25vw, 21.5rem); border-color: rgba(176, 137, 84, .39); background: linear-gradient(118deg, rgba(255, 253, 247, .98), rgba(244, 235, 218, .86)); box-shadow: 0 20px 44px rgba(83, 63, 39, .075), inset 0 1px 0 rgba(255, 255, 255, .72); }
+.market-radar-daily-word::after { position: absolute; z-index: 0; right: 13%; bottom: 1.6rem; width: min(27vw, 19rem); height: min(27vw, 19rem); border: 1px solid rgba(181, 142, 82, .16); border-radius: 50% 50% 0 0; content: ""; opacity: .7; }
+.market-radar-daily-word .market-radar-kicker { position: relative; display: inline-flex; align-items: center; gap: .48rem; }
+.market-radar-daily-word .market-radar-kicker::after { display: block; width: 1.4rem; height: 1px; background: #b58e52; content: ""; }
+.market-radar-daily-word h2 { font-family: Georgia, "Noto Serif TC", "Songti TC", serif; font-size: clamp(1.85rem, 2.6vw, 2.55rem); font-weight: 700; }
+.market-radar-daily-word__quote-mark { position: absolute; top: 5.6rem; left: -.06rem; color: rgba(186, 142, 78, .57); font-family: Georgia, serif; font-size: clamp(4rem, 7vw, 6.35rem); font-weight: 700; line-height: .72; }
+.market-radar-daily-word blockquote { position: relative; max-width: 48rem; margin-top: 1rem; padding-left: clamp(2.9rem, 5vw, 4.25rem); color: #30271f; font-size: clamp(2.05rem, 3.2vw, 3.15rem); line-height: 1.38; }
+.market-radar-daily-word__cityline { z-index: 1; right: 1%; bottom: 1.2rem; width: min(51%, 36rem); opacity: .6; }
+.market-radar-daily-word__cityline path { stroke: #aa7f46; stroke-width: 1.35; }
+
+@media (max-width: 1023px) {
+  .market-radar-hero__content { padding-bottom: 4.4rem; }
+  .market-radar-hero__skyline { bottom: -1rem; width: min(90%, 28rem); opacity: .18; }
+}
+@media (max-width: 767px) {
+  .market-radar-hero h1 { max-width: none; font-size: clamp(3rem, 14vw, 4.1rem); }
+  .market-radar-hero__content { padding-bottom: 3rem; }
+  .market-radar-hero__summary { max-width: 23rem; }
+  .market-radar-download__formats article { grid-template-columns: 2.5rem minmax(0, 1fr); }
+  .market-radar-download__format-icon { width: 2.32rem; min-height: 2.32rem; }
+  .market-radar-daily-word { min-height: 19.25rem; }
+  .market-radar-daily-word::after { right: -3.2rem; bottom: 1.25rem; width: 13rem; height: 13rem; }
+  .market-radar-daily-word__quote-mark { top: 3rem; left: -.12rem; font-size: 4.25rem; }
+  .market-radar-daily-word blockquote { max-width: 20rem; padding-left: 2.45rem; font-size: clamp(1.78rem, 8.4vw, 2.28rem); line-height: 1.42; }
+  .market-radar-daily-word__cityline { right: -17%; bottom: .85rem; width: 108%; opacity: .42; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .market-radar-quick-navigation__desktop a { transition: none; }
+}
