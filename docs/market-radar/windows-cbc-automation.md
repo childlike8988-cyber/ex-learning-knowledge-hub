@@ -35,3 +35,11 @@ The initial manual check was performed with CBC LIVE and the detected official p
 The Scheduled Task action uses a minimal local CMD shim because `schtasks.exe` has a 261-character action limit and the repository path contains spaces. The shim only starts the project-owned PowerShell wrapper; it contains no CBC acquisition, parsing, publishing or Git logic.
 
 MOI latest and MOI historical automation remain disabled and are outside this CBC-only runtime boundary.
+
+## Scheduler activation
+
+- Activation date: 2026-08-31 (Asia/Shanghai).
+- Task state: `Ready` (enabled after the final manual `SKIPPED` verification).
+- Next scheduled run: 2026-09-21 08:30 (Asia/Shanghai); the task then checks each monthly candidate day from the 21st through the 28th.
+- Runtime mode: CBC job enabled; MOI latest and history jobs disabled.
+- Deployment boundary: a future local CBC publish may run validation and build, but Git commit, Git push and GitHub Pages deployment remain manual review actions.
