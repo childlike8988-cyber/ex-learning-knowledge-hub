@@ -47,6 +47,8 @@ export type MarketRadarMoiLiveData = {
   freshness: MarketRadarFreshness;
   metrics: {
     transactionCount?: number;
+    /** Optional only: a comparable previous period, emitted by a future official-data importer. */
+    previousTransactionCount?: number;
     districtTransactionCounts: readonly MarketRadarDistrictTransactionCount[];
   };
   methodology: {

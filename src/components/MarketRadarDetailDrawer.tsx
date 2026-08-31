@@ -63,7 +63,7 @@ export function MarketRadarDetailDrawer({ detail, onClose }: MarketRadarDetailDr
       {detail.isMock && <p className="market-radar-detail-drawer__mock">MOCK DATA · 目前為介面與資料結構展示</p>}
       <p className="market-radar-detail-drawer__summary">{detail.summary}</p>
       <section className="market-radar-detail-drawer__facts"><h3>原始資訊</h3>{detail.facts.length > 0 ? <dl>{detail.facts.map((fact) => <div key={fact.id}><dt>{fact.label}</dt><dd><strong>{fact.value}{fact.unit ?? ""}</strong>{fact.comparison && <span>{fact.comparison}</span>}{fact.isEstimated && <em>估計值</em>}{fact.isMock && <small>Fixture</small>}</dd></div>)}</dl> : <p>目前沒有可驗證的原始資訊。</p>}</section>
-      <section><h3>Market Radar 解讀</h3><p>{detail.analysis.summary}</p><p>{detail.analysis.interpretation}</p><p className="market-radar-detail-drawer__analysis-note">本段為 Market Radar 根據公開資料整理之分析，不代表原始來源立場。</p></section>
+      <section><h3>Market Radar 解讀</h3><p>{detail.analysis.summary}</p><p>{detail.analysis.interpretation}</p><p className="market-radar-detail-drawer__analysis-note">Market Radar 解讀係依公開資料整理之分析，不代表原始資料來源立場，亦不構成投資或交易建議。</p></section>
       <section className="market-radar-detail-drawer__impact"><div><h3>影響對象</h3><p>{detail.analysis.affectedAudience.map((audience) => <span key={audience}>{audienceLabels[audience]}</span>)}</p></div><div><h3>影響程度</h3><strong>{impactLabels[detail.analysis.impactLevel]}</strong><small>分析信心：{detail.analysis.confidence === "high" ? "高" : detail.analysis.confidence === "medium" ? "中" : "低"}</small></div></section>
       <section className="market-radar-detail-drawer__sources"><h3>原始來源</h3><p>發布日期、資料期間、驗證時間皆依原始資料分別保存。</p><div>{detail.sources.map((source) => <SourceMetadata key={source.id} source={source} />)}</div></section>
     </aside>

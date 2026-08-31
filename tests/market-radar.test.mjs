@@ -26,10 +26,10 @@ test("market radar keeps the quarterly Free credit and monthly / annual pricing 
 
 test("market radar route and report UI preserve the requested public sections", () => {
   for (const term of ["market-radar-hero__grid", "market-radar-hero__download", "market-key-take", "market-district-signals", "market-temperature", "market-public-charts", "market-updates", "market-key-sentences", "TODAY&apos;S KEY TAKE", "market-radar-daily-word__bookmark", "market-radar-daily-word__cityline", "今日一句", "今日市場溫度", "今日 3 大重點", "今天最值得知道的 3 句話", "今日快訊", "公開圖表"]) assert.ok(pageSource.includes(term));
-  assert.ok(pageSource.indexOf("今日 3 大重點") < pageSource.indexOf("今日市場溫度"));
-  assert.ok(pageSource.indexOf("今日市場溫度") < pageSource.indexOf("公開圖表"));
-  assert.ok(pageSource.indexOf("公開圖表") < pageSource.indexOf("今日快訊"));
-  assert.ok(pageSource.indexOf("今日快訊") < pageSource.indexOf("今天最值得知道的 3 句話"));
+  assert.ok(pageSource.indexOf('id="market-district-signals"') < pageSource.indexOf("<MarketTemperature"));
+  assert.ok(pageSource.indexOf("<MarketTemperature") < pageSource.indexOf('id="market-public-charts"'));
+  assert.ok(pageSource.indexOf('id="market-public-charts"') < pageSource.indexOf('id="market-updates"'));
+  assert.ok(pageSource.indexOf('id="market-updates"') < pageSource.indexOf('id="market-key-sentences"'));
   assert.match(routeSource, /MarketRadarPage/);
   assert.match(routeSource, /loadMarketRadarLiveData/);
   assert.match(routeSource, /loadMarketRadarCbcData/);
@@ -74,7 +74,7 @@ test("market radar loader validates references and safely falls back without har
 });
 
 test("market radar detail drawer distinguishes facts, analysis and source metadata without mock links", () => {
-  for (const term of ["role=\"dialog\"", "aria-modal=\"true\"", "Escape", "MOCK DATA", "原始資訊", "Market Radar 解讀", "本段為 Market Radar 根據公開資料整理之分析", "影響對象", "影響程度", "分析信心", "原始來源", "發布日期", "資料期間", "最後驗證", "取得時間", "target=\"_blank\"", "rel=\"noopener noreferrer\"", "Boolean(source.url) && !source.isMock", "Mock Source"]) assert.ok(detailDrawerSource.includes(term));
+  for (const term of ["role=\"dialog\"", "aria-modal=\"true\"", "Escape", "MOCK DATA", "原始資訊", "Market Radar 解讀", "亦不構成投資或交易建議", "影響對象", "影響程度", "分析信心", "原始來源", "發布日期", "資料期間", "最後驗證", "取得時間", "target=\"_blank\"", "rel=\"noopener noreferrer\"", "Boolean(source.url) && !source.isMock", "Mock Source"]) assert.ok(detailDrawerSource.includes(term));
 });
 
 test("market radar news keeps its primary content column expandable across responsive layouts", () => {

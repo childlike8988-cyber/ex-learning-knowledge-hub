@@ -6,6 +6,9 @@ export type MarketRadarFreshnessStatus = "fresh" | "normal" | "aging" | "stale";
 export type MarketRadarImpactLevel = "low" | "medium" | "high";
 export type MarketRadarDirection = "positive" | "neutral" | "negative" | "mixed";
 export type MarketRadarAudience = "buyer" | "seller" | "agent" | "investor" | "homeowner";
+export type MarketRadarSignalStatus = "live" | "partial" | "fixture" | "unavailable";
+export type MarketRadarSignalDirection = "up" | "down" | "flat" | "mixed" | "unavailable";
+export type MarketRadarSignalLevel = "low" | "neutral" | "high" | "unavailable";
 
 export type MarketRadarSource = {
   id: string;
@@ -56,6 +59,51 @@ export type MarketRadarAnalysis = {
   affectedAudience: readonly MarketRadarAudience[];
   confidence: "low" | "medium" | "high";
   notes?: string;
+};
+
+export type MarketRadarSignal = {
+  id: "transaction-activity" | "financing-environment" | "price-momentum";
+  label: string;
+  status: MarketRadarSignalStatus;
+  direction: MarketRadarSignalDirection;
+  level: MarketRadarSignalLevel;
+  confidence: "low" | "medium" | "high";
+  factIds: readonly string[];
+  sourceIds: readonly string[];
+  facts: readonly MarketRadarFact[];
+  sources: readonly MarketRadarSource[];
+  analysis: MarketRadarAnalysis;
+  generatedAt: string;
+  dataStatus: MarketRadarSignalStatus;
+};
+
+export type MarketRadarDataCoverage = {
+  moi: "live" | "unavailable";
+  cbc: "live" | "unavailable";
+};
+
+export type MarketRadarTemperature = {
+  label: string;
+  description: string;
+  confidence: "low" | "medium" | "high";
+  dataStatus: "live" | "partial" | "unavailable";
+  basisSignalIds: readonly string[];
+  detail: MarketRadarDetail;
+};
+
+export type MarketRadarAnalysisResult = {
+  generatedAt: string;
+  ruleVersion: string;
+  dataCoverage: MarketRadarDataCoverage;
+  signals: readonly MarketRadarSignal[];
+  marketTemperature: MarketRadarTemperature;
+  dailyKeyTake?: {
+    text: string;
+    basisFactIds: readonly string[];
+    basisSignalIds: readonly string[];
+    dataStatus: "live";
+  };
+  warnings: readonly string[];
 };
 
 export type MarketRadarDetail = {
@@ -126,6 +174,9 @@ export type MarketRadarDailyKeyTake = {
   text: string;
   lineCount: 1 | 2 | 3;
   sourceIds: readonly string[];
+  basisFactIds: readonly string[];
+  basisSignalIds: readonly string[];
+  dataStatus: "live" | "partial" | "fixture" | "unavailable";
   analysisBasis: string;
   isMock: boolean;
 };
@@ -173,7 +224,7 @@ export const marketRadarFallbackReport: MarketRadarReport = {
   id: "market-radar-fallback", status: "fallback", isMock: true, date: "—", updatedAt: "", updatedAtLabel: "資料暫時無法取得", title: "高雄房市快報", subtitle: "Kaohsiung Housing Brief", summary: "目前正在等待可驗證的資料 Fixture。頁面骨架與下載方案仍可安全顯示。", sources: [],
   freshness: { status: "stale", label: "資料暫時無法取得", expectedUpdateFrequency: "irregular" },
   marketTemperature: { label: "待更新", description: "來源資料尚未通過驗證。", indicators: [], sourceIds: [], dataPeriod: {} },
-  dailyKeyTake: { text: "資料暫時無法取得，\n請稍後再試。", lineCount: 2, sourceIds: [], analysisBasis: "Fallback state", isMock: true },
+  dailyKeyTake: { text: "資料暫時無法取得，\n請稍後再試。", lineCount: 2, sourceIds: [], basisFactIds: [], basisSignalIds: [], dataStatus: "unavailable", analysisBasis: "Fallback state", isMock: true },
   districtHighlights: [], keyTakeaways: [], newsItems: [], publicCharts: [],
   proContent: { title: "MARKET RADAR PRO", description: "訂閱方案資訊維持可見；正式資料仍需來源驗證。", benefits: [] },
   freePlan: { downloadsPerQuarter: 1, includesPng: true, includesPdf: true, creditsCarryOver: false },

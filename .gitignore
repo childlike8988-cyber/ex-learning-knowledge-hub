@@ -21,3 +21,7 @@ data/market-radar/raw/*
 data/market-radar/raw/moi/*
 !data/market-radar/raw/moi/README.md
 !data/market-radar/raw/moi/source-manifest.json
+!data/market-radar/raw/cbc/
+data/market-radar/raw/cbc/*
+!data/market-radar/raw/cbc/README.md
+!data/market-radar/raw/cbc/source-manifest.json

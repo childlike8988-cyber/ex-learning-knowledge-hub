@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { MarketRadarPage } from "@/components/MarketRadarPage";
+import { loadMarketRadarCbcData } from "@/lib/market-radar/loadMarketRadarCbcData";
+import { loadMarketRadarAnalysis } from "@/lib/market-radar/loadMarketRadarAnalysis";
 import { loadMarketRadarReport } from "@/lib/market-radar/loadMarketRadarReport";
 import { loadMarketRadarLiveData } from "@/lib/market-radar/loadMarketRadarLiveData";
 
@@ -9,5 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default function MarketRadarRoute() {
-  return <MarketRadarPage report={loadMarketRadarReport()} liveData={loadMarketRadarLiveData()} />;
+  const liveData = loadMarketRadarLiveData();
+  const cbcData = loadMarketRadarCbcData();
+  return <MarketRadarPage report={loadMarketRadarReport()} liveData={liveData} cbcData={cbcData} analysis={loadMarketRadarAnalysis(liveData, cbcData)} />;
 }
