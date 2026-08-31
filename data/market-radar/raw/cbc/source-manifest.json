@@ -1,0 +1,14 @@
+{
+  "sourceId": "cbc-housing-finance",
+  "name": "中央銀行房貸與購屋貸款統計",
+  "publisher": "中央銀行",
+  "sourcePageUrl": "https://www.cbc.gov.tw/tw/cp-302-192747-5edf4-1.html",
+  "downloadUrl": "https://www.cbc.gov.tw/tw/dl-227456-e03ab17dca544cd7811ead3e51d52b9d.html",
+  "expectedUpdateFrequency": "monthly",
+  "downloadedAt": "2026-08-31T00:00:00+08:00",
+  "sourcePublishedAt": "2026-08-21T00:00:00+08:00",
+  "dataPeriodStart": "2026-07-01",
+  "dataPeriodEnd": "2026-07-31",
+  "latestImportedFile": "cbc-115-07.xlsx",
+  "status": "imported-local-official-file"
+}
