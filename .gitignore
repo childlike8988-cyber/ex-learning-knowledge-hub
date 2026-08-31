@@ -29,3 +29,5 @@ data/market-radar/staging/*
 !data/market-radar/staging/README.md
 data/market-radar/backups/*
 !data/market-radar/backups/README.md
+data/market-radar/logs/*
+!data/market-radar/logs/README.md
