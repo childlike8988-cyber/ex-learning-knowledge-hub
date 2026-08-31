@@ -26,7 +26,9 @@ function signalValue(signal: MarketRadarAnalysisResult["signals"][number]) {
 
 function MarketTemperature({ analysis, onOpenDetail }: { analysis: MarketRadarAnalysisResult; onOpenDetail: (detail: MarketRadarDetail) => void }) {
   const temperature = analysis.marketTemperature;
-  return <><section className="market-radar-temperature" id="market-temperature" aria-labelledby="temperature"><div><p className="market-radar-kicker">MARKET STATUS · {signalStatusLabel(temperature.dataStatus)}</p><h2 id="temperature">今日市場溫度 <span>{temperature.label}</span></h2><p>{temperature.description}</p><button type="button" className="market-radar-detail-trigger" onClick={() => onOpenDetail(temperature.detail)}>查看資料基礎 <span aria-hidden="true">→</span></button></div><div className="market-radar-indicators">{analysis.signals.map((item) => <article key={item.id} data-status={item.status}><p>{item.label} <TrendMark trend={item.direction} /></p><strong>{signalValue(item)}</strong><span>{item.analysis.summary}</span><small>{signalStatusLabel(item.status)}</small><i className={`market-radar-meter market-radar-meter--${item.direction}`} /></article>)}</div></section><aside className="market-radar-data-coverage" aria-label="Market Radar 資料涵蓋"><p>資料涵蓋 <small>DATA COVERAGE</small></p><span data-status={analysis.dataCoverage.moi}>內政部 <b>{analysis.dataCoverage.moi === "live" ? "● LIVE" : "○ 待更新"}</b></span><span data-status={analysis.dataCoverage.cbc}>中央銀行 <b>{analysis.dataCoverage.cbc === "live" ? "● LIVE" : "○ 待更新"}</b></span></aside></>;
+  const transactionSignal = analysis.signals.find((item) => item.id === "transaction-activity");
+  const awaitingMoiTrend = analysis.dataCoverage.moi === "live" && transactionSignal?.direction === "unavailable";
+  return <><section className="market-radar-temperature" id="market-temperature" aria-labelledby="temperature"><div><p className="market-radar-kicker">MARKET STATUS · {signalStatusLabel(temperature.dataStatus)}</p><h2 id="temperature">今日市場溫度 <span>{temperature.label}</span></h2><p>{temperature.description}</p><button type="button" className="market-radar-detail-trigger" onClick={() => onOpenDetail(temperature.detail)}>查看資料基礎 <span aria-hidden="true">→</span></button></div><div className="market-radar-indicators">{analysis.signals.map((item) => <article key={item.id} data-status={item.status}><p>{item.label} <TrendMark trend={item.direction} /></p><strong>{signalValue(item)}</strong><span>{item.analysis.summary}</span><small>{signalStatusLabel(item.status)}</small><i className={`market-radar-meter market-radar-meter--${item.direction}`} /></article>)}</div></section><aside className="market-radar-data-coverage" aria-label="Market Radar 資料涵蓋"><p>資料涵蓋 <small>DATA COVERAGE</small></p><span data-status={analysis.dataCoverage.moi}>內政部 <b>{analysis.dataCoverage.moi === "live" ? "● LIVE" : "○ 待更新"}</b></span><span data-status={analysis.dataCoverage.cbc}>中央銀行 <b>{analysis.dataCoverage.cbc === "live" ? "● LIVE" : "○ 待更新"}</b></span>{awaitingMoiTrend && <small className="market-radar-data-coverage__note">趨勢基準：MOI 歷史資料尚未建立</small>}</aside></>;
 }
 
 function PublicChart({ chart, onOpenDetail }: { chart: MarketRadarChart; onOpenDetail: (detail: MarketRadarDetail) => void }) {
@@ -41,7 +43,8 @@ function LiveDistrictTransactionChart({ liveData, onOpenDetail }: { liveData: Ma
     return <article className="market-radar-chart market-radar-chart--updating"><div className="market-radar-chart__heading"><div><p>區域成交件數比較</p><span>內政部不動產實價登錄</span></div><b className="market-radar-live-badge market-radar-live-badge--updating">資料更新中</b></div><div className="market-radar-chart__empty"><strong>等待官方批次資料</strong><p>{liveData.warning ?? "Live 資料更新中。"}</p></div></article>;
   }
 
-  const rows = liveData.metrics.districtTransactionCounts.slice(0, 4);
+  const chartRows = liveData.metrics.districtTransactionCounts.slice(0, 8);
+  const detailRows = liveData.metrics.districtTransactionCounts;
   const dataPeriod = { start: liveData.dataPeriodStart, end: liveData.dataPeriodEnd, label: `${liveData.dataPeriodStart} ～ ${liveData.dataPeriodEnd}` };
   const detail: MarketRadarDetail = {
     id: "moi-live-district-transaction-counts",
@@ -51,6 +54,7 @@ function LiveDistrictTransactionChart({ liveData, onOpenDetail }: { liveData: Ma
     facts: [
       { id: "moi-transaction-count", label: "高雄市有效成交紀錄", value: liveData.metrics.transactionCount ?? 0, unit: "件", sourceIds: [liveData.source.id], dataPeriod, isEstimated: false, isMock: false },
       { id: "moi-district-count", label: "納入統計行政區", value: liveData.metrics.districtTransactionCounts.length, unit: "區", sourceIds: [liveData.source.id], dataPeriod, isEstimated: false, isMock: false },
+      ...detailRows.map((row) => ({ id: `moi-district-transaction-count-${row.district}`, label: `${row.district}實價登錄案件`, value: row.transactionCount, unit: "件", sourceIds: [liveData.source!.id], dataPeriod, isEstimated: false, isMock: false })),
     ],
     analysis: {
       summary: "本圖顯示目前資料期間內各行政區登錄案件數差異。",
@@ -70,11 +74,11 @@ function LiveDistrictTransactionChart({ liveData, onOpenDetail }: { liveData: Ma
     id: "district-comparison",
     dataStatus: "live",
     title: "區域成交件數比較",
-    subtitle: `${dataPeriod.label} · 登錄件數前四區`,
+    subtitle: `${dataPeriod.label} · 實價登錄案件數前八區`,
     chartType: "comparison",
-    xAxis: { label: "行政區", labels: rows.map((row) => row.district) },
+    xAxis: { label: "行政區", labels: chartRows.map((row) => row.district) },
     yAxis: { label: "成交件數" },
-    series: [{ id: "moi-district-transaction-counts", label: "成交件數", values: rows.map((row) => row.transactionCount), displayValues: rows.map((row) => `${row.transactionCount} 件`) }],
+    series: [{ id: "moi-district-transaction-counts", label: "實價登錄案件數", values: chartRows.map((row) => row.transactionCount), displayValues: chartRows.map((row) => `${row.transactionCount} 件`) }],
     dataPeriod,
     sourceIds: [liveData.source.id],
     analysis: detail.analysis,
@@ -123,12 +127,13 @@ export function MarketRadarPage({ report, liveData, cbcData, analysis }: { repor
   const dailyKeyTake = analysis.dailyKeyTake ? { ...report.dailyKeyTake, ...analysis.dailyKeyTake, sourceIds: analysis.signals.filter((signal) => analysis.dailyKeyTake?.basisSignalIds.includes(signal.id)).flatMap((signal) => signal.sourceIds), isMock: false } : report.dailyKeyTake;
   const dailyLines = dailyKeyTake.text.split("\n");
   const financeObservation = !analysis.dailyKeyTake ? analysis.signals.find((signal) => signal.id === "financing-environment" && signal.status === "live") : undefined;
+  const transactionObservation = !analysis.dailyKeyTake ? analysis.signals.find((signal) => signal.id === "transaction-activity" && signal.status === "live") : undefined;
 
   return <div className="market-radar-page"><div className="market-radar-page__texture" aria-hidden="true" />
     <section className="market-radar-hero" aria-labelledby="market-radar-title"><div className="market-radar-container market-radar-hero__grid"><div className="market-radar-hero__content"><div className="market-radar-hero__meta"><span>E.X MARKET RADAR</span><b>MOCK DATA · MVP</b></div><p className="market-radar-kicker">Kaohsiung Housing Brief</p><h1 id="market-radar-title">{report.title}</h1><p className="market-radar-hero__date"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.25" /><path d="M12 7.5v4.85l3.25 1.85" /></svg><span>{report.date}｜{report.updatedAtLabel}</span></p><p className="market-radar-hero__summary">{report.summary}</p><p className="market-radar-hero__notice">本頁為 UI 與 Mock Data 展示，不代表即時市場資訊或投資建議。</p><svg className="market-radar-hero__skyline" viewBox="0 0 500 270" aria-hidden="true"><path d="M0 247h38v-42h26v42h30v-76h25v76h23V40h8v207h36v-58h34v58h30v-97h38v97h29v-55h34v55h34v-81h32v81h31v-45h41v45h55" /><path d="M0 254h500" /></svg></div><div className="market-radar-hero__download"><MarketRadarDownloadSection report={report} /></div></div></section>
     <div className="market-radar-container market-radar-content">
       <MarketRadarQuickNavigation />
-      <section className="market-radar-daily-word" id="market-key-take" aria-labelledby="daily-word"><span className="market-radar-daily-word__bookmark" aria-hidden="true">✦</span><div className="market-radar-daily-word__copy"><p className="market-radar-kicker">TODAY&apos;S KEY TAKE · {dailyKeyTake.dataStatus === "live" ? "LIVE BASIS" : "FIXTURE"}</p><h2 id="daily-word">今日一句</h2><span className="market-radar-daily-word__quote-mark" aria-hidden="true">“</span><blockquote data-lines={dailyKeyTake.lineCount}>{dailyLines.map((line, index) => <span key={`${line}-${index}`}>{line}{index < dailyLines.length - 1 && <br />}</span>)}</blockquote>{financeObservation && <p className="market-radar-live-observation"><b>CBC LIVE OBSERVATION</b><span>{financeObservation.analysis.interpretation}</span></p>}</div><svg className="market-radar-daily-word__cityline" viewBox="0 0 620 112" aria-hidden="true"><path d="M0 98h56V75h34V50h24v48h34V27h36v71h28V62h44v36h36V42h46v56h48V20h20v78h38V58h42v40h50V71h42v27h54" fill="none" /><path d="M0 104h620" fill="none" /></svg></section>
+      <section className="market-radar-daily-word" id="market-key-take" aria-labelledby="daily-word"><span className="market-radar-daily-word__bookmark" aria-hidden="true">✦</span><div className="market-radar-daily-word__copy"><p className="market-radar-kicker">TODAY&apos;S KEY TAKE · {dailyKeyTake.dataStatus === "live" ? "LIVE BASIS" : "FIXTURE"}</p><h2 id="daily-word">今日一句</h2><span className="market-radar-daily-word__quote-mark" aria-hidden="true">“</span><blockquote data-lines={dailyKeyTake.lineCount}>{dailyLines.map((line, index) => <span key={`${line}-${index}`}>{line}{index < dailyLines.length - 1 && <br />}</span>)}</blockquote>{financeObservation && <p className="market-radar-live-observation"><b>CBC LIVE OBSERVATION</b><span>{financeObservation.analysis.interpretation}</span></p>}{transactionObservation && <p className="market-radar-live-observation"><b>MOI LIVE OBSERVATION</b><span>內政部實價登錄資料已接入，本期高雄有效買賣登錄案件共 {transactionObservation.facts[0]?.value ?? "—"} 筆。</span></p>}</div><svg className="market-radar-daily-word__cityline" viewBox="0 0 620 112" aria-hidden="true"><path d="M0 98h56V75h34V50h24v48h34V27h36v71h28V62h44v36h36V42h46v56h48V20h20v78h38V58h42v40h50V71h42v27h54" fill="none" /><path d="M0 104h620" fill="none" /></svg></section>
       <section className="market-radar-section" id="market-district-signals" aria-labelledby="district-highlights"><div className="market-radar-section__heading"><div><p className="market-radar-kicker">DISTRICT SIGNALS</p><h2 id="district-highlights">今日 3 大重點</h2></div><span>Free Brief</span></div><div className="market-radar-districts">{report.districtHighlights.map((item) => <article key={item.id}><p>{item.district}</p><h3>{item.headline}</h3><span>{item.summary}</span><button type="button" className="market-radar-detail-trigger" onClick={() => setActiveDetail(item.detail)}>查看區域分析 <span aria-hidden="true">→</span></button></article>)}</div></section>
       <MarketTemperature analysis={analysis} onOpenDetail={setActiveDetail} />
       <FinanceSignal data={cbcData} onOpenDetail={setActiveDetail} />

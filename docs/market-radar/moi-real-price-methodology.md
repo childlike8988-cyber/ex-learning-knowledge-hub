@@ -1,8 +1,23 @@
-# MOI 實價登錄資料方法說明（Phase 2B）
+# MOI 實價登錄資料方法說明（Phase 2C-3）
 
 ## 狀態
 
-Phase 2B 已建立可重現的本機匯入、正規化與靜態輸出管線；目前尚未匯入一份已完成官方授權下載流程的實際批次檔。因此公開頁會保留 Fixture Report，Live 圖表位置會顯示「資料更新中」，不會以展示數字假裝為官方資料。
+Phase 2C-3 已匯入第一份經內政部官方 Open Data 下載流程取得的高雄市買賣 CSV。公開頁的「區域成交件數比較」現在使用此 Live slice；其餘未接入資料的區塊仍保留 Fixture／Mock 標示。
+
+## 本次正式匯入
+
+- 官方檔名：`E_lvr_land_A.csv`
+- 檔案格式：UTF-8 CSV，高雄市專屬「不動產買賣」批次檔
+- 官方下載頁：<https://plvr.land.moi.gov.tw/DownloadOpenData>
+- 官方發布日：2026-08-21；官方交易實價服務網公告該日提供登記日期 2026-08-01 至 2026-08-10 的買賣案件查詢與下載
+- 資料期間：登記日期 2026-08-01 ～ 2026-08-10（非交易日期）
+- 取得時間：2026-08-31T04:31:23.000Z
+- 驗證／產製時間：記錄於 Live JSON 與 Data Quality Report 的 `verifiedAt`／`generatedAt`
+- 範圍：高雄市；交易類別：不動產買賣
+
+官方 schema 首列為中文欄位，第二列為英文欄位說明；匯入器會明確略過第二列。必要欄位已依實際 header 驗證為：`鄉鎮市區`、`交易標的`、`交易年月日`、`總價元`、`編號`，並讀取可選的面積、單價、車位、建物型態與備註欄位。
+
+本次品質結果：`rawRows=1040`、`acceptedRows=1040`、`rejectedRows=0`、`duplicateRows=0`、`districtCount=36`。36 個行政區件數加總為 1040，與 `transactionCount` 一致。
 
 ## 官方來源
 
@@ -12,7 +27,7 @@ Phase 2B 已建立可重現的本機匯入、正規化與靜態輸出管線；�
 - 優先級：Tier 1／Official／Primary Source
 - 官方下載頁：https://plvr.land.moi.gov.tw/DownloadOpenData
 
-官方下載頁要求依其流程取得批次資料；原始 ZIP／CSV 不會自動下載，也不會納入 Git。每次匯入應在 `data/market-radar/raw/moi/source-manifest.json` 填入下載日、官方發布日、資料期間與原始檔案名稱。
+官方下載頁要求依其流程取得批次資料；原始 ZIP／CSV 不會納入 Git。每次匯入應在 `data/market-radar/raw/moi/source-manifest.json` 填入下載日、官方發布日、資料期間與原始檔案名稱。
 
 ## 匯入步驟
 
@@ -68,6 +83,8 @@ node scripts/market-radar/import-moi-real-price.mjs "<官方 CSV 路徑>" `
 - `public/data/market-radar/live/moi-real-price-latest.json`
 
 品質報告包含 raw／accepted／rejected／duplicate rows、行政區數、日期／價格／行政區缺漏計數與警語。Live JSON 缺失或驗證失敗時，靜態頁面仍以 Fixture 正常建置，Live 區塊明確顯示「資料更新中」。
+
+Live JSON 只有在 Quality Gate 通過後才會產製。Gate 必須同時確認：接受列數大於零、行政區數大於零、行政區非全數缺漏、資料期間有效，且官方發布／取得／驗證時間皆可解析。若 Gate 失敗，仍會留下品質報告，但不覆蓋 Live JSON。
 
 ## Live 與 Fixture 並存
 

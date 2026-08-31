@@ -57,6 +57,10 @@ test("missing MOI history does not claim a fake transaction trend", () => {
   const result = buildMarketRadarAnalysis(moiLive(), cbcLive());
   assert.equal(signal(result, "transaction-activity").status, "live");
   assert.equal(signal(result, "transaction-activity").direction, "unavailable");
+  assert.equal(signal(result, "financing-environment").status, "live");
+  assert.equal(signal(result, "price-momentum").status, "unavailable");
+  assert.equal(result.marketTemperature.dataStatus, "partial");
+  assert.match(result.marketTemperature.description, /僅有一期資料/);
   assert.equal(result.dailyKeyTake, undefined);
 });
 

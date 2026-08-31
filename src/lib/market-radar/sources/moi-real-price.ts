@@ -43,6 +43,8 @@ export type MarketRadarMoiLiveData = {
   dataPeriodStart?: string;
   dataPeriodEnd?: string;
   verifiedAt?: string;
+  retrievedAt?: string;
+  methodologyVersion?: string;
   source?: MarketRadarSource;
   freshness: MarketRadarFreshness;
   metrics: {

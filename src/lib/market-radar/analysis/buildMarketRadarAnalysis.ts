@@ -90,6 +90,7 @@ function buildTemperature(coverage: MarketRadarDataCoverage, signals: readonly M
   let dataStatus: "live" | "partial" | "unavailable" = liveSignalCount > 0 ? "partial" : "unavailable";
   let confidence: "low" | "medium" | "high" = "low";
   if (coverage.cbc === "live" && coverage.moi === "unavailable") description = "目前融資環境已接入中央銀行資料；成交與價格趨勢仍待官方資料完成。";
+  if (coverage.cbc === "live" && coverage.moi === "live" && transaction.direction === "unavailable") description = "內政部與中央銀行官方資料已接入；內政部目前僅有一期資料，成交趨勢與價格序列仍待建立。";
   if (coverage.cbc === "live" && coverage.moi === "live" && transaction.direction !== "unavailable") {
     dataStatus = "live";
     confidence = "medium";

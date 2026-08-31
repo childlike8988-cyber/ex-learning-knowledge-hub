@@ -39,6 +39,8 @@ function isMoiLiveData(value: unknown): value is MarketRadarMoiLiveData {
     && typeof data.dataPeriodStart === "string"
     && typeof data.dataPeriodEnd === "string"
     && typeof data.verifiedAt === "string"
+    && typeof data.retrievedAt === "string"
+    && typeof data.methodologyVersion === "string"
     && Boolean(data.source && data.source.isMock === false)
     && typeof data.metrics?.transactionCount === "number"
     && Array.isArray(data.metrics.districtTransactionCounts);
