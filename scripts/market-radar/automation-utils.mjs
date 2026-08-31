@@ -7,7 +7,7 @@ export const AUTOMATION_ENABLED = false;
 export const JOB_DEFINITIONS = Object.freeze({
   "moi-latest-refresh": { sourceId: "moi-real-price-sales", enabled: false, purpose: "latest" },
   "moi-history-backfill": { sourceId: "moi-real-price-sales", enabled: false, purpose: "history" },
-  "cbc-monthly-refresh": { sourceId: "cbc-housing-finance", enabled: false, purpose: "monthly" },
+  "cbc-monthly-refresh": { sourceId: "cbc-housing-finance", enabled: true, purpose: "monthly" },
 });
 
 export async function sha256File(filePath) {
@@ -42,6 +42,21 @@ export function isCandidateNewer(candidate, current, force = false) {
 
 export function canPublishCandidate({ metadataValid, schemaValid, qualityPassed, isNewer }) {
   return Boolean(metadataValid && schemaValid && qualityPassed && isNewer);
+}
+
+export function validateCbcAutomationQuality({ quality, liveData }) {
+  const history = Array.isArray(liveData?.history) ? liveData.history : [];
+  const periods = history.map((record) => record?.period);
+  const sorted = periods.every((period, index) => index === 0 || periods[index - 1] < period);
+  const uniquePeriods = new Set(periods).size === periods.length;
+  const latest = liveData?.latest;
+  const validPeriod = /^\d{4}-\d{2}$/.test(latest?.period ?? "");
+  const validRate = Number.isFinite(latest?.mortgageRate) && latest.mortgageRate > 0 && latest.mortgageRate < 20;
+  const validAmount = Number.isFinite(latest?.newMortgageAmount) && latest.newMortgageAmount >= 0;
+  return {
+    passed: Number(quality?.acceptedRows) > 0 && validPeriod && validRate && validAmount && sorted && uniquePeriods,
+    checks: { acceptedRows: Number(quality?.acceptedRows) > 0, validPeriod, validRate, validAmount, historySorted: sorted, uniquePeriods },
+  };
 }
 
 export async function safeJsonWrite(filePath, value) {
@@ -79,6 +94,10 @@ export function buildPublicUpdateStatus({ generatedAt, moiLatest, cbcLatest, moi
   return {
     generatedAt,
     automationEnabled: false,
+    automation: {
+      globalReady: true,
+      jobs: { moiLatestRefresh: false, moiHistoryBackfill: false, cbcMonthlyRefresh: true },
+    },
     overallStatus: sourcesLive ? "partial" : "degraded",
     safeMessage: sourcesLive && !moiHistoryReady
       ? "MOI 最新期與 CBC 資料已驗證；MOI 歷史基準仍等待可驗證的前期官方批次。"

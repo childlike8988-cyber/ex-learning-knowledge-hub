@@ -80,6 +80,14 @@ export type MarketRadarHealthStatus = {
 export type MarketRadarPublicUpdateStatus = {
   generatedAt: string;
   automationEnabled: false;
+  automation: {
+    globalReady: boolean;
+    jobs: {
+      moiLatestRefresh: boolean;
+      moiHistoryBackfill: boolean;
+      cbcMonthlyRefresh: boolean;
+    };
+  };
   overallStatus: "healthy" | "partial" | "degraded";
   safeMessage: string;
   sources: {

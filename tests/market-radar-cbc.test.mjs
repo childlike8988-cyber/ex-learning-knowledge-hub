@@ -28,7 +28,7 @@ const normalized = normalizeCbcRows([
 ], { sourcePublishedAt: "2026-08-21T00:00:00+08:00" });
 
 test("CBC source config is Tier 1 official, primary and monthly", () => {
-  for (const term of ["cbc-housing-finance", "中央銀行", "priority: \"official\"", "isPrimarySource: true", "expectedUpdateFrequency: \"monthly\"", "sourcePageUrl", "downloadUrl"]) assert.ok(sourceConfig.includes(term));
+  for (const term of ["cbc-housing-finance", "中央銀行", "priority: \"official\"", "isPrimarySource: true", "expectedUpdateFrequency: \"monthly\"", "sourcePageUrl", "attachmentDiscovery"]) assert.ok(sourceConfig.includes(term));
 });
 
 test("CBC period and numeric parsers preserve official monthly and unit semantics", () => {

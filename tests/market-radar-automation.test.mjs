@@ -38,7 +38,9 @@ test("automation is disabled and exposes the three future job definitions", () =
   assert.equal(AUTOMATION_ENABLED, false);
   assert.equal(automationConfig.includes("MARKET_RADAR_AUTOMATION_ENABLED = false"), true);
   assert.deepEqual(Object.keys(JOB_DEFINITIONS), ["moi-latest-refresh", "moi-history-backfill", "cbc-monthly-refresh"]);
-  assert.ok(Object.values(JOB_DEFINITIONS).every((job) => job.enabled === false));
+  assert.equal(JOB_DEFINITIONS["moi-latest-refresh"].enabled, false);
+  assert.equal(JOB_DEFINITIONS["moi-history-backfill"].enabled, false);
+  assert.equal(JOB_DEFINITIONS["cbc-monthly-refresh"].enabled, true);
 });
 
 test("source refresh state is represented by the public status contract", () => {
@@ -60,8 +62,8 @@ test("MOI history backfill job stays separate and disabled", () => {
   assert.deepEqual(JOB_DEFINITIONS["moi-history-backfill"], { sourceId: "moi-real-price-sales", enabled: false, purpose: "history" });
 });
 
-test("CBC monthly refresh job stays disabled", () => {
-  assert.deepEqual(JOB_DEFINITIONS["cbc-monthly-refresh"], { sourceId: "cbc-housing-finance", enabled: false, purpose: "monthly" });
+test("CBC monthly refresh is the only enabled job", () => {
+  assert.deepEqual(JOB_DEFINITIONS["cbc-monthly-refresh"], { sourceId: "cbc-housing-finance", enabled: true, purpose: "monthly" });
 });
 
 test("source version uses deterministic SHA-256 provenance and skips duplicates or older candidates", async () => {
@@ -108,6 +110,7 @@ test("safe JSON write is atomic-at-target and public status excludes internal er
   assert.deepEqual(JSON.parse(await readFile(destination, "utf8")), { ready: true });
   const status = buildPublicUpdateStatus({ generatedAt: "2026-08-31T00:00:00Z", moiLatest: liveMoi, cbcLatest: liveCbc, moiHistoryReady: false });
   assert.equal(status.automationEnabled, false);
+  assert.deepEqual(status.automation.jobs, { moiLatestRefresh: false, moiHistoryBackfill: false, cbcMonthlyRefresh: true });
   assert.equal(status.overallStatus, "partial");
   assert.equal(status.sources.moiHistory.status, "waiting");
   assert.equal(JSON.stringify(status).includes("stack"), false);

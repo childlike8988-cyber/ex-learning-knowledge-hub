@@ -1,0 +1,33 @@
+{
+  "name": "Market Radar — CBC Monthly Refresh",
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "nodes": [
+    { "name": "Manual Trigger", "type": "n8n-nodes-base.manualTrigger", "typeVersion": 1, "position": [240, 280], "parameters": {} },
+    { "name": "Monthly Candidate Check", "type": "n8n-nodes-base.cron", "typeVersion": 1, "position": [240, 440], "parameters": { "triggerTimes": { "item": [{ "mode": "custom", "cronExpression": "0 30 16 20-28 * *" }] } } },
+    { "name": "Dry Run Official CBC Cycle", "type": "n8n-nodes-base.executeCommand", "typeVersion": 1, "position": [510, 360], "parameters": { "command": "node scripts/market-radar/run-cbc-monthly-cycle.mjs --trigger scheduled" } },
+    { "name": "Candidate Staged?", "type": "n8n-nodes-base.if", "typeVersion": 2, "position": [760, 360], "parameters": { "conditions": { "options": { "caseSensitive": true }, "conditions": [{ "leftValue": "={{ JSON.parse($json.stdout).status === 'staged' }}", "rightValue": true, "operator": { "type": "boolean", "operation": "true", "singleValue": true } }], "combinator": "and" } } },
+    { "name": "Cycle Skipped?", "type": "n8n-nodes-base.if", "typeVersion": 2, "position": [1010, 500], "parameters": { "conditions": { "options": { "caseSensitive": true }, "conditions": [{ "leftValue": "={{ JSON.parse($json.stdout).status === 'skipped' }}", "rightValue": true, "operator": { "type": "boolean", "operation": "true", "singleValue": true } }], "combinator": "and" } } },
+    { "name": "Quality Passed and Changed?", "type": "n8n-nodes-base.if", "typeVersion": 2, "position": [1010, 260], "parameters": { "conditions": { "options": { "caseSensitive": true }, "conditions": [{ "leftValue": "={{ JSON.parse($json.stdout).job.qualityPassed && JSON.parse($json.stdout).job.changed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "true", "singleValue": true } }], "combinator": "and" } } },
+    { "name": "Publish Candidate", "type": "n8n-nodes-base.executeCommand", "typeVersion": 1, "position": [1260, 180], "parameters": { "command": "=node scripts/market-radar/run-cbc-monthly-cycle.mjs --publish --trigger scheduled --candidate \"{{ JSON.parse($node[\"Dry Run Official CBC Cycle\"].json.stdout).job.warnings.find(value => value.startsWith(\"candidatePath=\")).replace(\"candidatePath=\", \"\") }}\"" } },
+    { "name": "Verify Local Build", "type": "n8n-nodes-base.executeCommand", "typeVersion": 1, "position": [1510, 180], "parameters": { "command": "npm run typecheck && npm run lint && npm test && npm run build" } },
+    { "name": "Record Safe Status", "type": "n8n-nodes-base.executeCommand", "typeVersion": 1, "position": [1770, 140], "parameters": { "command": "node scripts/market-radar/update-cbc-status.mjs --outcome success" } },
+    { "name": "Rollback Known-Good CBC", "type": "n8n-nodes-base.executeCommand", "typeVersion": 1, "position": [1770, 300], "parameters": { "command": "node scripts/market-radar/rollback-cbc-live.mjs" } },
+    { "name": "Record Skipped Status", "type": "n8n-nodes-base.executeCommand", "typeVersion": 1, "position": [1260, 560], "parameters": { "command": "node scripts/market-radar/update-cbc-status.mjs --outcome skipped" } },
+    { "name": "Record Failed Safe Status", "type": "n8n-nodes-base.executeCommand", "typeVersion": 1, "position": [2020, 300], "parameters": { "command": "node scripts/market-radar/update-cbc-status.mjs --outcome failed --safe-message \"中央銀行資料更新檢查暫時失敗，現行資料仍可使用。\"" } }
+  ],
+  "connections": {
+    "Manual Trigger": { "main": [[{ "node": "Dry Run Official CBC Cycle", "type": "main", "index": 0 }]] },
+    "Monthly Candidate Check": { "main": [[{ "node": "Dry Run Official CBC Cycle", "type": "main", "index": 0 }]] },
+    "Dry Run Official CBC Cycle": { "main": [[{ "node": "Candidate Staged?", "type": "main", "index": 0 }]] },
+    "Candidate Staged?": { "main": [[{ "node": "Quality Passed and Changed?", "type": "main", "index": 0 }], [{ "node": "Cycle Skipped?", "type": "main", "index": 0 }]] },
+    "Cycle Skipped?": { "main": [[{ "node": "Record Skipped Status", "type": "main", "index": 0 }], [{ "node": "Record Failed Safe Status", "type": "main", "index": 0 }]] },
+    "Quality Passed and Changed?": { "main": [[{ "node": "Publish Candidate", "type": "main", "index": 0 }], [{ "node": "Record Failed Safe Status", "type": "main", "index": 0 }]] },
+    "Publish Candidate": { "main": [[{ "node": "Verify Local Build", "type": "main", "index": 0 }]] },
+    "Verify Local Build": { "main": [[{ "node": "Record Safe Status", "type": "main", "index": 0 }], [{ "node": "Rollback Known-Good CBC", "type": "main", "index": 0 }]] },
+    "Rollback Known-Good CBC": { "main": [[{ "node": "Record Failed Safe Status", "type": "main", "index": 0 }]] }
+  },
+  "pinData": {},
+  "meta": { "templateCredsSetupCompleted": true, "instanceId": "market-radar-local-template" },
+  "tags": []
+}

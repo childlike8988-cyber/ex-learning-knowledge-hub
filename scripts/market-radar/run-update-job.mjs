@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { existsSync, readFileSync } from "node:fs";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFile } from "node:child_process";
@@ -13,6 +13,7 @@ import {
   isCandidateNewer,
   sha256File,
   safeJsonWrite,
+  validateCbcAutomationQuality,
 } from "./automation-utils.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -21,18 +22,19 @@ const moiImporterPath = join(runnerDirectory, "import-moi-real-price.mjs");
 const cbcImporterPath = join(runnerDirectory, "import-cbc-housing-finance.mjs");
 
 function usage() {
-  return "Usage: node scripts/market-radar/run-update-job.mjs <moi-latest-refresh|moi-history-backfill|cbc-monthly-refresh> --dry-run [--source-file <path> --source-published-at <ISO> --data-period-start <YYYY-MM-DD> --data-period-end <YYYY-MM-DD> --county-file] [--force]";
+  return "Usage: node scripts/market-radar/run-update-job.mjs <job-id> --dry-run --source-file <path> --source-published-at <ISO> [--data-period-start <YYYY-MM-DD> --data-period-end <YYYY-MM-DD> --county-file] | cbc-monthly-refresh --publish --candidate <candidate-path> [--trigger manual|scheduled]";
 }
 
 function readArguments(argv) {
   const [jobId, ...rest] = argv;
-  const options = { dryRun: false, force: false, countyFile: false };
+  const options = { dryRun: false, publish: false, force: false, countyFile: false, trigger: "manual" };
   for (let index = 0; index < rest.length; index += 1) {
     const value = rest[index];
     if (value === "--dry-run") { options.dryRun = true; continue; }
+    if (value === "--publish") { options.publish = true; continue; }
     if (value === "--force") { options.force = true; continue; }
     if (value === "--county-file") { options.countyFile = true; continue; }
-    if (["--source-file", "--source-published-at", "--data-period-start", "--data-period-end"].includes(value)) {
+    if (["--source-file", "--source-published-at", "--data-period-start", "--data-period-end", "--candidate", "--trigger"].includes(value)) {
       options[value.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = rest[index + 1];
       index += 1;
       continue;
@@ -40,6 +42,8 @@ function readArguments(argv) {
     throw new Error(`Unknown argument: ${value}\n${usage()}`);
   }
   if (!JOB_DEFINITIONS[jobId]) throw new Error(usage());
+  if (options.trigger !== "manual" && options.trigger !== "scheduled" && options.trigger !== "webhook") throw new Error("Invalid trigger.");
+  if (options.trigger !== "manual" && options.force) throw new Error("Force is permitted only for a manual trigger.");
   return { jobId, options };
 }
 
@@ -65,10 +69,36 @@ async function runImporter({ jobId, sourceId, sourceFile, options, stageDirector
       command.push("--history-only", "--history-output", join(stageDirectory, "moi-real-price-history-candidate.json"), "--period-id", `moi-${options.dataPeriodStart}-${options.dataPeriodEnd}`);
     } else command.push("--live-output", candidateLive);
     await execFileAsync(process.execPath, command);
-    return JSON.parse(await readFile(join(processedDirectory, "moi-real-price-quality.json"), "utf8"));
+    return { quality: JSON.parse(await readFile(join(processedDirectory, "moi-real-price-quality.json"), "utf8")), candidateLivePath: candidateLive };
   }
   await execFileAsync(process.execPath, [cbcImporterPath, sourceFile, "--source-published-at", options.sourcePublishedAt, "--verified-at", verifiedAt, "--out-dir", processedDirectory, "--live-output", candidateLive]);
-  return JSON.parse(await readFile(join(processedDirectory, "cbc-housing-finance-quality.json"), "utf8"));
+  return { quality: JSON.parse(await readFile(join(processedDirectory, "cbc-housing-finance-quality.json"), "utf8")), candidateLivePath: candidateLive };
+}
+
+export async function publishCbcCandidate(candidatePath, options, startedAt) {
+  const definition = JOB_DEFINITIONS["cbc-monthly-refresh"];
+  if (!definition.enabled) return result("cbc-monthly-refresh", definition.sourceId, startedAt, { status: "skipped", errors: ["CBC job is disabled"] });
+  if (!candidatePath || !existsSync(candidatePath)) return result("cbc-monthly-refresh", definition.sourceId, startedAt, { status: "failed", errors: ["candidate file not found; live data was preserved"] });
+  let candidate;
+  try { candidate = JSON.parse(await readFile(candidatePath, "utf8")); } catch { return result("cbc-monthly-refresh", definition.sourceId, startedAt, { status: "failed", errors: ["candidate file is invalid; live data was preserved"] }); }
+  const qualityGate = validateCbcAutomationQuality({ quality: candidate?.quality, liveData: candidate?.liveData });
+  if (candidate?.sourceId !== "cbc-housing-finance" || candidate?.qualityPassed !== true || !candidate?.sourceVersion?.sourceVersionId || !qualityGate.passed) {
+    return result("cbc-monthly-refresh", definition.sourceId, startedAt, { status: "failed", errors: ["candidate did not pass metadata, schema or quality validation; live data was preserved"] });
+  }
+  const current = readExistingPublishedVersion("cbc-monthly-refresh", definition.sourceId);
+  const newer = isCandidateNewer(candidate.sourceVersion, current, options.force);
+  if (!newer.eligible) return result("cbc-monthly-refresh", definition.sourceId, startedAt, { status: "skipped", sourceVersionId: candidate.sourceVersion.sourceVersionId, warnings: [newer.reason] });
+  const livePath = resolve(process.cwd(), "public/data/market-radar/live/cbc-housing-finance-latest.json");
+  const backupPath = resolve(process.cwd(), "data/market-radar/backups/cbc-housing-finance-known-good.json");
+  if (existsSync(livePath)) {
+    await mkdir(resolve(process.cwd(), "data/market-radar/backups"), { recursive: true });
+    await copyFile(livePath, backupPath);
+  }
+  await safeJsonWrite(livePath, { ...candidate.liveData, sourceVersionId: candidate.sourceVersion.sourceVersionId });
+  return result("cbc-monthly-refresh", definition.sourceId, startedAt, {
+    status: "published", sourceVersionId: candidate.sourceVersion.sourceVersionId, changed: true, published: true, qualityPassed: true,
+    candidateDataPeriod: { start: candidate.liveData.dataPeriodStart, end: candidate.liveData.dataPeriodEnd },
+  });
 }
 
 function result(jobId, sourceId, startedAt, overrides) {
@@ -90,6 +120,10 @@ async function main() {
   const { jobId, options } = readArguments(process.argv.slice(2));
   const definition = JOB_DEFINITIONS[jobId];
   const startedAt = Date.now();
+  if (options.publish) {
+    if (jobId !== "cbc-monthly-refresh") return result(jobId, definition.sourceId, startedAt, { status: "skipped", errors: ["Publish mode is enabled only for CBC in Phase 2D-1A."] });
+    return publishCbcCandidate(options.candidate, options, startedAt);
+  }
   if (!options.sourceFile) {
     return result(jobId, definition.sourceId, startedAt, {
       status: "failed",
@@ -128,17 +162,25 @@ async function main() {
       candidateDataPeriod: { start: options.dataPeriodStart, end: options.dataPeriodEnd },
     });
   }
+  await mkdir(resolve(process.cwd(), "data/market-radar/staging"), { recursive: true });
   const stageDirectory = await mkdtemp(join(resolve(process.cwd(), "data/market-radar/staging"), `${jobId}-`));
   try {
-    const quality = await runImporter({ jobId, sourceId: definition.sourceId, sourceFile, options, stageDirectory });
-    const qualityPassed = definition.sourceId === "moi-real-price-sales" ? Boolean(quality.qualityGate?.passed) : Number(quality.acceptedRows) > 0;
-    await safeJsonWrite(join(stageDirectory, "candidate-version.json"), { ...candidate, qualityStatus: qualityPassed ? "passed" : "failed", stagedAt: new Date().toISOString() });
+    const imported = await runImporter({ jobId, sourceId: definition.sourceId, sourceFile, options, stageDirectory });
+    const { quality } = imported;
+    const liveData = jobId === "moi-history-backfill" ? undefined : JSON.parse(await readFile(imported.candidateLivePath, "utf8"));
+    const qualityGate = definition.sourceId === "moi-real-price-sales"
+      ? { passed: Boolean(quality.qualityGate?.passed) }
+      : validateCbcAutomationQuality({ quality, liveData });
+    const qualityPassed = qualityGate.passed;
+    const finalizedCandidate = liveData ? createSourceVersion({ ...candidate, dataPeriodStart: liveData.dataPeriodStart, dataPeriodEnd: liveData.dataPeriodEnd }) : candidate;
+    const candidatePath = join(stageDirectory, "candidate.json");
+    await safeJsonWrite(candidatePath, { sourceId: definition.sourceId, sourceVersion: finalizedCandidate, qualityPassed, quality, qualityChecks: qualityGate.checks, liveData, stagedAt: new Date().toISOString() });
     return result(jobId, definition.sourceId, startedAt, {
       status: qualityPassed ? "staged" : "failed",
-      sourceVersionId: candidate.sourceVersionId,
+      sourceVersionId: finalizedCandidate.sourceVersionId,
       changed: qualityPassed,
       qualityPassed,
-      warnings: qualityPassed ? ["Dry run completed source-specific parse and quality gate in ignored staging. Live JSON was not changed."] : [],
+      warnings: qualityPassed ? ["Dry run completed source-specific parse and quality gate in ignored staging. Live JSON was not changed.", `candidatePath=${candidatePath}`] : [],
       errors: qualityPassed ? [] : ["quality gate failed; live data was preserved"],
       candidateDataPeriod: { start: options.dataPeriodStart, end: options.dataPeriodEnd },
     });

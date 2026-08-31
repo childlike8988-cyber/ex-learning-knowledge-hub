@@ -1,8 +1,7 @@
 import type { MarketRadarFreshness, MarketRadarSource } from "@/data/market-radar";
 
 export const CBC_HOUSING_FINANCE_SOURCE_ID = "cbc-housing-finance";
-export const CBC_HOUSING_FINANCE_SOURCE_PAGE_URL = "https://www.cbc.gov.tw/tw/cp-302-192747-5edf4-1.html";
-export const CBC_HOUSING_FINANCE_DOWNLOAD_URL = "https://www.cbc.gov.tw/tw/dl-227456-e03ab17dca544cd7811ead3e51d52b9d.html";
+export const CBC_HOUSING_FINANCE_SOURCE_PAGE_URL = "https://www.cbc.gov.tw/tw/lp-302-1.html";
 
 export const CBC_HOUSING_FINANCE_SOURCE_CONFIG = {
   sourceId: CBC_HOUSING_FINANCE_SOURCE_ID,
@@ -14,7 +13,7 @@ export const CBC_HOUSING_FINANCE_SOURCE_CONFIG = {
   isPrimarySource: true,
   expectedUpdateFrequency: "monthly",
   sourcePageUrl: CBC_HOUSING_FINANCE_SOURCE_PAGE_URL,
-  downloadUrl: CBC_HOUSING_FINANCE_DOWNLOAD_URL,
+  attachmentDiscovery: "從官方發布頁即時辨識 XLSX 附件；不固定附件 URL。",
   notes: "資料單位依中央銀行附件：新台幣百萬元、年息百分比率。月資料有發布與統計期間差，非即時房貸報價。",
 } as const;
 
