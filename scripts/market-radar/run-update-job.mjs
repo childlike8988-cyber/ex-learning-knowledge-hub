@@ -14,6 +14,7 @@ import {
   sha256File,
   safeJsonWrite,
   validateCbcAutomationQuality,
+  validateMoiAutomationQuality,
 } from "./automation-utils.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -101,6 +102,33 @@ export async function publishCbcCandidate(candidatePath, options, startedAt) {
   });
 }
 
+export async function publishMoiCandidate(candidatePath, options, startedAt) {
+  const definition = JOB_DEFINITIONS["moi-latest-refresh"];
+  if (!definition.enabled) return result("moi-latest-refresh", definition.sourceId, startedAt, { status: "skipped", errors: ["MOI latest job is disabled"] });
+  if (!candidatePath || !existsSync(candidatePath)) return result("moi-latest-refresh", definition.sourceId, startedAt, { status: "failed", errors: ["candidate file not found; MOI live data was preserved"] });
+  let candidate;
+  try { candidate = JSON.parse(await readFile(candidatePath, "utf8")); } catch { return result("moi-latest-refresh", definition.sourceId, startedAt, { status: "failed", errors: ["candidate file is invalid; MOI live data was preserved"] }); }
+  const currentPath = resolve(process.cwd(), "public/data/market-radar/live/moi-real-price-latest.json");
+  let previousLive;
+  try { previousLive = JSON.parse(await readFile(currentPath, "utf8")); } catch { /* no current data is permitted only for first verified publish */ }
+  const qualityGate = validateMoiAutomationQuality({ quality: candidate?.quality, liveData: candidate?.liveData, previousQuality: previousLive?.quality });
+  if (candidate?.sourceId !== "moi-real-price-sales" || candidate?.qualityPassed !== true || !candidate?.sourceVersion?.sourceVersionId || !qualityGate.passed) return result("moi-latest-refresh", definition.sourceId, startedAt, { status: "failed", errors: ["candidate did not pass MOI metadata, schema or quality validation; live data was preserved"], warnings: qualityGate.warnings ?? [] });
+  if (!options.force && previousLive?.dataPeriodEnd && candidate.liveData.dataPeriodEnd <= previousLive.dataPeriodEnd) {
+    return result("moi-latest-refresh", definition.sourceId, startedAt, {
+      status: "skipped",
+      qualityPassed: true,
+      safeMessage: "Candidate MOI data period is not newer than the current LIVE period.",
+      previousDataPeriod: { start: previousLive.dataPeriodStart, end: previousLive.dataPeriodEnd },
+      candidateDataPeriod: { start: candidate.liveData.dataPeriodStart, end: candidate.liveData.dataPeriodEnd },
+    });
+  }
+  const newer = isCandidateNewer(candidate.sourceVersion, readExistingPublishedVersion("moi-latest-refresh", definition.sourceId), options.force);
+  if (!newer.eligible) return result("moi-latest-refresh", definition.sourceId, startedAt, { status: "skipped", sourceVersionId: candidate.sourceVersion.sourceVersionId, warnings: [newer.reason] });
+  if (previousLive) { await mkdir(resolve(process.cwd(), "data/market-radar/backups"), { recursive: true }); await copyFile(currentPath, resolve(process.cwd(), "data/market-radar/backups/moi-real-price-known-good.json")); }
+  await safeJsonWrite(currentPath, { ...candidate.liveData, sourceVersionId: candidate.sourceVersion.sourceVersionId });
+  return result("moi-latest-refresh", definition.sourceId, startedAt, { status: "published", changed: true, published: true, qualityPassed: true, sourceVersionId: candidate.sourceVersion.sourceVersionId, candidateDataPeriod: { start: candidate.liveData.dataPeriodStart, end: candidate.liveData.dataPeriodEnd } });
+}
+
 function result(jobId, sourceId, startedAt, overrides) {
   return {
     jobId,
@@ -120,10 +148,7 @@ async function main() {
   const { jobId, options } = readArguments(process.argv.slice(2));
   const definition = JOB_DEFINITIONS[jobId];
   const startedAt = Date.now();
-  if (options.publish) {
-    if (jobId !== "cbc-monthly-refresh") return result(jobId, definition.sourceId, startedAt, { status: "skipped", errors: ["Publish mode is enabled only for CBC in Phase 2D-1A."] });
-    return publishCbcCandidate(options.candidate, options, startedAt);
-  }
+  if (options.publish) return jobId === "cbc-monthly-refresh" ? publishCbcCandidate(options.candidate, options, startedAt) : jobId === "moi-latest-refresh" ? publishMoiCandidate(options.candidate, options, startedAt) : result(jobId, definition.sourceId, startedAt, { status: "skipped", errors: ["Publish mode is not available for MOI historical backfill."] });
   if (!options.sourceFile) {
     return result(jobId, definition.sourceId, startedAt, {
       status: "failed",
@@ -168,8 +193,10 @@ async function main() {
     const imported = await runImporter({ jobId, sourceId: definition.sourceId, sourceFile, options, stageDirectory });
     const { quality } = imported;
     const liveData = jobId === "moi-history-backfill" ? undefined : JSON.parse(await readFile(imported.candidateLivePath, "utf8"));
-    const qualityGate = definition.sourceId === "moi-real-price-sales"
-      ? { passed: Boolean(quality.qualityGate?.passed) }
+    const qualityGate = jobId === "moi-history-backfill"
+      ? { passed: Boolean(quality.qualityGate?.passed), checks: quality.qualityGate?.checks }
+      : definition.sourceId === "moi-real-price-sales"
+      ? validateMoiAutomationQuality({ quality, liveData })
       : validateCbcAutomationQuality({ quality, liveData });
     const qualityPassed = qualityGate.passed;
     const finalizedCandidate = liveData ? createSourceVersion({ ...candidate, dataPeriodStart: liveData.dataPeriodStart, dataPeriodEnd: liveData.dataPeriodEnd }) : candidate;

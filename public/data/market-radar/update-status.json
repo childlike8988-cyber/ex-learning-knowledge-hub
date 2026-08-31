@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-08-31T09:35:17.644Z",
+  "generatedAt": "2026-08-31T15:35:36.244Z",
   "automationEnabled": false,
   "automation": {
     "globalReady": true,
     "jobs": {
-      "moiLatestRefresh": false,
+      "moiLatestRefresh": true,
       "moiHistoryBackfill": false,
       "cbcMonthlyRefresh": true
     }
   },
   "overallStatus": "partial",
-  "safeMessage": "MOI 最新期與 CBC 資料已驗證；MOI 歷史基準仍等待可驗證的前期官方批次。",
+  "safeMessage": "內政部尚無較新的高雄市買賣批次；現行資料維持使用。",
   "sources": {
     "moiLatest": {
       "sourceId": "moi-real-price-sales",
       "lastSuccessfulUpdateAt": "2026-08-31T05:59:41.357Z",
-      "lastAttemptAt": "2026-08-31T05:59:41.357Z",
+      "lastAttemptAt": "2026-08-31T15:35:36.244Z",
       "latestSourcePublishedAt": "2026-08-21",
       "latestDataPeriodStart": "2026-08-01",
       "latestDataPeriodEnd": "2026-08-10",

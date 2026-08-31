@@ -34,11 +34,11 @@ test("automation contract defines update job, refresh, source version, runner an
   assert.ok(healthSource.includes("buildMarketRadarHealthStatus"));
 });
 
-test("automation is disabled and exposes the three future job definitions", () => {
+test("global automation remains disabled while MOI latest and CBC jobs are explicitly enabled", () => {
   assert.equal(AUTOMATION_ENABLED, false);
   assert.equal(automationConfig.includes("MARKET_RADAR_AUTOMATION_ENABLED = false"), true);
   assert.deepEqual(Object.keys(JOB_DEFINITIONS), ["moi-latest-refresh", "moi-history-backfill", "cbc-monthly-refresh"]);
-  assert.equal(JOB_DEFINITIONS["moi-latest-refresh"].enabled, false);
+  assert.equal(JOB_DEFINITIONS["moi-latest-refresh"].enabled, true);
   assert.equal(JOB_DEFINITIONS["moi-history-backfill"].enabled, false);
   assert.equal(JOB_DEFINITIONS["cbc-monthly-refresh"].enabled, true);
 });
@@ -54,8 +54,8 @@ test("update manifest contract is public, safe and automation-disabled", () => {
   assert.equal(status.automationEnabled, false);
 });
 
-test("MOI latest refresh job stays disabled", () => {
-  assert.deepEqual(JOB_DEFINITIONS["moi-latest-refresh"], { sourceId: "moi-real-price-sales", enabled: false, purpose: "latest" });
+test("MOI latest refresh job is enabled while its scheduler remains a separate boundary", () => {
+  assert.deepEqual(JOB_DEFINITIONS["moi-latest-refresh"], { sourceId: "moi-real-price-sales", enabled: true, purpose: "latest" });
 });
 
 test("MOI history backfill job stays separate and disabled", () => {
@@ -110,7 +110,7 @@ test("safe JSON write is atomic-at-target and public status excludes internal er
   assert.deepEqual(JSON.parse(await readFile(destination, "utf8")), { ready: true });
   const status = buildPublicUpdateStatus({ generatedAt: "2026-08-31T00:00:00Z", moiLatest: liveMoi, cbcLatest: liveCbc, moiHistoryReady: false });
   assert.equal(status.automationEnabled, false);
-  assert.deepEqual(status.automation.jobs, { moiLatestRefresh: false, moiHistoryBackfill: false, cbcMonthlyRefresh: true });
+  assert.deepEqual(status.automation.jobs, { moiLatestRefresh: true, moiHistoryBackfill: false, cbcMonthlyRefresh: true });
   assert.equal(status.overallStatus, "partial");
   assert.equal(status.sources.moiHistory.status, "waiting");
   assert.equal(JSON.stringify(status).includes("stack"), false);

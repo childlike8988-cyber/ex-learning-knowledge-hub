@@ -1,0 +1,18 @@
+import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
+import test from "node:test";
+import { fileURLToPath } from "node:url";
+import { assertMoiOfficialUrl, expectedMoiPublicationDate, MOI_ALLOWED_DOMAINS, parseMoiActiveDataset, validateMoiCsvResponse } from "../scripts/market-radar/moi-acquire-latest.mjs";
+import { validateMoiAutomationQuality } from "../scripts/market-radar/automation-utils.mjs";
+
+const root=fileURLToPath(new URL("..",import.meta.url));
+const activeHtml=`資料內容：登記日期 115年8月1日至 115年8月10日之買賣案件<tr><td>高雄市</td><td><input value="E_lvr_land_A" class="checkBoxGrp landTypeA" code="EA" /></td></tr>`;
+const metadata=parseMoiActiveDataset(activeHtml);
+const live={sourceId:"moi-real-price-sales",dataPeriodStart:"2026-08-01",dataPeriodEnd:"2026-08-10",source:{isPrimarySource:true},metrics:{transactionCount:2,districtTransactionCounts:[{district:"左營區",transactionCount:1},{district:"楠梓區",transactionCount:1}]}};
+const quality={rawRows:2,acceptedRows:2,rejectedRows:0,duplicateRows:0,districtCount:2};
+
+test("MOI latest acquisition restricts official domains and verified Kaohsiung sale mapping",()=>{assert.deepEqual(MOI_ALLOWED_DOMAINS,["plvr.land.moi.gov.tw","lvr.land.moi.gov.tw"]);assert.equal(metadata.datasetCode,"E_lvr_land_A");assert.equal(metadata.scope,"kaohsiung");assert.equal(metadata.transactionType,"sale");assert.throws(()=>assertMoiOfficialUrl("https://example.com/file.csv"));});
+test("MOI batch metadata derives the official scheduled release and rejects wrong county/type",()=>{assert.equal(metadata.sourcePublishedAt,"2026-08-21");assert.equal(expectedMoiPublicationDate("2026-08-20"),"2026-09-01");assert.throws(()=>parseMoiActiveDataset(activeHtml.replace("高雄市","臺北市")));assert.throws(()=>parseMoiActiveDataset(activeHtml.replace("landTypeA","landTypeC")));});
+test("MOI CSV response needs matching filename and bilingual official schema",()=>{const bytes=Buffer.from("鄉鎮市區,交易標的,交易年月日,總價元,編號\r\nThe villages and towns urban district,transaction sign,transaction year,total price NTD,id\r\n");const response={ok:true,url:metadata.downloadUrl,headers:{get:(name)=>name==="content-disposition"?'attachment;filename="e_lvr_land_a.csv"':"application/octet-stream"}};assert.equal(validateMoiCsvResponse({response,bytes,metadata}).responseFileName,"e_lvr_land_a.csv");assert.throws(()=>validateMoiCsvResponse({response:{...response,headers:{get:()=> 'attachment;filename="wrong.csv"'}},bytes,metadata}));});
+test("MOI candidate quality reconciles districts and flags rejection anomalies",()=>{assert.equal(validateMoiAutomationQuality({quality,liveData:live}).passed,true);assert.equal(validateMoiAutomationQuality({quality:{...quality,rejectedRows:20,rawRows:22},liveData:live}).passed,false);});
+test("MOI runtime, rollback, scheduler and docs retain latest-only boundaries",()=>{for(const path of["scripts/market-radar/run-moi-latest.ps1","scripts/market-radar/run-moi-latest-task.cmd","scripts/market-radar/install-moi-latest-scheduled-task.ps1","scripts/market-radar/show-moi-latest-scheduled-task.ps1","scripts/market-radar/remove-moi-latest-scheduled-task.ps1","scripts/market-radar/rollback-moi-live.mjs","docs/market-radar/windows-moi-latest-automation.md"])assert.equal(existsSync(`${root}${path}`),true);const wrapper=readFileSync(`${root}scripts/market-radar/run-moi-latest.ps1`,"utf8");assert.ok(wrapper.includes("$TestInvalidMoi"));assert.equal(/git\s+(add|commit|push)/i.test(wrapper),false);const installer=readFileSync(`${root}scripts/market-radar/install-moi-latest-scheduled-task.ps1`,"utf8");assert.ok(installer.includes("2,3,11,12,13,21,22,23"));assert.ok(installer.includes("Disable-ScheduledTask"));});

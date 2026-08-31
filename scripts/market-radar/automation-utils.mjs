@@ -5,7 +5,7 @@ import { basename, dirname } from "node:path";
 export const AUTOMATION_ENABLED = false;
 
 export const JOB_DEFINITIONS = Object.freeze({
-  "moi-latest-refresh": { sourceId: "moi-real-price-sales", enabled: false, purpose: "latest" },
+  "moi-latest-refresh": { sourceId: "moi-real-price-sales", enabled: true, purpose: "latest" },
   "moi-history-backfill": { sourceId: "moi-real-price-sales", enabled: false, purpose: "history" },
   "cbc-monthly-refresh": { sourceId: "cbc-housing-finance", enabled: true, purpose: "monthly" },
 });
@@ -59,6 +59,22 @@ export function validateCbcAutomationQuality({ quality, liveData }) {
   };
 }
 
+export function validateMoiAutomationQuality({ quality, liveData, previousQuality }) {
+  const counts = liveData?.metrics?.districtTransactionCounts ?? [];
+  const total = counts.reduce((sum, item) => sum + Number(item?.transactionCount ?? 0), 0);
+  const acceptedRows = Number(quality?.acceptedRows) > 0;
+  const rejectedRows = Number(quality?.rejectedRows ?? 0);
+  const duplicateRows = Number(quality?.duplicateRows ?? 0);
+  const rawRows = Number(quality?.rawRows ?? acceptedRows + rejectedRows + duplicateRows);
+  const rejectionRatio = rawRows > 0 ? rejectedRows / rawRows : 1;
+  const priorRaw = Number(previousQuality?.rawRows ?? 0);
+  const priorRejected = Number(previousQuality?.rejectedRows ?? 0);
+  const priorRatio = priorRaw > 0 ? priorRejected / priorRaw : 0;
+  const rejectionNormal = rejectionRatio <= Math.max(0.1, priorRatio + 0.08);
+  const metadata = liveData?.sourceId === "moi-real-price-sales" && liveData?.dataPeriodStart <= liveData?.dataPeriodEnd && liveData?.source?.isPrimarySource === true;
+  return { passed: acceptedRows && Number(quality?.districtCount) > 0 && Number(liveData?.metrics?.transactionCount) > 0 && total === Number(liveData?.metrics?.transactionCount) && metadata && rejectionNormal, checks: { acceptedRows, districtCount: Number(quality?.districtCount) > 0, transactionCount: Number(liveData?.metrics?.transactionCount) > 0, districtSum: total === Number(liveData?.metrics?.transactionCount), metadata, rejectionNormal }, warnings: rejectionNormal ? [] : ["MOI rejected-row ratio is anomalous and requires review."] };
+}
+
 export async function safeJsonWrite(filePath, value) {
   const temporaryPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
   await mkdir(dirname(filePath), { recursive: true });
@@ -96,7 +112,7 @@ export function buildPublicUpdateStatus({ generatedAt, moiLatest, cbcLatest, moi
     automationEnabled: false,
     automation: {
       globalReady: true,
-      jobs: { moiLatestRefresh: false, moiHistoryBackfill: false, cbcMonthlyRefresh: true },
+      jobs: { moiLatestRefresh: true, moiHistoryBackfill: false, cbcMonthlyRefresh: true },
     },
     overallStatus: sourcesLive ? "partial" : "degraded",
     safeMessage: sourcesLive && !moiHistoryReady

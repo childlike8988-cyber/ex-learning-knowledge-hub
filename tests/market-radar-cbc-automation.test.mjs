@@ -76,9 +76,9 @@ test("CBC candidate quality requires valid rate, amount, sorted unique history a
   assert.equal(validateCbcAutomationQuality({ quality: { acceptedRows: 2 }, liveData: { ...liveData, history: [{ period: "2026-08" }, { period: "2026-07" }] } }).passed, false);
 });
 
-test("CBC is enabled while both MOI automation jobs remain disabled", () => {
+test("CBC and MOI latest are enabled while MOI historical automation remains disabled", () => {
   assert.equal(JOB_DEFINITIONS["cbc-monthly-refresh"].enabled, true);
-  assert.equal(JOB_DEFINITIONS["moi-latest-refresh"].enabled, false);
+  assert.equal(JOB_DEFINITIONS["moi-latest-refresh"].enabled, true);
   assert.equal(JOB_DEFINITIONS["moi-history-backfill"].enabled, false);
 });
 
