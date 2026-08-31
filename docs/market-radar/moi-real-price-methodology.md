@@ -60,6 +60,22 @@ node scripts/market-radar/import-moi-real-price.mjs "<官方 CSV 路徑>" `
 
 本階段不發布平均房價或中位數單價。未來如納入價格指標，將明確揭露交易標的、車位與特殊交易處理、樣本條件、資料期間與統計方法；不會將所有單價做簡單平均後稱為「高雄房價」。
 
+## Historical Baseline 與 Comparable Period Rule（Phase 2C-4）
+
+每一個正式歷史 period 只保存正規化後的件數、行政區件數、品質摘要與來源 metadata；不把 1,000+ 筆 raw CSV 複製到 public JSON。歷史序列位於 `public/data/market-radar/live/moi-real-price-history.json`，僅會由通過 Quality Gate 的正式官方檔案產製。
+
+比較會從本期之前，按資料期間最近到最遠尋找第一個可比較 period，不使用單純陣列倒數第二筆。兩期必須同時符合：相同 `sourceId`、高雄市範圍、買賣案件類型、`methodologyVersion`、`schemaVersion`，且兩期品質摘要皆有有效資料與行政區覆蓋。
+
+- 天數相同：`raw-count`，比較原始有效登錄件數。
+- 天數不同：`daily-normalized`，比較日均登錄件數；Drawer 同時保留兩期原始件數與天數。
+- 任一條件不符：`unavailable`，不產生趨勢。
+- 日均或原始件數變動絕對值小於 3%：`flat`；大於等於 +3% 為 `up`，小於等於 -3% 為 `down`。3% 是 Market Radar 產品規則，不是官方定義。
+- 同天數且品質完整：高信心；天數不同但可日均標準化：中信心；品質或方法不一致：低信心／不可比較。
+
+行政區比較沿用同一個 raw-count／daily-normalized 方法。前期為零而本期有紀錄時，標示「前期無有效登錄基準」／`newActivity`，不計算無限大百分比。
+
+不同批次資料期間長度可能不同；若長度不同，Market Radar 以日均登錄件數進行標準化比較。成交件數仍是已揭露登錄樣本，不能單獨宣稱買氣、房價或未來漲跌。
+
 ## 特殊交易與限制
 
 現階段不額外依自由文字備註排除特殊交易，品質報告會標記 `excludedSpecialTransactions: false`。官方揭露資料的既有篩選、申報及發布節奏，以官方說明為準。實價登錄有申報與發布時間差，並非即時成交行情；行政區件數反映已揭露登錄樣本量，不等同即時買氣。

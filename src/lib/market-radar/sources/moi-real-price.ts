@@ -34,6 +34,50 @@ export type MarketRadarRealEstateTransaction = {
 
 export type MarketRadarDistrictTransactionCount = { district: string; transactionCount: number };
 
+export type MarketRadarMoiHistoricalPeriod = {
+  periodId: string;
+  status: "live";
+  sourceId: typeof MOI_REAL_PRICE_SOURCE_ID;
+  sourcePublishedAt: string;
+  dataPeriodStart: string;
+  dataPeriodEnd: string;
+  dayCount: number;
+  transactionCount: number;
+  districtTransactionCounts: readonly MarketRadarDistrictTransactionCount[];
+  generatedAt: string;
+  verifiedAt: string;
+  retrievedAt: string;
+  methodologyVersion: string;
+  schemaVersion: string;
+  scope: "kaohsiung";
+  transactionType: "sale";
+  quality: { acceptedRows: number; rejectedRows: number; duplicateRows: number; districtCount: number };
+};
+
+export type MarketRadarMoiHistoricalSeries = {
+  status: "live";
+  sourceId: typeof MOI_REAL_PRICE_SOURCE_ID;
+  methodologyVersion: string;
+  periods: readonly MarketRadarMoiHistoricalPeriod[];
+};
+
+export type MarketRadarMoiPeriodComparison = {
+  currentPeriodId: string;
+  previousPeriodId: string;
+  current: { start: string; end: string; dayCount: number; transactionCount: number };
+  previous: { start: string; end: string; dayCount: number; transactionCount: number };
+  comparisonMethod: "raw-count" | "daily-normalized" | "unavailable";
+  isComparable: boolean;
+  reason?: string;
+  currentDailyAverage?: number;
+  previousDailyAverage?: number;
+  change?: number;
+  changePercent?: number | null;
+  direction?: "up" | "down" | "flat" | "unavailable";
+  confidence?: "low" | "medium" | "high";
+  districtTransactionChanges?: readonly { district: string; currentCount: number; previousCount: number; currentDailyAverage?: number; previousDailyAverage?: number; change: number; changePercent: number | null; newActivity: boolean; direction: "up" | "down" | "flat" | "unavailable" }[];
+};
+
 export type MarketRadarMoiLiveData = {
   status: "live" | "updating";
   dataStatus: "live" | "updating";
@@ -53,6 +97,7 @@ export type MarketRadarMoiLiveData = {
     previousTransactionCount?: number;
     districtTransactionCounts: readonly MarketRadarDistrictTransactionCount[];
   };
+  quality?: MarketRadarMoiHistoricalPeriod["quality"];
   methodology: {
     transactionCountDefinition: string;
     kaohsiungFilter: string;

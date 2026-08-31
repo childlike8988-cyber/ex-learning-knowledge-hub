@@ -12,10 +12,11 @@ import type {
 } from "@/data/market-radar";
 import type { MarketRadarCbcLiveData } from "@/lib/market-radar/sources/cbc-housing-finance";
 import type { MarketRadarMoiLiveData } from "@/lib/market-radar/sources/moi-real-price";
+import { buildMoiHistoricalPeriod, findComparablePreviousPeriod } from "@/lib/market-radar/moiHistoricalComparison";
+import type { MarketRadarMoiHistoricalSeries } from "@/lib/market-radar/sources/moi-real-price";
 
-export const MARKET_RADAR_ANALYSIS_RULE_VERSION = "1.0.0";
+export const MARKET_RADAR_ANALYSIS_RULE_VERSION = "1.1.0";
 const RATE_DIRECTION_THRESHOLD_PERCENTAGE_POINTS = 0.005;
-const TRANSACTION_DIRECTION_THRESHOLD_PERCENT = 2;
 const ANALYSIS_DISCLAIMER = "Market Radar 解讀係依公開資料整理之分析，不代表原始資料來源立場，亦不構成投資或交易建議。";
 
 function unavailableFreshness(): MarketRadarFreshness {
@@ -42,21 +43,34 @@ function signal(id: MarketRadarSignal["id"], label: string, status: MarketRadarS
   return { id, label, status, direction, level, confidence, factIds: facts.map((fact) => fact.id), sourceIds: sources.map((source) => source.id), facts, sources, analysis: valueAnalysis, generatedAt, dataStatus: status };
 }
 
-function buildTransactionActivity(moi: MarketRadarMoiLiveData, generatedAt: string): MarketRadarSignal {
+function currentMoiPeriod(moi: MarketRadarMoiLiveData) {
+  if (moi.status !== "live" || !moi.quality || typeof moi.metrics.transactionCount !== "number" || !moi.dataPeriodStart || !moi.dataPeriodEnd || !moi.sourcePublishedAt || !moi.generatedAt || !moi.verifiedAt || !moi.retrievedAt || !moi.methodologyVersion) return undefined;
+  return buildMoiHistoricalPeriod({ periodId: `moi-${moi.dataPeriodStart}-${moi.dataPeriodEnd}`, sourceId: moi.sourceId, sourcePublishedAt: moi.sourcePublishedAt, dataPeriodStart: moi.dataPeriodStart, dataPeriodEnd: moi.dataPeriodEnd, transactionCount: moi.metrics.transactionCount, districtTransactionCounts: moi.metrics.districtTransactionCounts, generatedAt: moi.generatedAt, verifiedAt: moi.verifiedAt, retrievedAt: moi.retrievedAt, methodologyVersion: moi.methodologyVersion, schemaVersion: "moi-real-price-csv-v1", quality: moi.quality });
+}
+
+function buildTransactionActivity(moi: MarketRadarMoiLiveData, history: MarketRadarMoiHistoricalSeries | undefined, generatedAt: string): MarketRadarSignal {
   if (moi.status !== "live" || !moi.source || typeof moi.metrics.transactionCount !== "number") {
     return signal("transaction-activity", "成交熱度", "unavailable", "unavailable", "unavailable", "low", [], [], analysis("尚未取得可驗證的內政部成交資料。", "成交熱度將在至少兩個可比較的官方資料期存在後，才判斷方向。", "neutral", "low"), generatedAt);
   }
   const period = dataPeriod(moi.dataPeriodStart, moi.dataPeriodEnd, moi.dataPeriodStart && moi.dataPeriodEnd ? `${moi.dataPeriodStart} ～ ${moi.dataPeriodEnd}` : "官方資料期間");
   const facts: MarketRadarFact[] = [{ id: `moi-transaction-count-${moi.dataPeriodStart ?? "latest"}`, label: "高雄市有效成交紀錄", value: moi.metrics.transactionCount, unit: "件", sourceIds: [moi.source.id], dataPeriod: period, isEstimated: false, isMock: false }];
-  const previous = moi.metrics.previousTransactionCount;
-  if (typeof previous !== "number" || previous < 0) {
+  const current = currentMoiPeriod(moi);
+  const comparison = current ? findComparablePreviousPeriod(current, history) : undefined;
+  if (!comparison || !comparison.isComparable || comparison.changePercent === undefined || comparison.changePercent === null || !comparison.direction || comparison.direction === "unavailable") {
     return signal("transaction-activity", "成交熱度", "live", "unavailable", "unavailable", "medium", facts, [moi.source], analysis("已有官方成交資料，尚需歷史基準判斷趨勢。", "單一資料期成交件數不能直接判定市場熱度或方向。", "neutral", "medium"), generatedAt);
   }
-  const changePercent = previous === 0 ? undefined : ((moi.metrics.transactionCount - previous) / previous) * 100;
-  const direction: MarketRadarSignalDirection = changePercent === undefined ? "unavailable" : changePercent > TRANSACTION_DIRECTION_THRESHOLD_PERCENT ? "up" : changePercent < -TRANSACTION_DIRECTION_THRESHOLD_PERCENT ? "down" : "flat";
-  facts.push({ id: `moi-transaction-count-previous-${moi.dataPeriodStart ?? "latest"}`, label: "前期有效成交紀錄", value: previous, unit: "件", comparison: changePercent === undefined ? undefined : `較前期 ${changePercent >= 0 ? "+" : ""}${changePercent.toFixed(1)}%`, sourceIds: [moi.source.id], dataPeriod: period, isEstimated: false, isMock: false });
-  const summary = direction === "up" ? "官方成交紀錄較前期增加。" : direction === "down" ? "官方成交紀錄較前期減少。" : "官方成交紀錄與前期差異有限。";
-  return signal("transaction-activity", "成交熱度", "live", direction, direction === "up" ? "high" : direction === "down" ? "low" : "neutral", "medium", facts, [moi.source], analysis(summary, "成交件數反映已揭露登錄樣本量，不等同即時市場需求或買氣。", direction === "up" ? "positive" : direction === "down" ? "negative" : "neutral", "medium", "應搭配資料發布落差、區域與產品條件判讀。", "medium"), generatedAt);
+  const direction: MarketRadarSignalDirection = comparison.direction;
+  const previousPeriod = { start: comparison.previous.start, end: comparison.previous.end, label: `${comparison.previous.start} ～ ${comparison.previous.end}` };
+  facts.push({ id: `moi-transaction-count-previous-${comparison.previousPeriodId}`, label: "前期有效成交紀錄", value: comparison.previous.transactionCount, unit: "件", comparison: `本期 ${comparison.comparisonMethod === "daily-normalized" ? "日均" : "件數"}較前期 ${comparison.changePercent >= 0 ? "+" : ""}${comparison.changePercent.toFixed(1)}%`, sourceIds: [moi.source.id], dataPeriod: previousPeriod, isEstimated: false, isMock: false });
+  facts.push({ id: `moi-period-days-current-${comparison.currentPeriodId}`, label: "本期資料天數", value: comparison.current.dayCount, unit: "日", sourceIds: [moi.source.id], dataPeriod: period, isEstimated: false, isMock: false });
+  facts.push({ id: `moi-period-days-previous-${comparison.previousPeriodId}`, label: "前期資料天數", value: comparison.previous.dayCount, unit: "日", sourceIds: [moi.source.id], dataPeriod: previousPeriod, isEstimated: false, isMock: false });
+  if (comparison.comparisonMethod === "daily-normalized") {
+    facts.push({ id: `moi-daily-average-current-${comparison.currentPeriodId}`, label: "本期日均登錄件數", value: Number(comparison.currentDailyAverage?.toFixed(2)), unit: "件／日", sourceIds: [moi.source.id], dataPeriod: period, isEstimated: false, isMock: false });
+    facts.push({ id: `moi-daily-average-previous-${comparison.previousPeriodId}`, label: "前期日均登錄件數", value: Number(comparison.previousDailyAverage?.toFixed(2)), unit: "件／日", sourceIds: [moi.source.id], dataPeriod: previousPeriod, isEstimated: false, isMock: false });
+  }
+  const summary = direction === "up" ? "與前一可比較資料期相比，實價登錄案件活動增加。" : direction === "down" ? "與前一可比較資料期相比，實價登錄案件活動減少。" : "與前一可比較資料期相比，實價登錄案件活動變化有限。";
+  const confidence = comparison.confidence ?? "low";
+  return signal("transaction-activity", "成交熱度", "live", direction, direction === "up" ? "high" : direction === "down" ? "low" : "neutral", confidence, facts, [moi.source], analysis(summary, `比較方式：${comparison.comparisonMethod === "daily-normalized" ? "資料期間天數不同，使用日均登錄件數標準化比較。" : "資料期間天數相同，使用原始登錄件數比較。"} 成交件數反映已揭露登錄樣本量，不等同即時市場需求或買氣。`, direction === "up" ? "positive" : direction === "down" ? "negative" : "neutral", confidence, "應搭配資料發布落差、區域與產品條件判讀。", "medium"), generatedAt);
 }
 
 function buildFinancingEnvironment(cbc: MarketRadarCbcLiveData, generatedAt: string): MarketRadarSignal {
@@ -92,11 +106,11 @@ function buildTemperature(coverage: MarketRadarDataCoverage, signals: readonly M
   if (coverage.cbc === "live" && coverage.moi === "unavailable") description = "目前融資環境已接入中央銀行資料；成交與價格趨勢仍待官方資料完成。";
   if (coverage.cbc === "live" && coverage.moi === "live" && transaction.direction === "unavailable") description = "內政部與中央銀行官方資料已接入；內政部目前僅有一期資料，成交趨勢與價格序列仍待建立。";
   if (coverage.cbc === "live" && coverage.moi === "live" && transaction.direction !== "unavailable") {
-    dataStatus = "live";
+    dataStatus = "partial";
     confidence = "medium";
     if (transaction.direction === "down" && financing.direction === "up") { label = "偏冷"; description = "成交活動轉弱，同時融資成本上升，買方決策環境偏保守。"; }
     else if (transaction.direction === "up" && financing.direction === "flat") { label = "偏熱"; description = "成交活動回升，融資環境變化有限，市場交易動能相對改善。"; }
-    else { label = "中性"; description = "官方成交與融資資料皆已接入；仍應搭配價格序列與資料發布落差判讀。"; }
+    else { label = "中性"; description = "成交活動與融資環境皆具可比較官方資料；價格動能資料尚待建立。"; }
   }
   return { label, description, confidence, dataStatus, basisSignalIds: signals.filter((item) => item.status === "live").map((item) => item.id), detail: temperatureDetail(signals, generatedAt, label, description, dataStatus, confidence) };
 }
@@ -113,10 +127,10 @@ function buildDailyKeyTake(signals: readonly MarketRadarSignal[]) {
   return { text, basisFactIds: [...transaction.factIds, ...financing.factIds], basisSignalIds: [transaction.id, financing.id], dataStatus: "live" as const };
 }
 
-export function buildMarketRadarAnalysis(moi: MarketRadarMoiLiveData, cbc: MarketRadarCbcLiveData): MarketRadarAnalysisResult {
+export function buildMarketRadarAnalysis(moi: MarketRadarMoiLiveData, cbc: MarketRadarCbcLiveData, history?: MarketRadarMoiHistoricalSeries): MarketRadarAnalysisResult {
   const generatedAt = [moi.generatedAt, cbc.generatedAt].filter((value): value is string => typeof value === "string").sort().at(-1) ?? "";
-  const dataCoverage: MarketRadarDataCoverage = { moi: moi.status === "live" ? "live" : "unavailable", cbc: cbc.status === "live" ? "live" : "unavailable" };
-  const signals = [buildTransactionActivity(moi, generatedAt), buildFinancingEnvironment(cbc, generatedAt), buildPriceMomentum(generatedAt)];
+  const dataCoverage: MarketRadarDataCoverage = { moi: moi.status === "live" ? "live" : "unavailable", moiHistory: history?.status === "live" && history.periods.length > 0 ? "ready" : "waiting", cbc: cbc.status === "live" ? "live" : "unavailable", priceMomentum: "waiting" };
+  const signals = [buildTransactionActivity(moi, history, generatedAt), buildFinancingEnvironment(cbc, generatedAt), buildPriceMomentum(generatedAt)];
   const marketTemperature = buildTemperature(dataCoverage, signals, generatedAt);
   const dailyKeyTake = buildDailyKeyTake(signals);
   const warnings = [

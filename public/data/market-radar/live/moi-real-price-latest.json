@@ -2,11 +2,11 @@
   "status": "live",
   "dataStatus": "live",
   "sourceId": "moi-real-price-sales",
-  "generatedAt": "2026-08-31T04:34:01.338Z",
+  "generatedAt": "2026-08-31T05:59:41.357Z",
   "sourcePublishedAt": "2026-08-21",
   "dataPeriodStart": "2026-08-01",
   "dataPeriodEnd": "2026-08-10",
-  "verifiedAt": "2026-08-31T04:34:00.9003813Z",
+  "verifiedAt": "2026-08-31T05:10:00.000Z",
   "retrievedAt": "2026-08-31T04:31:23.000Z",
   "methodologyVersion": "moi-real-price-methodology-v1",
   "source": {
@@ -19,7 +19,7 @@
     "publishedAt": "2026-08-21",
     "dataPeriodStart": "2026-08-01",
     "dataPeriodEnd": "2026-08-10",
-    "verifiedAt": "2026-08-31T04:34:00.9003813Z",
+    "verifiedAt": "2026-08-31T05:10:00.000Z",
     "retrievedAt": "2026-08-31T04:31:23.000Z",
     "expectedUpdateFrequency": "irregular",
     "notes": "官方 Open Data 為批次靜態資料；實價登錄具有申報與發布時間差，非即時成交行情。",
@@ -179,6 +179,12 @@
         "transactionCount": 1
       }
     ]
+  },
+  "quality": {
+    "acceptedRows": 1040,
+    "rejectedRows": 0,
+    "duplicateRows": 0,
+    "districtCount": 36
   },
   "methodology": {
     "transactionCountDefinition": "一筆通過必要欄位驗證且去重後的官方實價登錄買賣 record，計為一筆成交紀錄。",

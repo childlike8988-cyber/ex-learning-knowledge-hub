@@ -79,7 +79,9 @@ export type MarketRadarSignal = {
 
 export type MarketRadarDataCoverage = {
   moi: "live" | "unavailable";
+  moiHistory: "ready" | "waiting";
   cbc: "live" | "unavailable";
+  priceMomentum: "waiting";
 };
 
 export type MarketRadarTemperature = {

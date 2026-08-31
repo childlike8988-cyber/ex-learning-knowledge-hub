@@ -8,7 +8,7 @@
 Official Facts -> Normalized Facts -> Rule Engine -> Structured Analysis -> Optional LLM Rewrite -> Validation -> UI
 ```
 
-目前所有 UI 結論由 `market-radar-analysis-v1` 的 deterministic rules 產生。
+目前所有 UI 結論由 `market-radar-analysis-v1.1` 的 deterministic rules 產生。
 
 ## Source separation
 
@@ -26,7 +26,7 @@ Official Facts -> Normalized Facts -> Rule Engine -> Structured Analysis -> Opti
 
 - MOI unavailable：`unavailable`。
 - 只有一個官方資料期：可標示 `live`，但方向與 level 都是 `unavailable`；文案必須說明「尚需歷史基準」。
-- 至少兩個可比較期：以有效 record 件數變動判定方向。超過 ±2% 才標為 up/down；成交件數只代表已揭露登錄樣本，不等同即時需求。
+- 至少兩個可比較期：只有 source、scope、交易類型、import methodology、schema 與品質都一致時才比較。天數相同比較 raw-count；天數不同比較日均登錄件數。變動絕對值小於 3% 為 flat；成交件數只代表已揭露登錄樣本，不等同即時需求。
 
 ### Financing Environment（CBC）
 
@@ -42,16 +42,16 @@ Official Facts -> Normalized Facts -> Rule Engine -> Structured Analysis -> Opti
 
 - 沒有 LIVE signal：`unavailable`。
 - 只有一個 LIVE signal：`partial`，標示「資料建立中」。
-- MOI 與 CBC 都 LIVE 且交易有可比較方向時，才允許用規則給出偏冷／中性／偏熱。
+- MOI 與 CBC 都 LIVE 且交易有可比較方向時，才允許用規則給出偏冷／中性／偏熱；即使可以給出文字標籤，因價格動能仍 WAITING，整體狀態保持 PARTIAL LIVE。
 - 現階段 CBC LIVE + MOI unavailable 顯示「目前融資環境已接入中央銀行資料；成交與價格趨勢仍待官方資料完成。」
 
 ## Daily Key Take
 
-Live Key Take 需要至少兩個獨立 LIVE Signal、每個 confidence 至少 medium，並保存 `basisFactIds`、`basisSignalIds` 與 `dataStatus: live`。只有 CBC 時保留 Fixture 今日一句，另顯示 CBC LIVE OBSERVATION，不取代整體市場結論。
+Live Key Take 需要至少兩個獨立 LIVE Signal、每個 confidence 至少 medium，並保存 `basisFactIds`、`basisSignalIds` 與 `dataStatus: live`。交易活動必須有已驗證歷史基準；只有 CBC 或只有一期 MOI 時保留 Fixture 今日一句，另顯示 Live Observation，不取代整體市場結論。
 
 ## Confidence, versioning and limits
 
-- `ruleVersion`：`market-radar-analysis-v1` / `1.0.0`。
+- `ruleVersion`：`market-radar-analysis-v1` / `1.1.0`。v1.1 新增 MOI 歷史 baseline、日均標準化與 3% flat threshold。
 - 單月資料不能推導長期趨勢；correlation 不代表 causation。
 - 實價登錄有申報與發布時間差。
 - 每個分析下方都應保留：Market Radar 解讀係依公開資料整理之分析，不代表原始資料來源立場，亦不構成投資或交易建議。

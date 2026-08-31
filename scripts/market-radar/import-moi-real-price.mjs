@@ -10,17 +10,18 @@ const CITY = "高雄市";
 const PING_SQUARE_METERS = 3.305785;
 
 function usage() {
-  return `Usage:\n  node scripts/market-radar/import-moi-real-price.mjs <official-csv-path> --source-published-at <ISO> --data-period-start <YYYY-MM-DD> --data-period-end <YYYY-MM-DD> [--county-file] [--retrieved-at <ISO>] [--verified-at <ISO>] [--out-dir <path>] [--live-output <path>]\n\nUse --county-file only when the downloaded official CSV is confirmed to contain Kaohsiung City records exclusively. Otherwise the CSV must expose an official county/city column with the exact value 高雄市.`;
+  return `Usage:\n  node scripts/market-radar/import-moi-real-price.mjs <official-csv-path> --source-published-at <ISO> --data-period-start <YYYY-MM-DD> --data-period-end <YYYY-MM-DD> [--county-file] [--retrieved-at <ISO>] [--verified-at <ISO>] [--out-dir <path>] [--live-output <path>]\n\nHistorical import:\n  add --period-id <stable-id> --history-output <path> --history-only\n\nUse --county-file only when the downloaded official CSV is confirmed to contain Kaohsiung City records exclusively. Otherwise the CSV must expose an official county/city column with the exact value 高雄市.`;
 }
 
 function readArguments(argv) {
-  const options = { countyFile: false, outDir: "data/market-radar/processed", liveOutput: "public/data/market-radar/live/moi-real-price-latest.json", verifiedAt: new Date().toISOString() };
+  const options = { countyFile: false, historyOnly: false, outDir: "data/market-radar/processed", liveOutput: "public/data/market-radar/live/moi-real-price-latest.json", verifiedAt: new Date().toISOString(), methodologyVersion: "moi-real-price-methodology-v1", schemaVersion: "moi-real-price-csv-v1" };
   let inputPath;
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (!value.startsWith("--") && !inputPath) { inputPath = value; continue; }
     if (value === "--county-file") { options.countyFile = true; continue; }
-    if (["--source-published-at", "--data-period-start", "--data-period-end", "--retrieved-at", "--verified-at", "--out-dir", "--live-output"].includes(value)) {
+    if (value === "--history-only") { options.historyOnly = true; continue; }
+    if (["--source-published-at", "--data-period-start", "--data-period-end", "--retrieved-at", "--verified-at", "--out-dir", "--live-output", "--history-output", "--period-id", "--methodology-version", "--schema-version"].includes(value)) {
       options[value.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = argv[index + 1];
       index += 1;
       continue;
@@ -28,6 +29,7 @@ function readArguments(argv) {
     throw new Error(`Unknown argument: ${value}`);
   }
   if (!inputPath || !options.sourcePublishedAt || !options.dataPeriodStart || !options.dataPeriodEnd) throw new Error(usage());
+  if (options.historyOnly && (!options.historyOutput || !options.periodId)) throw new Error("Historical imports require both --history-output and --period-id.\n\n" + usage());
   return { inputPath: resolve(inputPath), options };
 }
 
@@ -273,10 +275,11 @@ export function buildLiveOutput(normalized, metadata) {
     dataPeriodEnd: metadata.dataPeriodEnd,
     verifiedAt: metadata.verifiedAt,
     retrievedAt: metadata.retrievedAt,
-    methodologyVersion: "moi-real-price-methodology-v1",
+    methodologyVersion: metadata.methodologyVersion ?? "moi-real-price-methodology-v1",
     source,
     freshness: { status: "normal", label: "官方批次資料已驗證", expectedUpdateFrequency: "irregular" },
     metrics: normalized.metrics,
+    quality: { acceptedRows: normalized.quality.acceptedRows, rejectedRows: normalized.quality.rejectedRows, duplicateRows: normalized.quality.duplicateRows, districtCount: normalized.quality.districtCount },
     methodology: {
       transactionCountDefinition: "一筆通過必要欄位驗證且去重後的官方實價登錄買賣 record，計為一筆成交紀錄。",
       kaohsiungFilter: "若 CSV 具官方縣市欄位，以完全等於「高雄市」篩選；若無該欄位，僅接受明確標記為高雄市專屬的官方檔案。",
@@ -286,12 +289,56 @@ export function buildLiveOutput(normalized, metadata) {
   };
 }
 
+function dayCount(start, end) {
+  const startAt = Date.parse(`${start}T00:00:00Z`);
+  const endAt = Date.parse(`${end}T00:00:00Z`);
+  if (!Number.isFinite(startAt) || !Number.isFinite(endAt) || endAt < startAt) return undefined;
+  return Math.floor((endAt - startAt) / 86_400_000) + 1;
+}
+
+export function buildMoiHistoricalPeriod(normalized, metadata) {
+  const days = dayCount(metadata.dataPeriodStart, metadata.dataPeriodEnd);
+  if (!days) throw new Error("Historical MOI period has an invalid data range.");
+  return {
+    periodId: metadata.periodId,
+    status: "live",
+    sourceId: SOURCE_ID,
+    sourcePublishedAt: metadata.sourcePublishedAt,
+    dataPeriodStart: metadata.dataPeriodStart,
+    dataPeriodEnd: metadata.dataPeriodEnd,
+    dayCount: days,
+    transactionCount: normalized.metrics.transactionCount,
+    districtTransactionCounts: normalized.metrics.districtTransactionCounts,
+    generatedAt: metadata.generatedAt,
+    verifiedAt: metadata.verifiedAt,
+    retrievedAt: metadata.retrievedAt,
+    methodologyVersion: metadata.methodologyVersion,
+    schemaVersion: metadata.schemaVersion,
+    scope: "kaohsiung",
+    transactionType: "sale",
+    quality: { acceptedRows: normalized.quality.acceptedRows, rejectedRows: normalized.quality.rejectedRows, duplicateRows: normalized.quality.duplicateRows, districtCount: normalized.quality.districtCount },
+  };
+}
+
+async function mergeHistoricalPeriod(historyOutput, period) {
+  let existing = [];
+  try {
+    const parsed = JSON.parse(await readFile(historyOutput, "utf8"));
+    if (Array.isArray(parsed?.periods)) existing = parsed.periods;
+  } catch {
+    // A missing history file starts a new, isolated official series.
+  }
+  const periods = [...existing.filter((item) => item?.periodId !== period.periodId), period].sort((left, right) => left.dataPeriodStart.localeCompare(right.dataPeriodStart));
+  await mkdir(dirname(historyOutput), { recursive: true });
+  await writeFile(historyOutput, `${JSON.stringify({ status: "live", sourceId: SOURCE_ID, methodologyVersion: period.methodologyVersion, periods }, null, 2)}\n`, "utf8");
+}
+
 async function main() {
   const { inputPath, options } = readArguments(process.argv.slice(2));
   const csvText = await readFile(inputPath, "utf8");
   const normalized = normalizeMoiCsv(csvText, { countyFile: options.countyFile });
   const generatedAt = new Date().toISOString();
-  const metadata = { generatedAt, sourcePublishedAt: options.sourcePublishedAt, dataPeriodStart: options.dataPeriodStart, dataPeriodEnd: options.dataPeriodEnd, retrievedAt: options.retrievedAt ?? generatedAt, verifiedAt: options.verifiedAt };
+  const metadata = { generatedAt, sourcePublishedAt: options.sourcePublishedAt, dataPeriodStart: options.dataPeriodStart, dataPeriodEnd: options.dataPeriodEnd, retrievedAt: options.retrievedAt ?? generatedAt, verifiedAt: options.verifiedAt, methodologyVersion: options.methodologyVersion, schemaVersion: options.schemaVersion, periodId: options.periodId };
   const outputDirectory = resolve(options.outDir);
   const liveOutputPath = resolve(options.liveOutput);
   const quality = { ...normalized.quality, sourceId: SOURCE_ID, sourceFile: basename(inputPath), generatedAt, sourcePublishedAt: options.sourcePublishedAt, retrievedAt: metadata.retrievedAt, verifiedAt: options.verifiedAt, dataPeriodStart: options.dataPeriodStart, dataPeriodEnd: options.dataPeriodEnd };
@@ -301,8 +348,13 @@ async function main() {
   await writeFile(resolve(outputDirectory, "moi-real-price-normalized.json"), `${JSON.stringify(normalized.transactions, null, 2)}\n`, "utf8");
   await writeFile(resolve(outputDirectory, "moi-real-price-quality.json"), `${JSON.stringify(quality, null, 2)}\n`, "utf8");
   if (!quality.qualityGate.passed) throw new Error(`MOI quality gate failed: ${JSON.stringify(quality.qualityGate.checks)}`);
-  await writeFile(liveOutputPath, `${JSON.stringify(buildLiveOutput(normalized, metadata), null, 2)}\n`, "utf8");
-  process.stdout.write(`${JSON.stringify({ transactionCount: normalized.metrics.transactionCount, districtCount: normalized.metrics.districtTransactionCounts.length, qualityPath: resolve(outputDirectory, "moi-real-price-quality.json"), liveOutputPath }, null, 2)}\n`);
+  let historicalOutputPath;
+  if (options.historyOutput) {
+    historicalOutputPath = resolve(options.historyOutput);
+    await mergeHistoricalPeriod(historicalOutputPath, buildMoiHistoricalPeriod(normalized, metadata));
+  }
+  if (!options.historyOnly) await writeFile(liveOutputPath, `${JSON.stringify(buildLiveOutput(normalized, metadata), null, 2)}\n`, "utf8");
+  process.stdout.write(`${JSON.stringify({ transactionCount: normalized.metrics.transactionCount, districtCount: normalized.metrics.districtTransactionCounts.length, qualityPath: resolve(outputDirectory, "moi-real-price-quality.json"), ...(!options.historyOnly ? { liveOutputPath } : {}), ...(historicalOutputPath ? { historicalOutputPath } : {}) }, null, 2)}\n`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

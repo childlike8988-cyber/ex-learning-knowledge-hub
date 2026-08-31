@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import test from "node:test";
+import ts from "../node_modules/typescript/lib/typescript.js";
 import {
   buildLiveOutput,
   normalizeMoiCsv,
@@ -15,6 +16,14 @@ import {
   squareMetersToPing,
   validateMoiQualityGate,
 } from "../scripts/market-radar/import-moi-real-price.mjs";
+
+const historySource = await readFile(new URL("../src/lib/market-radar/moiHistoricalComparison.ts", import.meta.url), "utf8");
+const historyCompiled = ts.transpileModule(historySource, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
+const { buildMoiHistoricalPeriod, compareMoiPeriods, findComparablePreviousPeriod, MOI_TRANSACTION_ACTIVITY_FLAT_THRESHOLD_PERCENT } = await import(`data:text/javascript;base64,${Buffer.from(historyCompiled).toString("base64")}`);
+
+function period({ id, start, end, count, districts = [{ district: "左營區", transactionCount: count }] }) {
+  return buildMoiHistoricalPeriod({ periodId: id, sourceId: "moi-real-price-sales", sourcePublishedAt: "2026-08-21", dataPeriodStart: start, dataPeriodEnd: end, transactionCount: count, districtTransactionCounts: districts, generatedAt: "2026-08-31T00:00:00Z", verifiedAt: "2026-08-31T00:00:00Z", retrievedAt: "2026-08-31T00:00:00Z", methodologyVersion: "moi-real-price-methodology-v1", schemaVersion: "moi-real-price-csv-v1", quality: { acceptedRows: count, rejectedRows: 0, duplicateRows: 0, districtCount: districts.length } });
+}
 
 const execFileAsync = promisify(execFile);
 const fixturePath = new URL("./fixtures/moi-kaohsiung-sample.csv", import.meta.url);
@@ -53,10 +62,43 @@ test("MOI output has official source metadata, live status and deterministic con
   assert.equal(output.source.isMock, false);
   assert.equal(output.retrievedAt, "2026-08-30T09:00:00.000Z");
   assert.equal(output.methodologyVersion, "moi-real-price-methodology-v1");
+  assert.equal(output.quality.acceptedRows, 3);
   assert.equal(output.metrics.transactionCount, 3);
   assert.match(output.methodology.transactionCountDefinition, /去重/);
   assert.equal(squareMetersToPing(3.305785), 1);
   assert.equal(pricePerSquareMeterToTenThousandPerPing(100000), 33.05785);
+});
+
+test("MOI historical comparison uses raw counts only for equal-day official periods", () => {
+  const previous = period({ id: "previous", start: "2026-07-21", end: "2026-07-30", count: 100 });
+  const current = period({ id: "current", start: "2026-08-01", end: "2026-08-10", count: 106 });
+  const comparison = compareMoiPeriods(current, previous);
+  assert.equal(comparison.isComparable, true);
+  assert.equal(comparison.comparisonMethod, "raw-count");
+  assert.equal(comparison.direction, "up");
+  assert.equal(comparison.confidence, "high");
+  assert.equal(comparison.changePercent, 6);
+});
+
+test("MOI historical comparison normalizes unequal-day periods and protects zero baselines", () => {
+  const previous = period({ id: "previous", start: "2026-07-21", end: "2026-07-31", count: 110, districts: [{ district: "左營區", transactionCount: 0 }] });
+  const current = period({ id: "current", start: "2026-08-01", end: "2026-08-10", count: 120, districts: [{ district: "左營區", transactionCount: 12 }] });
+  const comparison = compareMoiPeriods(current, previous);
+  assert.equal(comparison.comparisonMethod, "daily-normalized");
+  assert.equal(comparison.confidence, "medium");
+  assert.equal(comparison.direction, "up");
+  assert.equal(comparison.districtTransactionChanges[0].newActivity, true);
+  assert.equal(comparison.districtTransactionChanges[0].changePercent, null);
+});
+
+test("MOI historical comparison rejects schema mismatch and selects the closest valid predecessor", () => {
+  const previous = period({ id: "previous", start: "2026-07-21", end: "2026-07-30", count: 100 });
+  const incompatible = { ...previous, periodId: "incompatible", dataPeriodEnd: "2026-07-31", schemaVersion: "other-schema" };
+  const current = period({ id: "current", start: "2026-08-01", end: "2026-08-10", count: 102 });
+  assert.equal(compareMoiPeriods(current, incompatible).isComparable, false);
+  const found = findComparablePreviousPeriod(current, { status: "live", sourceId: "moi-real-price-sales", methodologyVersion: "moi-real-price-methodology-v1", periods: [previous, incompatible] });
+  assert.equal(found.previousPeriodId, "previous");
+  assert.equal(MOI_TRANSACTION_ACTIVITY_FLAT_THRESHOLD_PERCENT, 3);
 });
 
 test("MOI importer recognizes the official bilingual schema row and keeps a Kaohsiung-only file deterministic", () => {
@@ -116,7 +158,24 @@ test("the import command writes isolated processed and live JSON without changin
   assert.equal(liveOutput.metrics.transactionCount, 3);
 });
 
+test("the historical import mode appends a normalized period without overwriting latest output", async () => {
+  const temp = await mkdtemp(join(tmpdir(), "market-radar-moi-history-"));
+  const processed = join(temp, "processed");
+  const history = join(temp, "moi-real-price-history.json");
+  const script = fileURLToPath(new URL("../scripts/market-radar/import-moi-real-price.mjs", import.meta.url));
+  await execFileAsync(process.execPath, [script, fileURLToPath(fixturePath), "--source-published-at", "2026-08-11", "--data-period-start", "2026-07-21", "--data-period-end", "2026-07-31", "--verified-at", "2026-08-31T10:00:00.000Z", "--out-dir", processed, "--history-output", history, "--period-id", "moi-2026-07-21-2026-07-31", "--history-only"]);
+  const output = JSON.parse(await readFile(history, "utf8"));
+  assert.equal(output.periods.length, 1);
+  assert.equal(output.periods[0].dayCount, 11);
+  assert.equal(existsSync(join(temp, "moi-real-price-latest.json")), false);
+});
+
 test("Live loader declares an updating fallback when no validated live JSON exists", async () => {
   const loader = await readFile(new URL("../src/lib/market-radar/loadMarketRadarLiveData.ts", import.meta.url), "utf8");
   for (const term of ["loadMarketRadarLiveData", "existsSync", "status: \"updating\"", "官方資料更新中", "Live JSON 尚未產製"]) assert.ok(loader.includes(term));
+});
+
+test("MOI history loader safely returns no baseline for missing or invalid history", async () => {
+  const loader = await readFile(new URL("../src/lib/market-radar/loadMarketRadarMoiHistory.ts", import.meta.url), "utf8");
+  for (const term of ["loadMarketRadarMoiHistory", "moi-real-price-history.json", "status !== \"live\"", "periods.every(isPeriod)"]) assert.ok(loader.includes(term));
 });
