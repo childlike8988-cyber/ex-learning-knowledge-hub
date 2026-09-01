@@ -168,7 +168,7 @@ export function buildMarketRadarReportSnapshot(input: MarketRadarReportSnapshotI
     highlights,
     marketTemperature: { label: input.analysis.marketTemperature.label, description: input.analysis.marketTemperature.description, dataStatus: input.analysis.marketTemperature.dataStatus, confidence: input.analysis.marketTemperature.confidence, basisSignalIds: input.analysis.marketTemperature.basisSignalIds, sourceIds: input.analysis.signals.filter((signal) => signal.status === "live").flatMap((signal) => signal.sourceIds), analysis: input.analysis.marketTemperature.detail.analysis },
     liveObservations: buildLiveObservations(input.moi, input.cbc, moiFacts, cbcFacts),
-    moi: { status: moiFacts.length > 0 ? "live" : "unavailable", facts: moiFacts, sourceIds: moiFacts.flatMap((item) => item.sourceIds), dataPeriod: period(input.moi.dataPeriodStart, input.moi.dataPeriodEnd), historicalStatus: coverage.moiHistory },
+    moi: { status: moiFacts.length > 0 ? "live" : "unavailable", facts: moiFacts, sourceIds: moiFacts.flatMap((item) => item.sourceIds), dataPeriod: period(input.moi.dataPeriodStart, input.moi.dataPeriodEnd), historicalStatus: coverage.moiHistory, districtTransactionCounts: [...(input.moi.metrics.districtTransactionCounts ?? [])].sort((a, b) => b.transactionCount - a.transactionCount || a.district.localeCompare(b.district, "zh-Hant")).slice(0, 8) },
     cbc: { status: cbcFacts.length > 0 ? "live" : "unavailable", facts: cbcFacts, sourceIds: cbcFacts.flatMap((item) => item.sourceIds), dataPeriod: period(input.cbc.dataPeriodStart, input.cbc.dataPeriodEnd, input.cbc.latest?.period), historyPeriods: input.cbc.history.length },
     signals: input.analysis.signals,
     charts: input.report.publicCharts,

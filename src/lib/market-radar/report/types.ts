@@ -51,6 +51,7 @@ export type MarketRadarReportFactGroup = {
 
 export type MarketRadarReportMoiSection = MarketRadarReportFactGroup & {
   historicalStatus: "ready" | "waiting";
+  districtTransactionCounts: readonly { district: string; transactionCount: number }[];
 };
 
 export type MarketRadarReportCbcSection = MarketRadarReportFactGroup & {
