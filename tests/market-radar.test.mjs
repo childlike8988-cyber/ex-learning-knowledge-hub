@@ -6,6 +6,7 @@ const dataSource = await readFile(new URL("../src/data/market-radar.ts", import.
 const pageSource = await readFile(new URL("../src/components/MarketRadarPage.tsx", import.meta.url), "utf8");
 const proSource = await readFile(new URL("../src/components/MarketRadarProSection.tsx", import.meta.url), "utf8");
 const downloadSource = await readFile(new URL("../src/components/MarketRadarDownloadSection.tsx", import.meta.url), "utf8");
+const entitlementSource = await readFile(new URL("../src/lib/market-radar/auth/entitlement.ts", import.meta.url), "utf8");
 const quickNavigationSource = await readFile(new URL("../src/components/MarketRadarQuickNavigation.tsx", import.meta.url), "utf8");
 const detailDrawerSource = await readFile(new URL("../src/components/MarketRadarDetailDrawer.tsx", import.meta.url), "utf8");
 const stylesSource = await readFile(new URL("../src/app/globals.css", import.meta.url), "utf8");
@@ -42,9 +43,9 @@ test("market radar offers semantic desktop and mobile quick navigation", () => {
   for (const term of ["QUICK NAVIGATION", "快速索引", "快速導覽", "aria-expanded", "aria-controls", "market-pro"]) assert.ok(quickNavigationSource.includes(term));
 });
 
-test("market radar models Free exhaustion and individual Pro format actions", () => {
-  for (const term of ["freeQuarterlyDownloadsRemaining", "isFreeQuarterlyCreditExhausted", "hasActiveMonthlySubscription", "hasActiveAnnualSubscription", "canDownloadWithPro", "本季免費額度已使用", "disabled", "Pro 下載", "下載 ${download.format}"]) assert.ok(downloadSource.includes(term) || dataSource.includes(term));
-  assert.ok(downloadSource.includes("本季已下載。下一次免費額度"));
+test("market radar models Guest, report-level Free and Pro download states without a real download", () => {
+  for (const term of ["guest-login-required", "free-credit-available", "free-report-unlocked", "free-credit-exhausted", "pro-ready", "download-unavailable", "本季免費額度已使用", "NOT_IMPLEMENTED", "REQUIRES_BACKEND"]) assert.ok(downloadSource.includes(term) || entitlementSource.includes(term));
+  assert.ok(entitlementSource.includes("本季已下載。下一次免費額度"));
 });
 
 test("market radar source contract keeps source times, priority, freshness, facts and analysis separate", () => {
@@ -85,8 +86,8 @@ test("market radar news keeps its primary content column expandable across respo
   assert.ok(pageSource.includes("查看分析"));
 });
 
-test("market radar shows one quarterly Free bundle and does not pretend payment is active", () => {
-  for (const term of ["本季免費下載", "一次解鎖本期 PNG + PDF", "1 Free Full Report Credit", "本季免費額度已使用", "nextQuarterLabel"]) assert.ok(downloadSource.includes(term));
+test("market radar shows one quarterly Free report bundle and does not pretend payment is active", () => {
+  for (const term of ["本季免費下載完整報告", "本季免費解鎖完整報告", "同一期 PNG 分享圖文 + PDF 完整報告", "1 Free Full Report Credit", "本季免費額度已使用"]) assert.ok(downloadSource.includes(term) || entitlementSource.includes(term));
   assert.match(proSource, /付款功能準備中/);
   assert.match(proSource, /Payment integration coming soon/);
   assert.match(proSource, /monthlyPrice/);
