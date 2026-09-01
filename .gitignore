@@ -31,3 +31,5 @@ data/market-radar/backups/*
 !data/market-radar/backups/README.md
 data/market-radar/logs/*
 !data/market-radar/logs/README.md
+data/market-radar/exports/*
+!data/market-radar/exports/README.md

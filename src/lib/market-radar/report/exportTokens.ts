@@ -1,5 +1,5 @@
-/** Export contract version. Bump when the PNG/PDF layout contract changes. */
-export const MARKET_RADAR_EXPORT_VERSION = "1.0.0" as const;
+/** Export contract version. Bump when the PNG/PDF content or layout contract changes. */
+export const MARKET_RADAR_EXPORT_VERSION = "1.1.0" as const;
 
 export const MARKET_RADAR_EXPORT_TOKENS = {
   pageBackground: "#f5efe5",
@@ -38,5 +38,6 @@ export const MARKET_RADAR_PNG_EXPORT_SPEC = {
 export const MARKET_RADAR_PDF_EXPORT_SPEC = {
   format: "A4",
   orientation: "portrait",
-  pages: ["cover", "overview", "moi", "cbc", "signals", "sources"],
+  pages: ["executive-summary", "official-data-context", "client-guidance-sources"],
+  pageCount: "content-driven",
 } as const;

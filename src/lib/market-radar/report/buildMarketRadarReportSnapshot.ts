@@ -14,6 +14,7 @@ import {
 } from "./types";
 
 import { MARKET_RADAR_EXPORT_VERSION } from "./exportTokens";
+import { buildMarketRadarDownloadContent } from "./buildMarketRadarDownloadContent";
 export { MARKET_RADAR_EXPORT_VERSION } from "./exportTokens";
 
 const ANALYSIS_DISCLAIMER = "Market Radar 解讀係依公開資料整理之分析，不代表原始資料來源立場，亦不構成投資或交易建議。";
@@ -136,7 +137,7 @@ export function createMarketRadarExportBundle(snapshot: MarketRadarReportSnapsho
   if (!eligibility.canGeneratePng || !eligibility.canGeneratePdf) throw new Error(`Market Radar snapshot is not exportable: ${eligibility.warnings.join(" ")}`);
   return {
     reportId: snapshot.reportId,
-    pngFileName: `EX-Market-Radar-Kaohsiung-${snapshot.reportDate}.png`,
+    shareCards: buildMarketRadarDownloadContent(snapshot).shareCards.map((card) => ({ id: card.id, role: card.role, fileName: `EX-Market-Radar-Kaohsiung-${snapshot.reportDate}-${card.id}.png` })),
     pdfFileName: `EX-Market-Radar-Kaohsiung-${snapshot.reportDate}.pdf`,
     generatedAt: snapshot.generatedAt,
     exportVersion: snapshot.exportVersion,

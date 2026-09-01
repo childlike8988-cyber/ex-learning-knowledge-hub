@@ -144,7 +144,7 @@ export type MarketRadarReportSnapshot = {
 
 export type MarketRadarExportBundle = {
   reportId: string;
-  pngFileName: string;
+  shareCards: readonly { id: "share-01" | "share-02" | "share-03"; role: "market-overview" | "data-and-context" | "client-guidance"; fileName: string }[];
   pdfFileName: string;
   generatedAt: string;
   exportVersion: string;
@@ -160,7 +160,7 @@ export type MarketRadarPngExportSpec = {
 };
 
 export type MarketRadarPdfPage = {
-  pageId: "cover" | "overview" | "moi" | "cbc" | "signals" | "sources";
+  pageId: "executive-summary" | "official-data-context" | "client-guidance-sources";
   title: string;
   sections: readonly string[];
   format: "A4";

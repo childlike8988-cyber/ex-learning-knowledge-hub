@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const read = (path) => readFileSync(`${root}${path}`, "utf8");
 const png = read("src/components/market-radar/report/MarketRadarPngReport.tsx");
+const download = read("src/components/market-radar/report/MarketRadarDownloadContent.tsx");
+const downloadModel = read("src/lib/market-radar/report/buildMarketRadarDownloadContent.ts");
 const pdf = read("src/components/market-radar/report/MarketRadarPdfReport.tsx");
 const preview = read("src/components/market-radar/report/MarketRadarReportPreview.tsx");
 const route = read("src/app/market-radar/report-preview/page.tsx");
@@ -21,9 +23,11 @@ test("internal report preview is static, noindex and kept outside global navigat
   assert.equal(/cookies\(|headers\(|fetch\(/.test(route), false);
 });
 
-test("PNG renderer is a fixed 1080 by 1920 snapshot-only report with one MOI primary chart", () => {
+test("PNG renderer is a fixed 1080 by 1920 snapshot-only share-card bundle", () => {
   assert.match(png, /MarketRadarPngReport/);
-  assert.match(png, /MarketRadarPrimaryChart|MarketRadarMoiSection snapshot=\{snapshot\} chart/);
+  for (const term of ["MarketRadarPngShareCard", "MarketRadarDownloadDataContext", "MarketRadarDownloadGuidance"]) assert.match(`${png}\n${download}`, new RegExp(term));
+  for (const term of ["share-01", "share-02", "share-03", "market-overview", "data-and-context", "client-guidance"]) assert.match(downloadModel, new RegExp(term));
+  assert.match(download, /MarketRadarMoiSection snapshot=\{snapshot\} chart/);
   assert.match(css, /market-radar-export--png\s*\{\s*width:\s*1080px;\s*height:\s*1920px/);
   assert.match(css, /padding:\s*72px 64px/);
   assert.match(primitives, /最多 8 區 · 非買氣排行/);
@@ -33,16 +37,22 @@ test("PNG renderer is a fixed 1080 by 1920 snapshot-only report with one MOI pri
 test("renderer disclosures keep fixture, partial live and waiting data explicit", () => {
   assert.match(primitives, /FIXTURE/);
   assert.match(primitives, /PARTIAL LIVE/);
-  assert.match(pdf, /MOI HISTORICAL <b>WAITING<\/b>/);
-  assert.match(pdf, /PRICE MOMENTUM <b>WAITING<\/b>/);
+  assert.match(pdf, /Historical Baseline 與 Price Momentum 目前為 WAITING/);
+  assert.match(download, /dataCoverage\.moiHistorical/);
+  assert.match(download, /MarketRadarKeyTake snapshot=\{snapshot\}/);
+  assert.match(download, /MarketRadarDownloadEditorial/);
+  assert.match(download, /MarketRadarDownloadKeySentences/);
+  assert.match(download, /MarketRadarStatusBadge status="fixture"/);
   assert.match(primitives, /不等同即時市場詢問度或買氣/);
 });
 
-test("PDF renderer has an A4 portrait six-page model with sources and disclaimer", () => {
+test("PDF renderer has an A4 portrait content-driven deep-report model with sources and disclaimer", () => {
   assert.match(pdf, /MarketRadarPdfReport/);
-  for (const page of ["cover", "overview", "moi", "cbc", "signals", "sources"]) assert.match(pdf, new RegExp(`label="${page}"`));
+  for (const page of ["executive-summary", "official-data-context", "client-guidance-sources"]) assert.match(pdf, new RegExp(`label="${page}"`));
   assert.match(pdf, /MarketRadarSourceMeta/);
   assert.match(pdf, /MarketRadarDisclaimer/);
+  assert.match(pdf, /MarketRadarDownloadEditorial/);
+  assert.match(pdf, /MarketRadarDownloadKeySentences/);
   assert.match(css, /@page \{ size: A4 portrait; margin: 0; \}/);
   assert.match(css, /break-inside: avoid/);
 });
@@ -56,7 +66,7 @@ test("report primitives render all numeric and source data from the snapshot con
 });
 
 test("preview controls are print-safe and do not expose download or auth behavior", () => {
-  assert.match(preview, /PNG 9:16/);
+  assert.match(preview, /Share \{index \+ 1\}/);
   assert.match(preview, /PDF A4/);
   assert.match(preview, /Fit Width/);
   assert.match(preview, /Actual Size/);

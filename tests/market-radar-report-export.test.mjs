@@ -5,6 +5,7 @@ import test from "node:test";
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 const typesSource = await read("../src/lib/market-radar/report/types.ts");
 const builderSource = await read("../src/lib/market-radar/report/buildMarketRadarReportSnapshot.ts");
+const downloadContentSource = await read("../src/lib/market-radar/report/buildMarketRadarDownloadContent.ts");
 const snapshotLoaderSource = await read("../src/lib/market-radar/report/loadMarketRadarReportSnapshot.ts");
 const tokenSource = await read("../src/lib/market-radar/report/exportTokens.ts");
 const spec = await read("../docs/market-radar/report-export-spec.md");
@@ -54,13 +55,14 @@ test("snapshot builder provides live observations without changing numeric facts
   for (const term of ["loadMarketRadarReport", "loadMarketRadarLiveData", "loadMarketRadarCbcData", "loadMarketRadarAnalysis", "buildMarketRadarReportSnapshot"]) assert.match(snapshotLoaderSource, new RegExp(term));
 });
 
-test("PNG and PDF naming and bundle contract are deterministic", () => {
-  for (const term of ["MarketRadarExportBundle", "pngFileName", "pdfFileName", "generatedAt", "exportVersion"]) assert.match(typesSource + builderSource, new RegExp(term));
-  assert.ok(builderSource.includes("pngFileName: `EX-Market-Radar-Kaohsiung-${snapshot.reportDate}.png`"));
+test("PNG share cards and PDF naming stay deterministic while card count remains variable", () => {
+  for (const term of ["MarketRadarExportBundle", "shareCards", "pdfFileName", "generatedAt", "exportVersion"]) assert.match(typesSource + builderSource, new RegExp(term));
+  assert.ok(builderSource.includes("EX-Market-Radar-Kaohsiung-${snapshot.reportDate}-${card.id}.png"));
   assert.ok(builderSource.includes("pdfFileName: `EX-Market-Radar-Kaohsiung-${snapshot.reportDate}.pdf`"));
   assert.equal(sample.exportVersion, "1.0.0");
   assert.equal(sample.exportEligibility.canGeneratePng, true);
   assert.equal(sample.exportEligibility.canGeneratePdf, true);
+  for (const term of ["share-01", "share-02", "share-03", "market-overview", "data-and-context", "client-guidance"]) assert.match(downloadContentSource, new RegExp(term));
 });
 
 test("PNG and PDF specs preserve dimensions, safe area, A4 and static rendering", () => {
@@ -71,6 +73,7 @@ test("PNG and PDF specs preserve dimensions, safe area, A4 and static rendering"
   assert.match(tokenSource, /format: "A4"/);
   assert.match(tokenSource, /MARKET_RADAR_PNG_EXPORT_SPEC/);
   assert.match(tokenSource, /MARKET_RADAR_PDF_EXPORT_SPEC/);
+  assert.match(tokenSource, /pageCount: "content-driven"/);
   for (const term of ["1080 × 1920", "9:16", "A4 portrait", "static", "hover", "tooltip", "animation", "PARTIAL LIVE"]) assert.match(spec, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.match(printStyles, /@media print/);
   assert.match(printStyles, /\.market-radar-export/);

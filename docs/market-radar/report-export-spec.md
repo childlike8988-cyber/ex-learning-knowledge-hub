@@ -4,6 +4,25 @@
 
 This document defines the future report contract only. Phase 2D-1B.0 does not expose a download API, consume a Free Credit, check Auth, process payment, or publish a downloadable PNG/PDF. Existing Market Radar UI, pricing, credit rules and automation are unchanged.
 
+## Download Content Layer Phase 1
+
+Web is for quick browsing and fast understanding. The PNG bundle is for
+client-forwardable communication; it can contain one to three standalone cards
+instead of a screenshot of the web page. The PDF is the deeper professional
+report, with source context, methodology, interpretation limits, buyer/seller
+communication points and a forward watchlist where the current Snapshot
+supports them.
+
+The current role set is `share-01` market overview, `share-02` data and
+context, and `share-03` client guidance. Card count is variable: unavailable
+facts remove a card rather than producing filler. `WAITING` coverage is a
+compact availability note. `LIVE`, `PARTIAL LIVE` and `FIXTURE` disclosures
+remain visible in every applicable artifact.
+
+The PDF uses content-driven pagination (currently 3–8 validated A4 pages), not
+a fixed number of pages. Neither renderer may invent a fact, price trend,
+historical comparison or a Live conclusion from Fixture editorial content.
+
 ## Report Snapshot
 
 `MarketRadarReportSnapshot` in `src/lib/market-radar/report/types.ts` is the single deterministic input for web, PNG and PDF renderers. `buildMarketRadarReportSnapshot.ts` combines the current report fixture, validated MOI/CBC Live slices and the rule-based analysis result. Renderers must consume this snapshot instead of reimplementing source or analysis logic.

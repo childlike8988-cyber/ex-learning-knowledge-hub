@@ -1,5 +1,7 @@
 import type { MarketRadarReportSnapshot } from "@/lib/market-radar/report/types";
-import { MarketRadarCbcSection, MarketRadarDisclaimer, MarketRadarHighlights, MarketRadarKeyTake, MarketRadarMoiSection, MarketRadarObservations, MarketRadarReportFooter, MarketRadarReportHeader, MarketRadarSourceMeta, MarketRadarTemperature } from "./MarketRadarReportPrimitives";
+import { MarketRadarPngShareCard } from "./MarketRadarDownloadContent";
 
-/** Fixed 1080 × 1920 capture target; responsive CSS only scales its preview shell. */
-export function MarketRadarPngReport({ snapshot }: { snapshot: MarketRadarReportSnapshot }) { return <article className="market-radar-export market-radar-export--png" aria-label="Market Radar PNG report preview"><div className="market-radar-export__safe-area"><MarketRadarReportHeader snapshot={snapshot}/><MarketRadarKeyTake snapshot={snapshot}/><MarketRadarHighlights snapshot={snapshot}/><MarketRadarTemperature snapshot={snapshot}/><MarketRadarMoiSection snapshot={snapshot} chart/><MarketRadarCbcSection snapshot={snapshot}/><MarketRadarObservations snapshot={snapshot}/><MarketRadarSourceMeta snapshot={snapshot} compact/><MarketRadarDisclaimer snapshot={snapshot}/><MarketRadarReportFooter snapshot={snapshot}/></div></article>; }
+/** Backward-compatible first share card; individual cards use MarketRadarPngShareCard. */
+export function MarketRadarPngReport({ snapshot }: { snapshot: MarketRadarReportSnapshot }) {
+  return <MarketRadarPngShareCard snapshot={snapshot} cardId="share-01" />;
+}
