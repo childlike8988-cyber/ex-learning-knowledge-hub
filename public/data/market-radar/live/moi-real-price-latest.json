@@ -2,12 +2,12 @@
   "status": "live",
   "dataStatus": "live",
   "sourceId": "moi-real-price-sales",
-  "generatedAt": "2026-08-31T05:59:41.357Z",
-  "sourcePublishedAt": "2026-08-21",
-  "dataPeriodStart": "2026-08-01",
-  "dataPeriodEnd": "2026-08-10",
-  "verifiedAt": "2026-08-31T05:10:00.000Z",
-  "retrievedAt": "2026-08-31T04:31:23.000Z",
+  "generatedAt": "2026-09-01T04:40:03.879Z",
+  "sourcePublishedAt": "2026-09-01",
+  "dataPeriodStart": "2026-08-11",
+  "dataPeriodEnd": "2026-08-20",
+  "verifiedAt": "2026-09-01T04:40:03.677Z",
+  "retrievedAt": "2026-09-01T04:40:03.879Z",
   "methodologyVersion": "moi-real-price-methodology-v1",
   "source": {
     "id": "moi-real-price-sales",
@@ -16,11 +16,11 @@
     "type": "public-record",
     "priority": "official",
     "url": "https://plvr.land.moi.gov.tw/DownloadOpenData",
-    "publishedAt": "2026-08-21",
-    "dataPeriodStart": "2026-08-01",
-    "dataPeriodEnd": "2026-08-10",
-    "verifiedAt": "2026-08-31T05:10:00.000Z",
-    "retrievedAt": "2026-08-31T04:31:23.000Z",
+    "publishedAt": "2026-09-01",
+    "dataPeriodStart": "2026-08-11",
+    "dataPeriodEnd": "2026-08-20",
+    "verifiedAt": "2026-09-01T04:40:03.677Z",
+    "retrievedAt": "2026-09-01T04:40:03.879Z",
     "expectedUpdateFrequency": "irregular",
     "notes": "官方 Open Data 為批次靜態資料；實價登錄具有申報與發布時間差，非即時成交行情。",
     "isPrimarySource": true,
@@ -32,94 +32,102 @@
     "expectedUpdateFrequency": "irregular"
   },
   "metrics": {
-    "transactionCount": 1040,
+    "transactionCount": 1278,
     "districtTransactionCounts": [
       {
+        "district": "三民區",
+        "transactionCount": 218
+      },
+      {
+        "district": "鳳山區",
+        "transactionCount": 150
+      },
+      {
+        "district": "小港區",
+        "transactionCount": 110
+      },
+      {
         "district": "橋頭區",
-        "transactionCount": 147
+        "transactionCount": 109
       },
       {
         "district": "大寮區",
         "transactionCount": 93
       },
       {
-        "district": "三民區",
-        "transactionCount": 91
-      },
-      {
-        "district": "鳳山區",
-        "transactionCount": 91
-      },
-      {
-        "district": "仁武區",
-        "transactionCount": 88
-      },
-      {
-        "district": "小港區",
-        "transactionCount": 78
-      },
-      {
         "district": "鼓山區",
-        "transactionCount": 58
+        "transactionCount": 82
       },
       {
         "district": "左營區",
-        "transactionCount": 55
-      },
-      {
-        "district": "苓雅區",
-        "transactionCount": 53
-      },
-      {
-        "district": "鳥松區",
-        "transactionCount": 48
+        "transactionCount": 61
       },
       {
         "district": "楠梓區",
-        "transactionCount": 34
+        "transactionCount": 58
+      },
+      {
+        "district": "苓雅區",
+        "transactionCount": 57
+      },
+      {
+        "district": "仁武區",
+        "transactionCount": 49
       },
       {
         "district": "前鎮區",
-        "transactionCount": 26
+        "transactionCount": 32
       },
       {
         "district": "新興區",
-        "transactionCount": 21
+        "transactionCount": 28
       },
       {
         "district": "岡山區",
-        "transactionCount": 19
+        "transactionCount": 25
+      },
+      {
+        "district": "鳥松區",
+        "transactionCount": 25
       },
       {
         "district": "林園區",
-        "transactionCount": 19
+        "transactionCount": 22
       },
       {
-        "district": "大樹區",
-        "transactionCount": 16
+        "district": "旗津區",
+        "transactionCount": 21
       },
       {
         "district": "大社區",
+        "transactionCount": 16
+      },
+      {
+        "district": "大樹區",
+        "transactionCount": 13
+      },
+      {
+        "district": "前金區",
         "transactionCount": 12
       },
       {
-        "district": "阿蓮區",
-        "transactionCount": 11
-      },
-      {
         "district": "美濃區",
-        "transactionCount": 9
-      },
-      {
-        "district": "梓官區",
-        "transactionCount": 9
+        "transactionCount": 12
       },
       {
         "district": "旗山區",
-        "transactionCount": 9
+        "transactionCount": 12
       },
       {
-        "district": "湖內區",
+        "district": "梓官區",
+        "transactionCount": 11
+      },
+      {
+        "district": "燕巢區",
+        "transactionCount": 11
+      },
+      {
+        "district": "阿蓮區",
         "transactionCount": 8
       },
       {
@@ -127,16 +135,24 @@
         "transactionCount": 8
       },
       {
-        "district": "前金區",
-        "transactionCount": 7
-      },
-      {
-        "district": "燕巢區",
-        "transactionCount": 7
-      },
-      {
         "district": "鹽埕區",
-        "transactionCount": 7
+        "transactionCount": 8
+      },
+      {
+        "district": "內門區",
+        "transactionCount": 5
+      },
+      {
+        "district": "湖內區",
+        "transactionCount": 5
+      },
+      {
+        "district": "六龜區",
+        "transactionCount": 4
+      },
+      {
+        "district": "永安區",
+        "transactionCount": 3
       },
       {
         "district": "茄萣區",
@@ -147,44 +163,24 @@
         "transactionCount": 3
       },
       {
-        "district": "內門區",
+        "district": "田寮區",
         "transactionCount": 2
       },
       {
         "district": "杉林區",
-        "transactionCount": 2
-      },
-      {
-        "district": "六龜區",
         "transactionCount": 1
       },
       {
-        "district": "永安區",
-        "transactionCount": 1
-      },
-      {
-        "district": "田寮區",
-        "transactionCount": 1
-      },
-      {
-        "district": "甲仙區",
-        "transactionCount": 1
-      },
-      {
-        "district": "那瑪夏區",
-        "transactionCount": 1
-      },
-      {
-        "district": "旗津區",
+        "district": "桃源區",
         "transactionCount": 1
       }
     ]
   },
   "quality": {
-    "acceptedRows": 1040,
+    "acceptedRows": 1278,
     "rejectedRows": 0,
     "duplicateRows": 0,
-    "districtCount": 36
+    "districtCount": 35
   },
   "methodology": {
     "transactionCountDefinition": "一筆通過必要欄位驗證且去重後的官方實價登錄買賣 record，計為一筆成交紀錄。",
@@ -194,5 +190,6 @@
       "實價登錄具有申報與發布時間差，非即時成交行情。",
       "本階段僅發布成交件數與行政區成交件數，不發布平均或中位數價格。"
     ]
-  }
+  },
+  "sourceVersionId": "moi-real-price-sales:2026-09-01:2026-08-11/2026-08-20:578af8b7c7e8339b638f55bbc0b11f1c9b049c6419c4ac96a4b8caf4127a4c8e"
 }

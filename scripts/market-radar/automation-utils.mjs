@@ -121,3 +121,46 @@ export function buildPublicUpdateStatus({ generatedAt, moiLatest, cbcLatest, moi
     sources: { moiLatest: moiLatestState, moiHistory, cbc: cbcState },
   };
 }
+
+/**
+ * Reconciles the public MOI refresh state only after a completed runtime
+ * outcome.  Keeping this here makes the publish/status boundary deterministic
+ * and testable instead of relying on the PowerShell wrapper's console output.
+ */
+export function reconcileMoiLatestUpdateStatus({ current = { sources: {} }, liveData, outcome, now = new Date().toISOString() }) {
+  if (!new Set(["success", "skipped", "failed"]).has(outcome)) throw new Error("Invalid MOI update-status outcome.");
+  const prior = current.sources?.moiLatest ?? { sourceId: "moi-real-price-sales" };
+  if (outcome === "success" && liveData?.status !== "live") throw new Error("A successful MOI status update requires validated LIVE data.");
+
+  const moiLatest = outcome === "success"
+    ? {
+        sourceId: "moi-real-price-sales",
+        lastSuccessfulUpdateAt: liveData.generatedAt ?? now,
+        lastAttemptAt: now,
+        latestSourcePublishedAt: liveData.sourcePublishedAt,
+        latestDataPeriodStart: liveData.dataPeriodStart,
+        latestDataPeriodEnd: liveData.dataPeriodEnd,
+        status: "live",
+        freshness: liveData.freshness?.status ?? "normal",
+      }
+    : outcome === "skipped"
+      ? { ...prior, lastAttemptAt: now, status: prior.status ?? "live" }
+      : { ...prior, lastAttemptAt: now, status: "failed", freshness: "aging" };
+
+  return {
+    ...current,
+    generatedAt: now,
+    automationEnabled: false,
+    automation: {
+      globalReady: true,
+      jobs: { moiLatestRefresh: true, moiHistoryBackfill: false, cbcMonthlyRefresh: true },
+    },
+    overallStatus: outcome === "failed" ? "degraded" : "partial",
+    safeMessage: outcome === "success"
+      ? "內政部最新高雄市買賣資料已成功更新。"
+      : outcome === "skipped"
+        ? "內政部尚無較新的高雄市買賣批次；現行資料維持使用。"
+        : "內政部資料更新檢查暫時失敗，現行資料仍可使用。",
+    sources: { ...current.sources, moiLatest },
+  };
+}
