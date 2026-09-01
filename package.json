@@ -8,7 +8,7 @@
     "start": "npx serve@latest out",
     "lint": "node node_modules/eslint/bin/eslint.js .",
     "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
-    "test": "node --test tests/life-management-content.test.mjs tests/creator-academy-content.test.mjs tests/creator-course-page.test.mjs tests/creator-video-course-page.test.mjs tests/creator-photography-course-page.test.mjs tests/creator-camera-movement-course-page.test.mjs tests/creator-learning-path.test.mjs tests/creator-resources.test.mjs tests/market-radar.test.mjs tests/market-radar-moi.test.mjs tests/market-radar-cbc.test.mjs tests/market-radar-analysis.test.mjs tests/market-radar-automation.test.mjs tests/market-radar-cbc-automation.test.mjs tests/market-radar-windows-automation.test.mjs tests/market-radar-moi-automation.test.mjs"
+    "test": "node --test tests/life-management-content.test.mjs tests/creator-academy-content.test.mjs tests/creator-course-page.test.mjs tests/creator-video-course-page.test.mjs tests/creator-photography-course-page.test.mjs tests/creator-camera-movement-course-page.test.mjs tests/creator-learning-path.test.mjs tests/creator-resources.test.mjs tests/market-radar.test.mjs tests/market-radar-moi.test.mjs tests/market-radar-cbc.test.mjs tests/market-radar-analysis.test.mjs tests/market-radar-automation.test.mjs tests/market-radar-cbc-automation.test.mjs tests/market-radar-windows-automation.test.mjs tests/market-radar-moi-automation.test.mjs tests/market-radar-report-export.test.mjs"
   },
   "dependencies": {
     "next": "15.5.22",
