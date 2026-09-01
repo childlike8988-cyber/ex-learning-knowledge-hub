@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./ai-learning/ai-learning.css";
 import { Footer } from "@/components/Footer";
 import { GlobalTechBackground } from "@/components/GlobalTechBackground";
 import { Header } from "@/components/Header";
