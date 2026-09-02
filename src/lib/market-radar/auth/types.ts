@@ -1,16 +1,20 @@
 export type MembershipPlan = "guest" | "free" | "pro";
 
-export type AuthUser = {
+/** Provider-neutral identity used by Market Radar domain/UI code. */
+export type IdentityUser = {
   id: string;
   displayName?: string;
   email?: string;
   avatarUrl?: string;
 };
 
+/** @deprecated Use IdentityUser in new code. Kept for Phase 2F-0 compatibility. */
+export type AuthUser = IdentityUser;
+
 export type AuthSession = {
   authenticated: boolean;
-  user?: AuthUser;
-  provider: "future-provider" | "local-mock" | "none";
+  user?: IdentityUser;
+  provider: "supabase" | "future-provider" | "local-mock" | "none";
   isMock: boolean;
 };
 
@@ -74,13 +78,24 @@ export type MarketRadarDownloadRequestResult = {
   safeMessage: string;
 };
 
+export type AuthSignInMethod = "google" | "email-otp";
+
+export type AuthActionResult = {
+  status: "redirecting" | "otp-sent" | "authenticated" | "signed-out" | "unavailable" | "failed";
+  safeMessage: string;
+  session?: AuthSession;
+};
+
+export type MarketRadarAuthStatus = "loading" | "guest" | "authenticated" | "unavailable";
+
 /**
  * Future providers must implement this adapter. The static site never treats
  * the local mock adapter as secure production authentication.
  */
 export interface AuthProviderAdapter {
   getSession(): Promise<AuthSession>;
-  signIn(): Promise<AuthSession>;
-  signOut(): Promise<void>;
+  signIn(method: AuthSignInMethod, options?: { email?: string; redirectTo?: string }): Promise<AuthActionResult>;
+  verifyEmailOtp?(email: string, token: string): Promise<AuthActionResult>;
+  signOut(): Promise<AuthActionResult>;
   getAccountState(): Promise<AccountState>;
 }

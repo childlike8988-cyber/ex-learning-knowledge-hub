@@ -1,4 +1,4 @@
-import type { AccountState, AuthProviderAdapter, AuthSession, MembershipPlan, QuarterlyDownloadCreditState } from "./types";
+import type { AccountState, AuthActionResult, AuthProviderAdapter, AuthSession, MembershipPlan, QuarterlyDownloadCreditState } from "./types";
 
 export const MARKET_RADAR_LOCAL_AUTH_STATE_LABEL = "DEMO / LOCAL AUTH STATE";
 
@@ -23,8 +23,8 @@ export function createLocalMockAuthAdapter(initialPlan: MembershipPlan = "guest"
   let account = createLocalMockAccount(initialPlan);
   return {
     async getSession() { return account.session; },
-    async signIn() { return account.session; },
-    async signOut() { account = createLocalMockAccount("guest"); },
+    async signIn(): Promise<AuthActionResult> { return { status: "unavailable", safeMessage: "本機 preview 不會建立正式登入或 session。" }; },
+    async signOut(): Promise<AuthActionResult> { account = createLocalMockAccount("guest"); return { status: "signed-out", safeMessage: "已結束本機 preview 狀態。" }; },
     async getAccountState() { return account; },
   };
 }

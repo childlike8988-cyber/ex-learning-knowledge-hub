@@ -111,8 +111,8 @@ test("download card supplies Guest, Free and Pro UX with a clear no-auth product
   assert.match(downloadSource, /PNG 提供 1–3 張/);
 });
 
-test("login-required dialog manages focus, supports Escape and does not fake authentication", () => {
-  for (const term of ['role="dialog"', 'aria-modal="true"', "previousFocusRef", "Escape", "登入／建立帳號", "稍後再說", "不會建立假帳號、session 或下載連結"])
+test("login-required dialog manages focus, supports Escape and keeps download authorization deferred", () => {
+  for (const term of ['role="dialog"', 'aria-modal="true"', "previousFocusRef", "Escape", "使用 Google 登入", "寄送 6 位數驗證碼", "稍後再說", "季度額度與下載授權尚未接入"])
     assert.match(dialogSource, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 });
 
