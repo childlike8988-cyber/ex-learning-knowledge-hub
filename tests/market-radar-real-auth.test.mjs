@@ -1,13 +1,26 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import test from "node:test";
 
+const require = createRequire(import.meta.url);
+const typescript = require("typescript");
 const root = new URL("../", import.meta.url);
 const read = (path) => readFile(new URL(path, root), "utf8");
+
+async function loadPureTypeScriptModule(path) {
+  const source = await read(path);
+  const output = typescript.transpileModule(source, { compilerOptions: { target: typescript.ScriptTarget.ES2022, module: typescript.ModuleKind.CommonJS } }).outputText;
+  const runtimeModule = { exports: {} };
+  new Function("exports", "module", output)(runtimeModule.exports, runtimeModule);
+  return runtimeModule.exports;
+}
 
 const packageJson = JSON.parse(await read("package.json"));
 const types = await read("src/lib/market-radar/auth/types.ts");
 const client = await read("src/lib/market-radar/auth/supabaseClient.ts");
+const callbackUrlSource = await read("src/lib/market-radar/auth/callbackUrl.ts");
+const callbackUrl = await loadPureTypeScriptModule("src/lib/market-radar/auth/callbackUrl.ts");
 const adapter = await read("src/lib/market-radar/auth/supabaseAdapter.ts");
 const authHook = await read("src/lib/market-radar/auth/useMarketRadarAuth.ts");
 const download = await read("src/components/MarketRadarDownloadSection.tsx");
@@ -34,8 +47,15 @@ test("public environment contract permits only URL plus public Supabase browser 
 });
 
 test("production client is browser-only, config-gated and uses a static callback path", () => {
-  for (const term of ["typeof window === \"undefined\"", "isSupabaseAuthConfigured", "persistSession", "detectSessionInUrl", "flowType: \"pkce\"", "/market-radar/auth/callback/", "NEXT_PUBLIC_BASE_PATH"]) assert.match(client, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  for (const term of ["typeof window === \"undefined\"", "isSupabaseAuthConfigured", "persistSession", "detectSessionInUrl", "flowType: \"pkce\"", "/market-radar/auth/callback/", "NEXT_PUBLIC_BASE_PATH"]) assert.match(`${client}\n${callbackUrlSource}`, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.doesNotMatch(client, /api\/|server action|cookies|headers/i);
+});
+
+test("callback construction always uses the initiating browser origin with a trailing slash", () => {
+  assert.equal(callbackUrl.buildMarketRadarAuthCallbackUrl("http://localhost:3000"), "http://localhost:3000/market-radar/auth/callback/");
+  assert.equal(callbackUrl.buildMarketRadarAuthCallbackUrl("https://excreatorstudio.github.io/"), "https://excreatorstudio.github.io/market-radar/auth/callback/");
+  assert.equal(callbackUrl.buildMarketRadarAuthCallbackUrl("https://legacy.example", "/ex-learning-knowledge-hub/"), "https://legacy.example/ex-learning-knowledge-hub/market-radar/auth/callback/");
+  assert.doesNotMatch(callbackUrlSource, /excreatorstudio\.github\.io/);
 });
 
 test("adapter maps Supabase users into provider-neutral IdentityUser and Free account state", () => {
@@ -67,9 +87,9 @@ test("login dialog retains accessible dialog behavior and never claims an export
   assert.doesNotMatch(dialog, /href=.*exports|download=/i);
 });
 
-test("callback route is static/noindex and returns only after a browser session check", () => {
+test("callback route is static/noindex, exchanges each code once and cleans URL state", () => {
   assert.match(callbackRoute, /index: false/);
-  for (const term of ["exchangeCodeForSession", "getSession", "getMarketRadarHomePath", "window.location.replace"]) assert.match(callback, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  for (const term of ["exchangeCodeForSession", "getSession", "getMarketRadarHomePath", "window.location.replace", "processedRef", "window.history.replaceState", "重新登入"]) assert.match(callback, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.doesNotMatch(`${callbackRoute}\n${callback}`, /cookies|headers|server action|route\.ts/i);
 });
 

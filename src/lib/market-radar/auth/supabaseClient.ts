@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { buildMarketRadarAuthCallbackUrl, buildMarketRadarHomePath } from "./callbackUrl";
 
 type SupabasePublicConfig = {
   url: string;
@@ -47,9 +48,9 @@ function getBasePath(): string {
 /** Exact redirect path to register in Supabase Auth Redirect URLs. */
 export function getMarketRadarAuthCallbackUrl(): string | undefined {
   if (typeof window === "undefined") return undefined;
-  return `${window.location.origin}${getBasePath()}/market-radar/auth/callback/`;
+  return buildMarketRadarAuthCallbackUrl(window.location.origin, getBasePath());
 }
 
 export function getMarketRadarHomePath(): string {
-  return `${getBasePath()}/market-radar/`;
+  return buildMarketRadarHomePath(getBasePath());
 }

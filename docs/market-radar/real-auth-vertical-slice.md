@@ -85,4 +85,28 @@ Logout delegates to `supabase.auth.signOut()` and then restores the safe Guest s
 5. Test session restore, logout, expired/invalid session, provider outage and mobile callback behavior.
 6. Implement memberships, quarterly unlock persistence, RLS/RPC and protected delivery in later phases before enabling any actual download.
 
+## Live Acceptance — 2026-09-03
+
+Status: **BLOCKED — Supabase project configuration has not been supplied to this local environment.**
+
+- No `.env.local` file was present, and no `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, or legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` was available in the process environment.
+- No Supabase URL, public key, Google provider setting, Site URL, redirect allow-list, or OTP email template was guessed, created, or changed.
+- The intended production Site URL is `https://excreatorstudio.github.io/` and the exact production callback is `https://excreatorstudio.github.io/market-radar/auth/callback/`.
+- The intended local callback is `http://localhost:3000/market-radar/auth/callback/` when development uses port 3000. Register the actual local port instead if it differs.
+- With configuration absent, the client enters `unavailable`: public Market Radar remains browseable while account and download controls stay fail-closed. No Guest CTA is shown during session restoration.
+- Google OAuth, Google cancellation, email OTP send/verify/resend/wrong-code, session restoration after a real login, new-tab restoration, logout against the provider, and GitHub Pages-origin callback remain **NOT TESTED** until a real configured Supabase project is available.
+- No credentials, user data, session token, database row, membership, credit, report unlock, Storage object, download grant, payment, deployment, commit, or push was created by this acceptance attempt.
+
+## Google OAuth Live Acceptance — 2026-09-03
+
+Status: local live authentication confirmed by the configured project operator.
+
+- A real Supabase project is configured locally with a public publishable key; no credential value is recorded here.
+- Google provider is enabled. Local Google authentication, F5 session restore, new-tab/revisit restoration, logout, `IdentityUser` mapping, and the temporary authenticated Free state were confirmed on `http://localhost:3000`.
+- Callback construction is deterministic: it uses the **origin of the browser initiating login**, then appends the configured deployment base path and `/market-radar/auth/callback/`. Localhost therefore stays localhost; it never infers the production origin.
+- For the root GitHub Pages deployment, the configured base path is empty, so the production contract is exactly `https://excreatorstudio.github.io/market-radar/auth/callback/`, without a legacy repository segment.
+- The callback stores an OAuth code only in local function scope, removes it from the visible URL before exchange, and has an in-component single-processing guard for React effect re-entry. Failure shows a safe retry link without rendering a code, token, or provider error.
+- The current code change has not been deployed. A fresh GitHub Pages-origin OAuth acceptance remains required after a separately authorized deployment.
+- Membership, quarterly credit, report unlock, Pro authority, payment, Storage, signed URL, and protected download remain unimplemented.
+
 References: [Supabase Auth](https://supabase.com/docs/guides/auth), [social login](https://supabase.com/docs/guides/auth/social-login), [redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls), and [JavaScript Auth methods](https://supabase.com/docs/reference/javascript/auth).
