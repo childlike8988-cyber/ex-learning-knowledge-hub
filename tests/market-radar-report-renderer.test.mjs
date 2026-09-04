@@ -18,7 +18,7 @@ const formatters = read("src/lib/market-radar/report/formatters.ts");
 test("internal report preview is static, noindex and kept outside global navigation", () => {
   assert.equal(existsSync(`${root}src/app/market-radar/report-preview/page.tsx`), true);
   assert.match(route, /robots:\s*\{\s*index:\s*false,\s*follow:\s*false/);
-  assert.match(route, /buildMarketRadarReportSnapshot/);
+  assert.match(route, /loadMarketRadarReportSnapshot/);
   assert.equal(read("src/components/Header.tsx").includes("report-preview"), false);
   assert.equal(/cookies\(|headers\(|fetch\(/.test(route), false);
 });

@@ -13,7 +13,7 @@ const staticRoot = join(root, "out");
 const defaultOutputRoot = join(root, "data", "market-radar", "exports");
 const stagingRoot = join(root, "data", "market-radar", "staging", "export");
 const logsRoot = join(root, "data", "market-radar", "logs");
-const rendererVersion = "1.1.0";
+const rendererVersion = "1.1.1";
 const edgeCandidates = [process.env.MARKET_RADAR_BROWSER_PATH, "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe"].filter(Boolean);
 const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 

@@ -34,7 +34,7 @@ test("PNG and PDF contracts validate deterministic geometry and DOM print render
 });
 
 test("bundle output is relative, versioned, atomic and cannot silently overwrite a different snapshot", () => {
-  assert.match(exporter, /rendererVersion = "1\.1\.0"/);
+  assert.match(exporter, /rendererVersion = "1\.1\.1"/);
   assert.match(exporter, /EX-Market-Radar-Kaohsiung-\$\{reportDate\}-\$\{cardId\}\.png/);
   assert.match(exporter, /EX-Market-Radar-Kaohsiung-\$\{reportDate\}\.pdf/);
   assert.match(exporter, /previous\.snapshotHash !== hash/);

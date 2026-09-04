@@ -13,6 +13,7 @@ export function MarketRadarReportHeader({ snapshot, compact = false }: { snapsho
 }
 
 export function MarketRadarKeyTake({ snapshot }: { snapshot: Snapshot }) {
+  if (snapshot.keyTake.status === "unavailable") return <section className="market-radar-export__key-take market-radar-export__key-take--unavailable"><div className="market-radar-export__section-label"><span>TODAY&apos;S KEY TAKE</span><MarketRadarStatusBadge status="waiting" /></div><p>今日一句待可比較的歷史基準建立後再提供；本期不以單一期案件數推導市場趨勢。</p></section>;
   return <section className="market-radar-export__key-take"><div className="market-radar-export__section-label"><span>TODAY&apos;S KEY TAKE</span>{snapshot.keyTake.status === "fixture" && <MarketRadarStatusBadge status="fixture" />}</div><blockquote>“{snapshot.keyTake.text}”</blockquote></section>;
 }
 

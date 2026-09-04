@@ -5,6 +5,7 @@ import test from "node:test";
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 const typesSource = await read("../src/lib/market-radar/report/types.ts");
 const builderSource = await read("../src/lib/market-radar/report/buildMarketRadarReportSnapshot.ts");
+const productionBuilderSource = await read("../src/lib/market-radar/report/buildMarketRadarProductionReportSnapshot.ts");
 const downloadContentSource = await read("../src/lib/market-radar/report/buildMarketRadarDownloadContent.ts");
 const snapshotLoaderSource = await read("../src/lib/market-radar/report/loadMarketRadarReportSnapshot.ts");
 const tokenSource = await read("../src/lib/market-radar/report/exportTokens.ts");
@@ -52,7 +53,18 @@ test("official source metadata is complete and facts remain source referenced", 
 test("snapshot builder provides live observations without changing numeric facts", () => {
   for (const term of ["buildLiveObservations", "內政部實價登錄資料已接入", "中央銀行最新月資料", "factIds", "sourceIds", "isMock: false"]) assert.match(builderSource, new RegExp(term));
   assert.equal(sample.liveObservations.length, 0);
-  for (const term of ["loadMarketRadarReport", "loadMarketRadarLiveData", "loadMarketRadarCbcData", "loadMarketRadarAnalysis", "buildMarketRadarReportSnapshot"]) assert.match(snapshotLoaderSource, new RegExp(term));
+  for (const term of ["loadMarketRadarLiveData", "loadMarketRadarCbcData", "loadMarketRadarAnalysis", "buildMarketRadarProductionReportSnapshot"]) assert.match(snapshotLoaderSource, new RegExp(term));
+});
+
+test("first production publication snapshot is independent of the fixture report", () => {
+  for (const term of ["MARKET_RADAR_FIRST_PRODUCTION_REPORT_DATE = \"2026-09-01\"", "buildMarketRadarProductionReportSnapshot", "createMarketRadarReportId(reportDate)", "status: \"partial-live\"", "keyTake: { text: \"本期尚無可由完整趨勢基準支撐的今日一句。\"", "highlights: []", "charts: []", "news: []", "keySentences: []", "isMock: false"]) assert.match(productionBuilderSource, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.doesNotMatch(productionBuilderSource, /loadMarketRadarReport|fixture-official-contract|fixture-editorial-context/);
+});
+
+test("production publication gate requires sourced facts, no fixture leakage and truthful waiting coverage", () => {
+  for (const term of ["evaluateMarketRadarProductionPublicationGate", "numericFactsSourced", "noFixtureFacts", "factAnalysisSeparated", "truthfulCoverage", "catalogMetadataValid", "sourceIds.length > 0", "moiHistorical === \"waiting\"", "priceMomentum === \"waiting\""]) assert.match(productionBuilderSource, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.match(productionBuilderSource, /snapshot\.exportEligibility\.canGeneratePng/);
+  assert.match(productionBuilderSource, /snapshot\.exportEligibility\.canGeneratePdf/);
 });
 
 test("PNG share cards and PDF naming stay deterministic while card count remains variable", () => {
