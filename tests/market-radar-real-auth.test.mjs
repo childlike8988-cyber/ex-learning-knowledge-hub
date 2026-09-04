@@ -23,6 +23,8 @@ const callbackUrlSource = await read("src/lib/market-radar/auth/callbackUrl.ts")
 const callbackUrl = await loadPureTypeScriptModule("src/lib/market-radar/auth/callbackUrl.ts");
 const adapter = await read("src/lib/market-radar/auth/supabaseAdapter.ts");
 const authHook = await read("src/lib/market-radar/auth/useMarketRadarAuth.ts");
+const membershipRepository = await read("src/lib/market-radar/auth/membershipRepository.ts");
+const entitlementHook = await read("src/lib/market-radar/auth/useMarketRadarEntitlement.ts");
 const download = await read("src/components/MarketRadarDownloadSection.tsx");
 const dialog = await read("src/components/MarketRadarLoginRequiredDialog.tsx");
 const callback = await read("src/components/MarketRadarAuthCallback.tsx");
@@ -69,9 +71,10 @@ test("Google OAuth relies on the centralized current-origin callback and the Pag
   assert.doesNotMatch(deployWorkflow, /service_role|SUPABASE_SERVICE_ROLE|DATABASE_URL|GOOGLE.*SECRET/i);
 });
 
-test("adapter maps Supabase users into provider-neutral IdentityUser and Free account state", () => {
-  for (const term of ["IdentityUser", "mapSupabaseUserToIdentityUser", "provider: \"supabase\"", "plan: session.authenticated ? \"free\" : \"guest\"", "Membership is intentionally not read from the browser"]) assert.match(`${types}\n${adapter}`, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+test("adapter maps Supabase users into provider-neutral IdentityUser and authoritative membership state", () => {
+  for (const term of ["IdentityUser", "mapSupabaseUserToIdentityUser", "provider: \"supabase\"", "createMarketRadarEntitlementProvider", "getEffectiveMembership", "membership.plan"]) assert.match(`${types}\n${adapter}\n${membershipRepository}`, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.doesNotMatch(adapter, /membership.*localStorage|plan.*localStorage/i);
+  assert.doesNotMatch(adapter, /plan: session\.authenticated \? "free"/);
 });
 
 test("Google OAuth and six-digit email OTP are real SDK paths rather than mock success", () => {
@@ -82,19 +85,20 @@ test("Google OAuth and six-digit email OTP are real SDK paths rather than mock s
 
 test("session restore owns loading before Guest and fails closed when Auth is unavailable", () => {
   for (const term of ["MarketRadarAuthStatus", "setStatus(\"loading\")", "getAccountState", "subscribeToSupabaseAuthChanges", "setStatus(\"unavailable\")", "公開 Market Radar 內容仍可瀏覽"]) assert.match(`${types}\n${authHook}`, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-  assert.match(download, /Session restore 完成前不會顯示訪客下載 CTA/);
+  assert.match(download, /Session 與會員權益確認完成前不會顯示訪客或下載 CTA/);
   assert.match(download, /isLoading \? "正在確認…"/);
 });
 
-test("account UI supplies guest, authenticated Free identity and logout while preserving mock preview overrides", () => {
-  for (const term of ["訪客狀態", "Free（會員權益尚未持久化）", "登出", "auth.signOut", "accountOverride", "creditOverride"]) assert.match(download, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+test("account UI supplies guest, persisted Free or Pro identity and logout while preserving mock preview overrides", () => {
+  for (const term of ["訪客狀態", "Free（權益由會員資料庫驗證）", "Pro 狀態：有效期間與權益由會員資料庫驗證", "登出", "auth.signOut", "accountOverride", "creditOverride", "useMarketRadarEntitlement"]) assert.match(download, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.match(mock, /DEMO \/ LOCAL AUTH STATE/);
   assert.match(mock, /本機 preview 不會建立正式登入或 session/);
   assert.match(download, /useMarketRadarAuth\(\{ enabled: !accountOverride \}\)/);
+  assert.match(entitlementHook, /getQuarterlyEntitlement/);
 });
 
 test("login dialog retains accessible dialog behavior and never claims an export is authorized", () => {
-  for (const term of ['role="dialog"', 'aria-modal="true"', "previousFocusRef", "Escape", "使用 Google 登入", "寄送 6 位數驗證碼", "季度額度與下載授權尚未接入"]) assert.match(dialog, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  for (const term of ['role="dialog"', 'aria-modal="true"', "previousFocusRef", "Escape", "使用 Google 登入", "寄送 6 位數驗證碼", "安全會員資料庫", "正式檔案傳輸仍未接入"]) assert.match(dialog, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.doesNotMatch(dialog, /href=.*exports|download=/i);
 });
 

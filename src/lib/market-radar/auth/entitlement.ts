@@ -14,8 +14,9 @@ export type MarketRadarDownloadEntitlementInput = {
 };
 
 /**
- * Pure state evaluator only. It neither writes quarterly usage nor grants a
- * file URL; both operations require a future trusted backend.
+ * Pure presentation-state evaluator only. The trusted provider/RPC owns
+ * membership and quarterly mutations; this function never writes either and
+ * never grants a file URL.
  */
 export function evaluateMarketRadarDownloadEntitlement({ account, report, quarterState }: MarketRadarDownloadEntitlementInput): MarketRadarDownloadEntitlementState {
   if (!report.isAvailable) {

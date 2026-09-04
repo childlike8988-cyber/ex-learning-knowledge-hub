@@ -1,4 +1,13 @@
 export type MembershipPlan = "guest" | "free" | "pro";
+export type EffectivePlan = Exclude<MembershipPlan, "guest">;
+export type MembershipStatus = "active" | "inactive" | "expired";
+
+export type Membership = {
+  plan: EffectivePlan;
+  status: MembershipStatus;
+  startsAt: string;
+  endsAt?: string;
+};
 
 /** Provider-neutral identity used by Market Radar domain/UI code. */
 export type IdentityUser = {
@@ -32,6 +41,38 @@ export type QuarterlyDownloadCreditState = {
   unlockedReportId?: string;
   unlockedAt?: string;
   isMock: boolean;
+};
+
+export type ReportUnlock = {
+  reportId: string;
+  quarterKey: string;
+  unlockType: "free-quarterly";
+  unlockedAt: string;
+};
+
+export type QuarterlyEntitlement = {
+  membership: Membership;
+  reportId: string;
+  downloadState: Exclude<MarketRadarDownloadState, "guest-login-required">;
+  credit: QuarterlyDownloadCreditState;
+};
+
+export type UnlockResultStatus =
+  | "unlocked"
+  | "already-unlocked"
+  | "credit-exhausted"
+  | "pro-ready"
+  | "invalid-report"
+  | "unauthenticated"
+  | "membership-unavailable";
+
+export type UnlockResult = {
+  status: UnlockResultStatus;
+  reportId: string;
+  quarterKey?: string;
+  remainingCredit?: 0 | 1;
+  unlimited: boolean;
+  safeMessage: string;
 };
 
 export type MarketRadarReportAvailability = {
@@ -98,4 +139,10 @@ export interface AuthProviderAdapter {
   verifyEmailOtp?(email: string, token: string): Promise<AuthActionResult>;
   signOut(): Promise<AuthActionResult>;
   getAccountState(): Promise<AccountState>;
+}
+
+export interface MarketRadarEntitlementProvider {
+  getEffectiveMembership(): Promise<Membership>;
+  getQuarterlyEntitlement(reportId: string): Promise<QuarterlyEntitlement>;
+  unlockReport(reportId: string): Promise<UnlockResult>;
 }

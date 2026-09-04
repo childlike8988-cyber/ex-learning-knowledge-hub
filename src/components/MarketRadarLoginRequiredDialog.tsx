@@ -75,7 +75,7 @@ export function MarketRadarLoginRequiredDialog({ open, auth, onClose, onAuthenti
       <h2 id="market-radar-auth-dialog-title">下載完整報告需先登入</h2>
       <p id="market-radar-auth-dialog-description">Free 會員每季可免費解鎖 1 份完整報告，包含 PNG 分享圖文與 PDF 深度報告。</p>
       {auth.status === "unavailable" ? <p className="market-radar-auth-dialog__boundary" role="status">{auth.safeMessage ?? "登入服務暫時無法使用；帳戶與下載功能已安全停用。"}</p> : <>
-        <p className="market-radar-auth-dialog__boundary">登入後先以 Free 會員狀態顯示；會員權益、季度額度與下載授權尚未接入。</p>
+        <p className="market-radar-auth-dialog__boundary">登入後會由安全會員資料庫確認 Free / Pro 與本季額度；正式檔案傳輸仍未接入。</p>
         {step === "start" ? <div className="market-radar-auth-dialog__form">
           <button type="button" onClick={() => void beginGoogleSignIn()} disabled={pending || auth.status === "loading"}>{pending ? "處理中…" : "使用 Google 登入"}</button>
           <span>或使用 Email 驗證碼</span>

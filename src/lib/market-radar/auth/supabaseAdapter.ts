@@ -2,6 +2,7 @@
 
 import type { AuthChangeEvent, Session, SupabaseClient, User } from "@supabase/supabase-js";
 import { getMarketRadarAuthCallbackUrl, getSupabaseBrowserClient } from "./supabaseClient";
+import { createMarketRadarEntitlementProvider } from "./membershipRepository";
 import type { AccountState, AuthActionResult, AuthProviderAdapter, AuthSession, IdentityUser } from "./types";
 
 export function mapSupabaseUserToIdentityUser(user: User): IdentityUser {
@@ -26,11 +27,12 @@ function failed(message: string): AuthActionResult {
 
 /**
  * Production browser adapter. It owns only Supabase SDK calls and maps their
- * result to provider-neutral Market Radar contracts. Authenticated users are
- * intentionally shown as Free until trusted membership persistence exists.
+ * result to provider-neutral Market Radar contracts. Membership is always
+ * resolved through the trusted database function, never from browser state.
  */
 export function createSupabaseAuthProviderAdapter(client: SupabaseClient | undefined = getSupabaseBrowserClient()): AuthProviderAdapter | undefined {
   if (!client) return undefined;
+  const entitlements = createMarketRadarEntitlementProvider(client);
 
   return {
     async getSession() {
@@ -40,8 +42,9 @@ export function createSupabaseAuthProviderAdapter(client: SupabaseClient | undef
     },
     async getAccountState(): Promise<AccountState> {
       const session = await this.getSession();
-      // Membership is intentionally not read from the browser or persistence yet.
-      return { authenticated: session.authenticated, plan: session.authenticated ? "free" : "guest", session };
+      if (!session.authenticated) return { authenticated: false, plan: "guest", session };
+      const membership = await entitlements.getEffectiveMembership();
+      return { authenticated: true, plan: membership.plan, session };
     },
     async signIn(method, options = {}) {
       try {

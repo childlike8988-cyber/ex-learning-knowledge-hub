@@ -47,10 +47,13 @@ export function useMarketRadarAuth({ enabled = true }: { enabled?: boolean } = {
     void restore();
     if (!client || !adapter) return;
     return subscribeToSupabaseAuthChanges(client, (_event, session) => {
-      const nextAccount: AccountState = { authenticated: session.authenticated, plan: session.authenticated ? "free" : "guest", session };
-      setAccount(nextAccount);
-      setStatus(session.authenticated ? "authenticated" : "guest");
-      setSafeMessage(undefined);
+      if (!session.authenticated) {
+        setAccount({ authenticated: false, plan: "guest", session });
+        setStatus("guest");
+        setSafeMessage(undefined);
+        return;
+      }
+      window.setTimeout(() => void restore(), 0);
     });
   }, [adapter, client, restore]);
 
