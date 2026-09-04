@@ -31,6 +31,7 @@ const mock = await read("src/lib/market-radar/auth/mock.ts");
 const envExample = await read(".env.example");
 const documentation = await read("docs/market-radar/real-auth-vertical-slice.md");
 const gitignore = await read(".gitignore");
+const deployWorkflow = await read(".github/workflows/deploy.yml");
 
 test("Supabase browser SDK is a production dependency without a provider SDK sprawl", () => {
   assert.ok(packageJson.dependencies["@supabase/supabase-js"]);
@@ -53,9 +54,19 @@ test("production client is browser-only, config-gated and uses a static callback
 
 test("callback construction always uses the initiating browser origin with a trailing slash", () => {
   assert.equal(callbackUrl.buildMarketRadarAuthCallbackUrl("http://localhost:3000"), "http://localhost:3000/market-radar/auth/callback/");
-  assert.equal(callbackUrl.buildMarketRadarAuthCallbackUrl("https://excreatorstudio.github.io/"), "https://excreatorstudio.github.io/market-radar/auth/callback/");
+  const productionCallback = callbackUrl.buildMarketRadarAuthCallbackUrl("https://excreatorstudio.com/");
+  assert.equal(productionCallback, "https://excreatorstudio.com/market-radar/auth/callback/");
+  assert.doesNotMatch(productionCallback, /excreatorstudio\.github\.io|childlike8988|ex-learning-knowledge-hub|index\.(?:html|txt)/i);
   assert.equal(callbackUrl.buildMarketRadarAuthCallbackUrl("https://legacy.example", "/ex-learning-knowledge-hub/"), "https://legacy.example/ex-learning-knowledge-hub/market-radar/auth/callback/");
   assert.doesNotMatch(callbackUrlSource, /excreatorstudio\.github\.io/);
+});
+
+test("Google OAuth relies on the centralized current-origin callback and the Pages build receives only public Supabase configuration", () => {
+  assert.match(adapter, /options\.redirectTo \?\? getMarketRadarAuthCallbackUrl\(\)/);
+  for (const variable of ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "NEXT_PUBLIC_SUPABASE_ANON_KEY"]) {
+    assert.match(deployWorkflow, new RegExp(`vars\\.${variable}`));
+  }
+  assert.doesNotMatch(deployWorkflow, /service_role|SUPABASE_SERVICE_ROLE|DATABASE_URL|GOOGLE.*SECRET/i);
 });
 
 test("adapter maps Supabase users into provider-neutral IdentityUser and Free account state", () => {

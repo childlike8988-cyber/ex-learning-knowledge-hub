@@ -79,7 +79,7 @@ Logout delegates to `supabase.auth.signOut()` and then restores the safe Guest s
 ## Before production acceptance
 
 1. Provision separate Supabase development and production projects.
-2. Add exact allowed origins and redirect URLs for local and published GitHub Pages paths.
+2. Add exact allowed origins and redirect URLs for localhost and the custom production domain.
 3. Configure Google OAuth credentials inside Supabase only.
 4. Configure an OTP email template and test the six-digit code on a disposable account.
 5. Test session restore, logout, expired/invalid session, provider outage and mobile callback behavior.
@@ -91,7 +91,7 @@ Status: **BLOCKED — Supabase project configuration has not been supplied to th
 
 - No `.env.local` file was present, and no `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, or legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` was available in the process environment.
 - No Supabase URL, public key, Google provider setting, Site URL, redirect allow-list, or OTP email template was guessed, created, or changed.
-- The intended production Site URL is `https://excreatorstudio.github.io/` and the exact production callback is `https://excreatorstudio.github.io/market-radar/auth/callback/`.
+- The production target was subsequently migrated to `https://excreatorstudio.com/`; this historical blocked record does not describe the current production contract.
 - The intended local callback is `http://localhost:3000/market-radar/auth/callback/` when development uses port 3000. Register the actual local port instead if it differs.
 - With configuration absent, the client enters `unavailable`: public Market Radar remains browseable while account and download controls stay fail-closed. No Guest CTA is shown during session restoration.
 - Google OAuth, Google cancellation, email OTP send/verify/resend/wrong-code, session restoration after a real login, new-tab restoration, logout against the provider, and GitHub Pages-origin callback remain **NOT TESTED** until a real configured Supabase project is available.
@@ -104,9 +104,32 @@ Status: local live authentication confirmed by the configured project operator.
 - A real Supabase project is configured locally with a public publishable key; no credential value is recorded here.
 - Google provider is enabled. Local Google authentication, F5 session restore, new-tab/revisit restoration, logout, `IdentityUser` mapping, and the temporary authenticated Free state were confirmed on `http://localhost:3000`.
 - Callback construction is deterministic: it uses the **origin of the browser initiating login**, then appends the configured deployment base path and `/market-radar/auth/callback/`. Localhost therefore stays localhost; it never infers the production origin.
-- For the root GitHub Pages deployment, the configured base path is empty, so the production contract is exactly `https://excreatorstudio.github.io/market-radar/auth/callback/`, without a legacy repository segment.
+- For the root deployment, the configured base path is empty. The production contract is therefore exactly `https://excreatorstudio.com/market-radar/auth/callback/`, without a legacy repository segment.
 - The callback stores an OAuth code only in local function scope, removes it from the visible URL before exchange, and has an in-component single-processing guard for React effect re-entry. Failure shows a safe retry link without rendering a code, token, or provider error.
 - The current code change has not been deployed. A fresh GitHub Pages-origin OAuth acceptance remains required after a separately authorized deployment.
 - Membership, quarterly credit, report unlock, Pro authority, payment, Storage, signed URL, and protected download remain unimplemented.
 
 References: [Supabase Auth](https://supabase.com/docs/guides/auth), [social login](https://supabase.com/docs/guides/auth/social-login), [redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls), and [JavaScript Auth methods](https://supabase.com/docs/reference/javascript/auth).
+
+## Production domain migration — 2026-09-04
+
+The primary public origin is now `https://excreatorstudio.com/`.
+
+- Production Market Radar: `https://excreatorstudio.com/market-radar/`
+- Production application callback: `https://excreatorstudio.com/market-radar/auth/callback/`
+- Local application callback: `http://localhost:3000/market-radar/auth/callback/`
+- Google provider callback: `https://flgaeuxxvujtgptixmbo.supabase.co/auth/v1/callback`
+
+The browser callback helper always uses the origin that initiated sign-in, then appends the root-deployment path. It produces the localhost callback during local development and the custom-domain callback in production; it neither infers the production origin locally nor adds a legacy repository path.
+
+### Provider configuration checklist
+
+Supabase **Authentication → URL Configuration** must use `https://excreatorstudio.com/` as Site URL and allow the production and local application callbacks above. Retain `https://excreatorstudio.github.io/market-radar/auth/callback/` temporarily as a rollback redirect until custom-domain production acceptance passes.
+
+Google Cloud OAuth client **E.X Market Radar** must authorize JavaScript origins `https://excreatorstudio.com` and `http://localhost:3000`. Its provider redirect URI remains the Supabase callback above; the application callback must not be added as a Google provider redirect URI.
+
+The GitHub Pages workflow reads only GitHub Actions Variables named `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and, only when required for compatibility, `NEXT_PUBLIC_SUPABASE_ANON_KEY`. These are public browser configuration values; no service-role key, database password, or OAuth provider secret is ever placed in the static build.
+
+### Acceptance status
+
+The custom-domain public page and HTTPS were reachable on 2026-09-04. Production Google OAuth, session restore, new-tab restoration, logout, and logout-plus-refresh remain pending until the Supabase and Google dashboard entries above are confirmed and the workflow build with those public variables is deployed. Protected download, membership persistence, quarterly credits, payment, Storage, and Pro authority remain unimplemented.
