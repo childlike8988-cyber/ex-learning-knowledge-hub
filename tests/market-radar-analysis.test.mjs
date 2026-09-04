@@ -114,8 +114,8 @@ test("missing historical MOI input keeps the official latest period live without
   assert.equal(result.marketTemperature.dataStatus, "partial");
 });
 
-test("partial CBC analysis keeps the fixture key take in the page and adds an observation", () => {
-  for (const term of ["analysis.dailyKeyTake ?", "CBC LIVE OBSERVATION", "financeObservation", "dataStatus === \"live\" ? \"LIVE BASIS\" : \"FIXTURE\""]) assert.ok(pageSource.includes(term));
+test("partial analysis keeps an unavailable key take truthful and adds live observations", () => {
+  for (const term of ["analysis.dailyKeyTake ?", "CBC LIVE OBSERVATION", "financeObservation", "dailyKeyTake.dataStatus === \"unavailable\" ? \"WAITING\" : \"FIXTURE\""]) assert.ok(pageSource.includes(term));
 });
 
 test("drawer keeps facts and each source's own metadata separate", () => {

@@ -27,6 +27,8 @@ const downloadSource = await read("src/components/MarketRadarDownloadSection.tsx
 const dialogSource = await read("src/components/MarketRadarLoginRequiredDialog.tsx");
 const entitlementHookSource = await read("src/lib/market-radar/auth/useMarketRadarEntitlement.ts");
 const membershipRepositorySource = await read("src/lib/market-radar/auth/membershipRepository.ts");
+const productionRouteSource = await read("src/app/market-radar/page.tsx");
+const productionWebReportSource = await read("src/lib/market-radar/report/buildMarketRadarProductionWebReport.ts");
 const membershipMigration = await read("supabase/migrations/202609040001_market_radar_memberships_and_unlocks.sql");
 const membershipAcceptance = await read("supabase/tests/market_radar_membership_acceptance.sql");
 const persistenceDoc = await read("docs/market-radar/membership-quarterly-credit-persistence.md");
@@ -38,7 +40,7 @@ const aiLearningTest = await read("tests/ai-learning-station.test.mjs");
 const packageJson = JSON.parse(await read("package.json"));
 const fixture = JSON.parse(await read("public/data/market-radar/2026-08-29.json"));
 
-const availableReport = { reportId: "market-radar-kaohsiung-2026-08-29", reportDate: "2026-08-29", quarterKey: "2026-Q3", isAvailable: true, availableFormats: ["share-bundle", "pdf"], status: "ready-for-backend" };
+const availableReport = { reportId: "market-radar-kaohsiung-2026-09-01", reportDate: "2026-09-01", quarterKey: "2026-Q3", isAvailable: true, availableFormats: ["share-bundle", "pdf"], status: "ready-for-backend" };
 const availableCredit = { quarterKey: "2026-Q3", totalCredits: 1, usedCredits: 0, remainingCredits: 1, isMock: true };
 const guest = { authenticated: false, plan: "guest", session: { authenticated: false, provider: "none", isMock: true } };
 const free = { authenticated: true, plan: "free", session: { authenticated: true, provider: "local-mock", isMock: true } };
@@ -160,21 +162,51 @@ test("atomic unlock RPC enforces one report and one Free unlock per quarter", ()
   assert.match(membershipAcceptance, /exactly one `unlocked`; the other is `credit_exhausted`/i);
 });
 
-test("membership adapter uses trusted RPCs and maps persisted entitlement without raw rows in UI", async () => {
+test("membership adapter maps an active Free report with no prior unlock to available", async () => {
   const calls = [];
   const client = { rpc: async (name, args) => {
     calls.push([name, args]);
     if (name === "ensure_market_radar_membership") return { data: { effective_plan: "free", membership_status: "active", starts_at: "2026-09-01T00:00:00Z", ends_at: null }, error: null };
-    if (name === "get_market_radar_entitlement") return { data: { status: "free_report_unlocked", report_id: availableReport.reportId, quarter_key: "2026-Q3", effective_plan: "free", membership_status: "active", starts_at: "2026-09-01T00:00:00Z", ends_at: null, total_credits: 1, used_credits: 1, remaining_credits: 0, unlocked_report_id: availableReport.reportId, unlocked_at: "2026-09-01T08:30:00Z" }, error: null };
+    if (name === "get_market_radar_entitlement") return { data: { status: "free_credit_available", report_id: availableReport.reportId, quarter_key: "2026-Q3", effective_plan: "free", membership_status: "active", starts_at: "2026-09-01T00:00:00Z", ends_at: null, total_credits: 1, used_credits: 0, remaining_credits: 1, unlocked_report_id: null, unlocked_at: null }, error: null };
     return { data: { status: "already_unlocked", report_id: availableReport.reportId, quarter_key: "2026-Q3", remaining_credit: 0, unlimited: false }, error: null };
   } };
   const provider = membershipRepository.createMarketRadarEntitlementProvider(client);
   assert.deepEqual(await provider.getEffectiveMembership(), { plan: "free", status: "active", startsAt: "2026-09-01T00:00:00Z" });
-  assert.equal((await provider.getQuarterlyEntitlement(availableReport.reportId)).downloadState, "free-report-unlocked");
+  const persisted = await provider.getQuarterlyEntitlement(availableReport.reportId);
+  assert.equal(persisted.downloadState, "free-credit-available");
+  assert.equal(persisted.membership?.plan, "free");
+  assert.equal(persisted.credit?.remainingCredits, 1);
   assert.equal((await provider.unlockReport(availableReport.reportId)).status, "already-unlocked");
   assert.deepEqual(calls.map(([name]) => name), ["ensure_market_radar_membership", "get_market_radar_entitlement", "unlock_market_radar_report"]);
   assert.match(downloadSource, /useMarketRadarEntitlement/);
   assert.match(entitlementHookSource, /setStatus\("unavailable"\)/);
+});
+
+test("minimal inactive-report RPC response remains fail closed without inventing Free credit", async () => {
+  const client = { rpc: async () => ({ data: { status: "download_unavailable", report_id: "market-radar-kaohsiung-2026-08-29" }, error: null }) };
+  const provider = membershipRepository.createMarketRadarEntitlementProvider(client);
+  const result = await provider.getQuarterlyEntitlement("market-radar-kaohsiung-2026-08-29");
+  assert.deepEqual(result, { reportId: "market-radar-kaohsiung-2026-08-29", downloadState: "download-unavailable" });
+  assert.match(downloadSource, /entitlementUnavailable/);
+  assert.doesNotMatch(membershipRepositorySource, /effective_plan["']?\s*:\s*["']free["']/i);
+});
+
+test("RPC errors remain unavailable instead of falling back to a Free entitlement", async () => {
+  const client = { rpc: async () => ({ data: null, error: { message: "denied" } }) };
+  const provider = membershipRepository.createMarketRadarEntitlementProvider(client);
+  await assert.rejects(() => provider.getQuarterlyEntitlement(availableReport.reportId), /ENTITLEMENT_UNAVAILABLE/);
+  assert.match(entitlementHookSource, /setStatus\("unavailable"\)/);
+});
+
+test("public production route uses the active 2026-09-01 snapshot and never the inactive fixture", () => {
+  assert.match(productionRouteSource, /buildMarketRadarProductionReportSnapshot/);
+  assert.match(productionRouteSource, /buildMarketRadarProductionWebReport/);
+  assert.doesNotMatch(productionRouteSource, /loadMarketRadarReport|2026-08-29/);
+  assert.match(productionWebReportSource, /reportId: snapshot\.reportId/);
+  assert.match(productionWebReportSource, /date: reportDateDisplay/);
+  assert.doesNotMatch(productionWebReportSource, /2026-08-29|MOCK DATA/);
+  assert.equal(fixture.downloadBundle.reportId, "market-radar-kaohsiung-2026-08-29");
+  assert.match(membershipMigration, /values \('market-radar-kaohsiung-2026-08-29', date '2026-08-29', false\)/i);
 });
 
 test("current canonical report is cataloged inactive until publication approval", () => {

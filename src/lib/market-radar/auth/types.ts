@@ -51,10 +51,10 @@ export type ReportUnlock = {
 };
 
 export type QuarterlyEntitlement = {
-  membership: Membership;
+  membership?: Membership;
   reportId: string;
   downloadState: Exclude<MarketRadarDownloadState, "guest-login-required">;
-  credit: QuarterlyDownloadCreditState;
+  credit?: QuarterlyDownloadCreditState;
 };
 
 export type UnlockResultStatus =

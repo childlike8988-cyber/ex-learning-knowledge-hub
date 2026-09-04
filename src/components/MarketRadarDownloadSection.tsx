@@ -44,9 +44,10 @@ export function MarketRadarDownloadSection({ report, accountOverride, creditOver
   const persistence = useMarketRadarEntitlement({ reportId: availability.reportId, enabled: persistenceEnabled });
   const persistencePending = persistenceEnabled && (persistence.status === "idle" || persistence.status === "loading");
   const isLoading = !usePreviewOverride && (auth.status === "loading" || persistencePending);
-  const authUnavailable = !usePreviewOverride && (auth.status === "unavailable" || persistence.status === "unavailable");
+  const entitlementUnavailable = persistence.entitlement?.downloadState === "download-unavailable";
+  const authUnavailable = !usePreviewOverride && (auth.status === "unavailable" || persistence.status === "unavailable" || entitlementUnavailable);
   const restoredAccount = accountOverride ?? auth.account ?? createLocalMockAccount("guest");
-  const account = persistence.entitlement && restoredAccount.authenticated
+  const account = persistence.entitlement?.membership && restoredAccount.authenticated
     ? { ...restoredAccount, plan: persistence.entitlement.membership.plan }
     : restoredAccount;
   const credit = creditOverride ?? persistence.entitlement?.credit ?? (account.authenticated

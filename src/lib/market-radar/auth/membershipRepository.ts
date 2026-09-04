@@ -66,6 +66,8 @@ function mapDownloadState(value: string): QuarterlyEntitlement["downloadState"] 
 function mapQuarterlyEntitlement(value: unknown): QuarterlyEntitlement {
   const row = asRecord(value);
   const reportId = requiredString(row, "report_id");
+  const downloadState = mapDownloadState(requiredString(row, "status"));
+  if (downloadState === "download-unavailable") return { reportId, downloadState };
   const quarterKey = requiredString(row, "quarter_key");
   const totalCredits = integer(row, "total_credits");
   const usedCredits = integer(row, "used_credits");
@@ -82,7 +84,7 @@ function mapQuarterlyEntitlement(value: unknown): QuarterlyEntitlement {
     ...(unlockedAt ? { unlockedAt } : {}),
     isMock: false,
   };
-  return { membership: mapMembership(row), reportId, downloadState: mapDownloadState(requiredString(row, "status")), credit };
+  return { membership: mapMembership(row), reportId, downloadState, credit };
 }
 
 function mapUnlockStatus(value: string): UnlockResultStatus {

@@ -68,9 +68,11 @@ test("market radar fixture is explicitly mock and drives the source-referenced r
   assert.equal(fixture.pricing.annualPrice, 360);
 });
 
-test("market radar loader validates references and safely falls back without hardcoded route data", () => {
+test("fixture loader remains isolated while the public route uses the production snapshot", () => {
   for (const term of ["parseMarketRadarFixture", "loadMarketRadarReport", "marketRadarFallbackReport", "Unknown Market Radar source reference", "Fixture must remain marked as mock", "process.env.NODE_ENV !== \"production\""]) assert.ok(loaderSource.includes(term));
-  assert.match(routeSource, /loadMarketRadarReport/);
+  assert.match(routeSource, /buildMarketRadarProductionReportSnapshot/);
+  assert.match(routeSource, /buildMarketRadarProductionWebReport/);
+  assert.doesNotMatch(routeSource, /loadMarketRadarReport|2026-08-29/);
   assert.doesNotMatch(routeSource, /marketRadarReport/);
 });
 
