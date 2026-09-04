@@ -1,10 +1,12 @@
 import Link from "next/link";
 
+const EX_CREATOR_STUDIO_URL = "https://excreatorstudio.com/";
+
 export function Header() {
   return (
     <header className="creator-header">
       <div className="creator-header__inner">
-        <Link href="/" className="creator-brand" aria-label="E.X Creator Studio 首頁"><span className="creator-brand__mark">E.X</span><span className="creator-brand__name">CREATOR STUDIO</span></Link>
+        <a href={EX_CREATOR_STUDIO_URL} className="creator-brand" aria-label="前往 E.X 主站"><span className="creator-brand__mark">E.X</span><span className="creator-brand__name">CREATOR STUDIO</span></a>
         <nav aria-label="主要導覽" className="creator-header__nav">
           <Link href="/ai-tutorials">探索</Link>
           <Link href="/video-production">課程</Link>
