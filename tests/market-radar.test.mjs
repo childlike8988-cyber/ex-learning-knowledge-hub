@@ -89,7 +89,7 @@ test("market radar news keeps its primary content column expandable across respo
 });
 
 test("market radar shows one quarterly Free report bundle and does not pretend payment is active", () => {
-  for (const term of ["本季免費下載完整報告", "本季免費解鎖完整報告", "同一期 PNG 分享圖文 + PDF 完整報告", "1 Free Full Report Credit", "本季免費額度已使用"]) assert.ok(downloadSource.includes(term) || entitlementSource.includes(term));
+  for (const term of ["本季免費下載完整報告", "解鎖本期報告", "同一期 PNG 分享圖文 + PDF 完整報告", "1 Free Full Report Credit", "本季免費額度已使用"]) assert.ok(downloadSource.includes(term) || entitlementSource.includes(term));
   assert.match(proSource, /付款功能準備中/);
   assert.match(proSource, /Payment integration coming soon/);
   assert.match(proSource, /monthlyPrice/);

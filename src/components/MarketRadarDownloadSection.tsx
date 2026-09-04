@@ -55,7 +55,7 @@ export function MarketRadarDownloadSection({ report, accountOverride, creditOver
     : createLocalQuarterlyCreditState(availability.quarterKey));
   const entitlement = evaluateMarketRadarDownloadEntitlement({ account, report: availability, quarterState: credit });
   const canRequestFormats = !isLoading && !authUnavailable && (entitlement.canAccessReport || entitlement.canDownloadUnlimited);
-  const usedLabel = credit.remainingCredits > 0 ? `${credit.remainingCredits} / ${credit.totalCredits}` : "0 / 1";
+  const usedLabel = `已使用 ${credit.usedCredits} / ${credit.totalCredits}`;
 
   function requestDownload(format: MarketRadarDownloadFormat) {
     if (isLoading || authUnavailable) return;

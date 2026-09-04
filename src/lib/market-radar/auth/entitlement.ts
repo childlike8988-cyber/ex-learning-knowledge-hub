@@ -37,7 +37,7 @@ export function evaluateMarketRadarDownloadEntitlement({ account, report, quarte
   }
 
   if (quarterState.remainingCredits > 0) {
-    return { status: "free-credit-available", requiresLogin: false, canUnlockFreeReport: true, canDownloadUnlimited: false, canAccessReport: false, quarterlyCreditAvailable: true, ctaLabel: "本季免費解鎖完整報告", reason: "本季尚有 1 次完整報告解鎖額度，會同時包含 PNG 分享圖文與 PDF。", reportId: report.reportId };
+    return { status: "free-credit-available", requiresLogin: false, canUnlockFreeReport: true, canDownloadUnlimited: false, canAccessReport: false, quarterlyCreditAvailable: true, ctaLabel: "解鎖本期報告", reason: "本季尚有 1 次完整報告解鎖額度，會同時包含 PNG 分享圖文與 PDF。", reportId: report.reportId };
   }
 
   return { status: "free-credit-exhausted", requiresLogin: false, canUnlockFreeReport: false, canDownloadUnlimited: false, canAccessReport: false, quarterlyCreditAvailable: false, ctaLabel: "本季免費額度已使用", reason: "本季已下載。下一次免費額度將於下個自然季度開放；本季免費額度已用於另一份報告，額度不跨季度累積。", reportId: report.reportId };

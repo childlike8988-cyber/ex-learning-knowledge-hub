@@ -69,10 +69,13 @@ test("guest entitlement requires login without claiming report access", () => {
 
 test("Free entitlement makes a report-level quarterly unlock available", () => {
   const result = entitlement.evaluateMarketRadarDownloadEntitlement({ account: free, report: availableReport, quarterState: availableCredit });
+  assert.equal(availableCredit.usedCredits, 0);
+  assert.equal(availableCredit.remainingCredits, 1);
   assert.equal(result.status, "free-credit-available");
   assert.equal(result.canUnlockFreeReport, true);
   assert.equal(result.quarterlyCreditAvailable, true);
   assert.equal(result.canDownloadUnlimited, false);
+  assert.equal(result.ctaLabel, "解鎖本期報告");
   assert.equal(availableReport.availableFormats.length, 2);
 });
 
@@ -114,7 +117,7 @@ test("public availability is metadata-only and never exposes local export paths"
 });
 
 test("download card supplies Guest, Free and Pro UX with a clear no-auth production default", () => {
-  for (const term of ["guest-login-required", "free-credit-available", "free-report-unlocked", "free-credit-exhausted", "pro-ready", "download-unavailable", "本季免費下載完整報告", "本季免費解鎖完整報告", "本季免費額度已使用", "下載完整報告", "accountOverride"])
+  for (const term of ["guest-login-required", "free-credit-available", "free-report-unlocked", "free-credit-exhausted", "pro-ready", "download-unavailable", "本季免費下載完整報告", "解鎖本期報告", "本季免費額度已使用", "下載完整報告", "accountOverride", "已使用 ${credit.usedCredits} / ${credit.totalCredits}"])
     assert.match(`${downloadSource}\n${entitlementSource}`, new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.match(downloadSource, /createLocalMockAccount\("guest"\)/);
   assert.match(downloadSource, /PNG 提供 1–3 張/);
